@@ -14,7 +14,7 @@ function PrivateRoute({ children }) {
     const fetchData = async () => {
       const authInfo = await isAuthUser();
       setIsAuthenticated(authInfo.isAuthenticated);
-      setLoading(false);
+      setTimeout(() => { setLoading(false); }, 3000);
     };
 
     fetchData();
@@ -22,12 +22,12 @@ function PrivateRoute({ children }) {
 
   if (isLoading) {
     // Handle loading state, you might show a loading spinner
-    return <Loader/>
+    return <Loader />
   }
 
-  if (!isAuthenticated) {
+  if (isAuthenticated) {
     // If not authenticated, redirect to login page with the return URL
-    return <Navigate to="/login" />;
+    return <Navigate to="/" />;
   }
 
   // If authenticated, render the child components

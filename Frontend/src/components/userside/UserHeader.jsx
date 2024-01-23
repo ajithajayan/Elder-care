@@ -70,14 +70,15 @@ const accountIcon = (
 
 
 const Navbar = () => {
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.authentication_user);
+  const { name, isAuthenticated } = useSelector((state) => state.authentication_user);
 
   const handleLogout = () => {
-    dispatch(logout());
-    dispatch(reset());
-    navigate("/");
+    
+    localStorage.removeItem("access");
+    window.location.reload();
   };
 
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -120,7 +121,7 @@ const Navbar = () => {
 
       {/* Icon Menu Section */}
       <div className="flex items-center space-x-5 lg:space-x-8">
-        {!user ? (
+        {!isAuthenticated ? (
           <>
             {/* Register */}
             <NavLink to="auth/register" className="flex text-gray-600 hover:text-blue-500 cursor-pointer transition-colors duration-300">
@@ -148,7 +149,7 @@ const Navbar = () => {
             {/* Account */}
             <NavLink className="flex text-gray-600 cursor-pointer transition-colors duration-300 font-semibold text-blue-600">
               {accountIcon}
-              Account
+              {name}
             </NavLink>
           </>
         )}

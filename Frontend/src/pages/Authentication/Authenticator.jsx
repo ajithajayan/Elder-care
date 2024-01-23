@@ -6,6 +6,7 @@ import { Route, Routes } from "react-router-dom";
 import Register from "../userSide/UserRegiser";
 import UserLogin from "../userSide/UserLogin";
 import ResetPasswordPage from "../userSide/ResetPassword";
+import PrivateRoute from "../../components/PrivateRoute";
 
 const Authenticator = () => {
   const [vantaEffect, setVantaEffect] = useState(0);
@@ -37,9 +38,9 @@ const Authenticator = () => {
     <div className="auth" ref={vantaRef}>
       <p style={{ color: "#fff", paddingTop: "20px" }}>
         <Routes>
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<UserLogin />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/register" element={ <PrivateRoute><Register /></PrivateRoute>} />
+          <Route path="/login" element={<PrivateRoute><UserLogin /></PrivateRoute>} />
+          <Route path="/reset-password" element={<PrivateRoute><ResetPasswordPage /></PrivateRoute>} />
         </Routes>
       </p>
     </div>

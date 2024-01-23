@@ -33,38 +33,34 @@ function UserWrapper() {
         isAuthenticated: isAuthenticated.isAuthenticated
       })
     );
-
-    
-
   };
 
-  const baseURL='http://127.0.0.1:8000'
   const token = localStorage.getItem('access');
 
-  const fetchUserData = async () => {
-    try {
-        // const res = await axios.post(baseURL+'/api/accounts/user/details/',{headers: {Authorization: `Bearer ${token}`}})
-        const res = await axios.get(baseURL+'/api/accounts/user/details/',{headers: {
-          'authorization': `Bearer ${token}`,
-          'Accept' : 'application/json',
-          'Content-Type': 'application/json'
-      }})
-        .then(res => {
+  // const fetchUserData = async () => {
+  //   try {
+  //       // const res = await axios.post(baseURL+'/api/accounts/user/details/',{headers: {Authorization: `Bearer ${token}`}})
+  //       const res = await axios.get(baseURL+'/api/accounts/user/details/',{headers: {
+  //         'authorization': `Bearer ${token}`,
+  //         'Accept' : 'application/json',
+  //         'Content-Type': 'application/json'
+  //     }})
+  //       .then(res => {
             
-            dispatch(
-              set_user_basic_details({
-                name : res.data.first_name,
-                profile_pic : res.data.profile_pic
-              })
-            );
-          })
-    }
-    catch (error) {
-      console.log(error);
+  //           dispatch(
+  //             set_user_basic_details({
+  //               name : res.data.first_name,
+  //               profile_pic : res.data.profile_pic
+  //             })
+  //           );
+  //         })
+  //   }
+  //   catch (error) {
+  //     console.log(error);
       
-    }
+  //   }
 
-  };
+  // };
 
 
   useEffect(() => {
@@ -73,10 +69,6 @@ function UserWrapper() {
      
       checkAuth();
     
-    }
-    if(authentication_user.isAuthenticated)
-    {
-      fetchUserData();
     }
 
   }, [authentication_user])

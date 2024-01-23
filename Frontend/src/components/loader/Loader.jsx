@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "../../Styles/loader.scss";
 
 
 
 function Loader() {
+  // useEffect(() => {
+  //   document.body.style.backgroundColor = '#fff'
+  // },[])
   return (
     <div class="loading">
       <svg width="64px" height="48px">
