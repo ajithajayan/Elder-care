@@ -13,6 +13,7 @@ import axios from 'axios';
 import isAuthAdmin from '../../../utils/isAuthAdmin';
 import AdminCreateUser from '../../../pages/admin/AdminCreateUser';
 import AdminUpdateUser from '../../../pages/admin/AdminUpdateUser';
+import AdminSignin from '../../../pages/admin/AdminSignin';
 
 function AdminWrapper() {
   const dispatch = useDispatch();
@@ -61,9 +62,8 @@ function AdminWrapper() {
 
   return (
     <>
-      <AdminHeader />
       <Routes>
-        <Route path="login" element={<AdminLogin />} />
+        <Route path="login" element={<AdminSignin/>} />
         <Route path="/" element={<AdminPrivateRoute><AdminHome /></AdminPrivateRoute>} />
         <Route path="/user/create" element={<AdminPrivateRoute><AdminCreateUser /></AdminPrivateRoute>} />
         <Route path="/user/update/:id" element={<AdminPrivateRoute><AdminUpdateUser /></AdminPrivateRoute>} />

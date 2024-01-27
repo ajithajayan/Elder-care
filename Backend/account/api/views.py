@@ -14,8 +14,8 @@ from rest_framework.exceptions import AuthenticationFailed, ParseError
 class getAccountsRoutes(APIView):
      def get(self, request, format=None):
         routes = [
-        'api/accounts/login',
-        'api/accounts/register',
+        'auth/login',
+        'auth/register',
                     ]
         return Response(routes)
 

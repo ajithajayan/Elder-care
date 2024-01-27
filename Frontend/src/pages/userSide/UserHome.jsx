@@ -2,6 +2,8 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { Link ,useNavigate} from 'react-router-dom'
 import AppointmentGuide from '../../components/userside/AppointmentGuide'
+import Appointment from '../../components/userside/Appointment'
+import FAQSection from '../../components/userside/Element/FAQSection'
 
 
 
@@ -24,7 +26,9 @@ function UserHome() {
       
     </form>
 
-    <AppointmentGuide/>
+    {/* <AppointmentGuide/> */}
+    <Appointment/>  
+    <FAQSection/>
 
     </>
   )

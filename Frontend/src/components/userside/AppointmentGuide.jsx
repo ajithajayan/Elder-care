@@ -17,7 +17,7 @@ function OnlineAppointment() {
         <div className="gap-5 flex max-md:flex-col max-md:items-stretch max-md:gap-0">
           <section className="flex flex-col items-stretch w-[33%] max-md:w-full max-md:ml-0">
             <div className="self-stretch shadow-lg bg-white flex grow items-stretch justify-between gap-5 w-full pl-16 py-10 rounded-md max-md:max-w-full max-md:flex-wrap max-md:mt-8 max-md:pl-5">
-              <div className="flex grow basis-[0%] flex-col items-stretch max-md:max-w-full">
+              <div className="flex grow  flex-col items-stretch max-md:max-w-full">
                 <img
                   loading="lazy"
                   src="https://cdn.builder.io/api/v1/image/assets/TEMP/a0486fa87e43a87575e4195946cdecac90488ffdf6b01e20d4973c82886f3499?apiKey=e5b36b972ccb4739bd317b67a96e9d90&"
@@ -33,12 +33,7 @@ function OnlineAppointment() {
                   care Health Care Service
                 </div>
               </div>
-              <img
-                loading="lazy"
-                srcSet="https://cdn.builder.io/api/v1/image/assets/TEMP/f96168fc-7e86-4549-87fb-cd8368e7e9de?apiKey=e5b36b972ccb4739bd317b67a96e9d90&width=100 100w, https://cdn.builder.io/api/v1/image/assets/TEMP/f96168fc-7e86-4549-87fb-cd8368e7e9de?apiKey=e5b36b972ccb4739bd317b67a96e9d90&width=200 200w, https://cdn.builder.io/api/v1/image/assets/TEMP/f96168fc-7e86-4549-87fb-cd8368e7e9de?apiKey=e5b36b972ccb4739bd317b67a96e9d90&width=400 400w, https://cdn.builder.io/api/v1/image/assets/TEMP/f96168fc-7e86-4549-87fb-cd8368e7e9de?apiKey=e5b36b972ccb4739bd317b67a96e9d90&width=800 800w, https://cdn.builder.io/api/v1/image/assets/TEMP/f96168fc-7e86-4549-87fb-cd8368e7e9de?apiKey=e5b36b972ccb4739bd317b67a96e9d90&width=1200 1200w, https://cdn.builder.io/api/v1/image/assets/TEMP/f96168fc-7e86-4549-87fb-cd8368e7e9de?apiKey=e5b36b972ccb4739bd317b67a96e9d90&width=1600 1600w, https://cdn.builder.io/api/v1/image/assets/TEMP/f96168fc-7e86-4549-87fb-cd8368e7e9de?apiKey=e5b36b972ccb4739bd317b67a96e9d90&width=2000 2000w, https://cdn.builder.io/api/v1/image/assets/TEMP/f96168fc-7e86-4549-87fb-cd8368e7e9de?apiKey=e5b36b972ccb4739bd317b67a96e9d90&"
-                alt="Arrow"
-                className="aspect-[0.31] object-contain object-center w-[22px] items-start overflow-hidden self-center shrink-0 max-w-full my-auto"
-              />
+             
             </div>
           </section>
           <section className="flex flex-col items-stretch w-[65%] ml-5 max-md:w-full max-md:ml-0">

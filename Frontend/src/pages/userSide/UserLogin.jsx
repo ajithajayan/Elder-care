@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import {jwtDecode} from "jwt-decode";
 import { set_Authentication } from '../../Redux/authentication/authenticationSlice';
 import { baseUrl } from '../../utils/constants/Constants';
+import { GoogleLogin } from '@react-oauth/google';
 
 
 
@@ -68,25 +69,39 @@ function UserLogin() {
       // }
     }
   }
+  const Google_login = async (user_detail) => {
+    const formData = new FormData();
+    formData.append("email", user_detail.email)
+    formData.append("password", "12345678874")
+    console.log("formData");
+    console.log(Object.fromEntries(formData))
 
-  // const [formData, setFormData] = useState({
-  //   "email" : "",
-  //   "password" : "",
-  // });
+    try {
+      const res = await axios.post(baseUrl + 'auth/login', formData)
+      console.log(res);
+      if (res.status === 200) {
+        localStorage.setItem('access', res.data.access)
+        localStorage.setItem('refresh', res.data.refresh)
+        dispatch(
+          set_Authentication({
+            name: jwtDecode(res.data.access).first_name,
+            isAuthenticated: true,
+            isAdmin: res.data.isAdmin
+          })
+        );
+        navigate('/')
+        return res
+      }
 
-  // const {email, password} = formData
+      if (res.response.status === 401) {
+        navigate('/auth/signup')
+      }
 
-  // const handleChange = (e) => {
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     [e.target.name]: e.target.value
-  // })
-  //   )
-  // };
-
-  // const handleSubmit = (e) => {
-  //   e.preventDefault()
-  // }
+    }
+    catch (error) {
+      console.log(error);
+    }
+  }
   
 
   return (
@@ -129,7 +144,16 @@ function UserLogin() {
       <p className="p">Don't have an account? <Link className="span" to="/auth/register">Sign Up</Link></p>
 
       <div className="flex-row">
-        <button className="btn google">
+      <GoogleLogin
+          onSuccess={(credentialResponse) => {
+            Google_login(jwtDecode(credentialResponse.credential))
+            console.log(jwtDecode(credentialResponse.credential));
+          }}
+          onError={() => {
+            console.log("Login Failed");
+          }}
+        />
+        {/* <button className="btn google">
           <svg version="1.1" width="20" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512" style={{ enableBackground: 'new 0 0 512 512' }} xmlSpace="preserve">
             <path style={{ fill: '#FBBB00' }} d="M113.47,309.408L95.648,375.94l-65.139,1.378C11.042,341.211,0,299.9,0,256
 c0-42.451,10.324-82.483,28.624-117.732h0.014l57.992,10.632l25.404,57.644c-5.317,15.501-8.215,32.141-8.215,49.456
@@ -148,7 +172,7 @@ C318.115,0,375.068,22.126,419.404,58.936z"></path>
 
           Google
 
-        </button>
+        </button> */}
         <button className="btn apple">
           <svg version="1.1" height="20" width="20" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 22.773 22.773" style={{ enableBackground: 'new 0 0 22.773 22.773' }} xmlSpace="preserve">
             <g>

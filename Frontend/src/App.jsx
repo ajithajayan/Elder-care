@@ -37,7 +37,7 @@ function App() {
       <Routes>
         <Route path="*" element={<UserWrapper />} /> 
 
-        <Route path='/admin/*' element={<AdminWrapper />} />  
+        <Route path='/admincontrol/*' element={<AdminWrapper />} />  
       </Routes>
       </GoogleOAuthProvider>
       </Provider>

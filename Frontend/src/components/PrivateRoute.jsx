@@ -14,7 +14,7 @@ function PrivateRoute({ children }) {
     const fetchData = async () => {
       const authInfo = await isAuthUser();
       setIsAuthenticated(authInfo.isAuthenticated);
-      setTimeout(() => { setLoading(false); }, 3000);
+      setTimeout(() => { setLoading(false); }, 2000);
     };
 
     fetchData();

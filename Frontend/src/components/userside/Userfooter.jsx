@@ -56,7 +56,7 @@ function UserFooter() {
                 </a>
               </span>
             </div>
-            <div className="text-gray-200 flex flex-col items-stretch w-6/12 ml-5 max-md:w-full max-md:ml-0">
+            <div className="text-gray-200 flex flex-col items-stretch w-6/12 ml-5 max-md:ml-0">
               <span className="items-stretch flex flex-col pb-12 max-md:mt-9">
                 <h2 className="text-white font-extrabold text-base font-medium leading-6 uppercase">
                   Company
@@ -81,35 +81,35 @@ function UserFooter() {
         <div className="text-gray-200 content-start flex-wrap self-stretch mt-16 pb-12 max-md:max-w-full max-md:mt-10">
           <div className="gap-5 flex max-md:flex-col max-md:items-stretch max-md:gap-0">
             <div className="flex flex-col items-stretch w-6/12 max-md:w-full max-md:ml-0">
-              <span className="items-stretch content-start self-stretch flex-wrap flex gap-5 pb-6 max-md:max-w-full">
+              <span className="items-stretch content-start self-stretch flex-wrap flex pb-6 max-md:max-w-full">
                 <a
                   href="#"
-                  className="text-neutral-400 text-base leading-6"
+                  className="text-neutral-400 text-base mr-4 leading-6"
                 >
                   Terms & Conditions
                 </a>
                 <a
                   href="#"
-                  className="text-neutral-400 text-base leading-6"
+                  className="text-neutral-400 text-base mr-4 leading-6"
                 >
                   Privacy Policy
                 </a>
                 <a
                   href="#"
-                  className="text-neutral-400 text-base leading-6"
+                  className="text-neutral-400 text-base mr-4 leading-6"
                 >
                   Refund Policy
                 </a>
                 <a
                   href="#"
-                  className="text-neutral-400 text-base leading-6 grow whitespace-nowrap"
+                  className="text-neutral-400 text-base mr-4 leading-6 grow whitespace-nowrap"
                 >
                   Patient Charter
                 </a>
               </span>
             </div>
-            <div className="flex flex-col items-stretch w-6/12 ml-5 max-md:w-full max-md:ml-0">
-              <div className="justify-between items-stretch self-stretch flex gap-5 pl-20 max-md:max-w-full max-md:flex-wrap max-md:pl-5">
+            <div className="relative flex flex-col items-stretch w-6/12 ml-5 max-md:w-full max-md:ml-0">
+              <div className="absolute inset-y-0 right-0 items-stretch self-stretch flex pl-20 max-md:max-w-full max-md:flex-wrap max-md:pl-5">
                 <img
                   loading="lazy"
                   src="https://cdn.builder.io/api/v1/image/assets/TEMP/d128f75677b07fbb4955b9ab9d413aa26703cf015a6fe35378000e02a6610858?apiKey=e5b36b972ccb4739bd317b67a96e9d90&"

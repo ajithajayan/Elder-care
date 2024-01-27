@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { baseUrl } from "../../utils/constants/Constants";
 import { GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -77,6 +78,32 @@ const Register = () => {
       // dispatch(register(userData))
     }
   };
+
+
+  const Google_reg = async (user_detail) => {
+    const formData = new FormData();
+    formData.append("email", user_detail.email)
+    formData.append("first_name", user_detail.given_name)
+    formData.append("last_name", user_detail.family_name)
+    formData.append("password", "12345678874")
+    try {
+        const res = await axios.post(baseUrl + 'auth/register', formData)
+        console.log(res);
+        if (res.status === 201) {
+            console.log("Saved successfully man");
+            navigate('/auth/login',
+                {
+                    state: res.data.Message
+                })
+            return res
+        }
+    }
+    catch (error) {
+        console.log("DafdAA\n\n", error);
+    }
+}
+
+
 
   useEffect(() => {
     if (isError) {
@@ -174,7 +201,8 @@ const Register = () => {
         </label>
         <GoogleLogin
           onSuccess={(credentialResponse) => {
-            console.log(credentialResponse);
+            Google_reg(jwtDecode(credentialResponse.credential))
+            console.log(jwtDecode(credentialResponse.credential));
           }}
           onError={() => {
             console.log("Login Failed");
