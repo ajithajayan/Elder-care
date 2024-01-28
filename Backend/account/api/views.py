@@ -1,14 +1,23 @@
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from account.models import User
-from .serializers import UserRegisterSerializer
+from account.models import Address, User
+from .serializers import AddressSerializer, UserDetailWithAddressSerializer, UserDetailsUpdateSerializer, UserRegisterSerializer
 from django.contrib.auth import authenticate
 import random
 from django.core.mail import send_mail
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.exceptions import AuthenticationFailed, ParseError
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.response import Response
+from rest_framework import status, generics
+from rest_framework.parsers import MultiPartParser, FormParser
+
+
 
 
 class getAccountsRoutes(APIView):
@@ -81,11 +90,59 @@ class UserLogin(APIView):
 
         refresh["first_name"] = str(user.first_name)
         # refresh["is_admin"] = str(user.is_superuser)
+        
 
         content = {
             'refresh': str(refresh),
             'access': str(refresh.access_token),
             'isAdmin': user.is_superuser,
+            'is_doctor': user.is_doctor(),
         }
         print(content)
         return Response(content, status=status.HTTP_200_OK)
+    
+
+
+# class UserDetailsUpdate(APIView):
+#     permission_classes = [IsAuthenticated]
+#     parser_classes = (MultiPartParser, FormParser)
+
+#     def post(self, request, *args, **kwargs):
+#         user_profile = User.objects.get(id =request.user.id)[0]
+
+     
+        
+#         user_update_details_serializer = UserDetailsUpdateSerializer(
+#             user_profile, data=request.data, partial=True
+#         )
+        
+       
+#         if user_update_details_serializer.is_valid():
+           
+#             user_update_details_serializer.save()
+#             return Response(user_update_details_serializer.data, status=status.HTTP_201_CREATED)
+#         else:
+#             print('error', user_update_details_serializer.errors)
+#             return Response(user_update_details_serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
+    
+class UserDetailsUpdate(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Address.objects.select_related('user')
+    parser_classes = (MultiPartParser, FormParser)
+    serializer_class = UserDetailsUpdateSerializer
+
+    
+    
+
+
+
+class UserAddressUpdate(generics.UpdateAPIView):
+    queryset = Address.objects.all()  # Target all address objects
+    serializer_class = AddressSerializer
+
+    def get_object(self):
+        user_id = self.kwargs.get('user_id')  # Retrieve the user ID from the URL
+        user = get_object_or_404(User, id=user_id)
+        
+        # Retrieve the address associated with the user
+        address = get_object_or_404(Address, user=user)
+        return address

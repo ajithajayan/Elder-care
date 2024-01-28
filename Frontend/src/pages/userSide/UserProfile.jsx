@@ -12,25 +12,25 @@ function UserProfile() {
 
   const baseURL='http://127.0.0.1:8000'
   const token = localStorage.getItem('access');
-  const fetchUserData = async () => {
-    try {
-        // const res = await axios.post(baseURL+'/api/accounts/user/details/',{headers: {Authorization: `Bearer ${token}`}})
-        const res = await axios.get(baseURL+'/api/accounts/user/details/',{headers: {
-          'authorization': `Bearer ${token}`,
-          'Accept' : 'application/json',
-          'Content-Type': 'application/json'
-      }})
-        .then(res => {
-            console.log(res.data);
-            setUserDetails(res.data)
-          })
-    }
-    catch (error) {
-      console.log(error);
+  // const fetchUserData = async () => {
+  //   try {
+  //       // const res = await axios.post(baseURL+'/api/accounts/user/details/',{headers: {Authorization: `Bearer ${token}`}})
+  //       const res = await axios.get(baseURL+'/api/accounts/user/details/',{headers: {
+  //         'authorization': `Bearer ${token}`,
+  //         'Accept' : 'application/json',
+  //         'Content-Type': 'application/json'
+  //     }})
+  //       .then(res => {
+  //           console.log(res.data);
+  //           setUserDetails(res.data)
+  //         })
+  //   }
+  //   catch (error) {
+  //     console.log(error);
       
-    }
+  //   }
 
-  };
+  // };
 
   const [userUpdateDetails, setUserUpdateDetails] = useState({
     image:null

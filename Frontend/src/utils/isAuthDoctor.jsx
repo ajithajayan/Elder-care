@@ -89,7 +89,7 @@ import axios from 'axios';
 import { baseUrl } from "./constants/Constants";
 
 
-const updateAdminToken = async () => {
+const updateDocToken = async () => {
     const refreshToken = localStorage.getItem("refresh");
 
     try {
@@ -110,30 +110,33 @@ const updateAdminToken = async () => {
     }
 };
 
-// const fetchisAdmin = async () => {
-//     const token = localStorage.getItem('access');
+
+const fetchisDoctor = async () => {
+        const token = localStorage.getItem('access');
+        
+        try {
+            const res = await axios.get(baseURL + '/api/accounts/user/details/', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            });
     
-//     try {
-//         const res = await axios.get(baseURL + '/api/accounts/user/details/', {
-//             headers: {
-//                 'Authorization': `Bearer ${token}`,
-//                 'Accept': 'application/json',
-//                 'Content-Type': 'application/json'
-//             }
-//         });
+            return res.data.is_superuser; // Return directly from the function
+    
+        } catch (error) {
+            return false;
+        }
+    };
+    
 
-//         return res.data.is_superuser; // Return directly from the function
 
-//     } catch (error) {
-//         return false;
-//     }
-// };
-
-const isAuthAdmin = async () => {
+const isAuthDoctor = async () => {
     const accessToken = localStorage.getItem("access");
 
     if (!accessToken) {
-        return { 'name': null, isAuthenticated: false, isAdmin: false };
+        return { 'name': null, isAuthenticated: false, isAdmin: false,is_doctor:false };
     }
 
     const currentTime = Date.now() / 1000;
@@ -150,9 +153,9 @@ const isAuthAdmin = async () => {
             let checkAdmin = await fetchisAdmin(); // Await the result
             return { 'name': decoded.first_name, isAuthenticated: true, isAdmin: checkAdmin };
         } else {
-            return { 'name': null, isAuthenticated: false, isAdmin: false };
+            return { 'name': null, isAuthenticated: false, isAdmin: false ,is_doctor:false };
         }
     }
 };
 
-export default isAuthAdmin;
+export default isAuthDoctor;

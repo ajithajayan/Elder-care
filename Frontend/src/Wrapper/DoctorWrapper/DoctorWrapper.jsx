@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import UserHeader from '../userside/UserHeader'
-import Userfooter from '../userside/Userfooter'
+import UserHeader from '../../components/userside/UserHeader'
+import Userfooter from '../../components/userside/Userfooter'
 import UserHome from '../../pages/userSide/UserHome'
 
 import { Routes,Route} from 'react-router-dom'
@@ -9,16 +9,21 @@ import UserLogin from '../../pages/userSide/UserLogin'
 
 import UserProfile from '../../pages/userSide/UserProfile'
 import { Outlet, useRoutes } from 'react-router-dom'
-import PrivateRoute from "../PrivateRoute";
+import PrivateRoute from "../../components/Private/PrivateRoute";
 import isAuthUser from '../../utils/IsAuthUser'
 import { useDispatch,useSelector } from 'react-redux';
 import { set_Authentication } from '../../Redux/authentication/authenticationSlice'
 import { set_user_basic_details } from '../../Redux/userBasicDetails/userBasicDetailsSlice'
 import axios from 'axios'
 import Authenticator from "../../pages/Authentication/Authenticator";
+import DoctorHome from "../../pages/Doctor/DoctorHome";
+import DoctorHeader from "../../components/Doctor/DoctorHeader";
+import DoctorFooter from "../../components/Doctor/Doctorfooter";
 
 
-function UserWrapper() {
+
+
+function DoctorWrapper() {
 
   const dispatch = useDispatch();
 
@@ -76,14 +81,14 @@ function UserWrapper() {
   const routes = useRoutes([{
     element: (
       <>
-     <UserHeader/>
+     <DoctorHeader/>
       <Outlet/>
-      <Userfooter/>
+      <DoctorFooter/>
       </>
     ),
     children:[
-      {path: "/auth/*", element:<Authenticator/>},
-      {path: "/", element: <UserHome/>}
+      {path: "/doctor/*", element:<Authenticator/>},
+      {path: "/dashboard", element: <DoctorHome/>}
     ],
   },
   {
@@ -98,4 +103,4 @@ return routes
 
 }
 
-export default UserWrapper;
+export default DoctorWrapper;

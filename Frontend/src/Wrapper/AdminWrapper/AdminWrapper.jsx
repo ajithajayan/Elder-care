@@ -1,19 +1,19 @@
 
 import React, { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import AdminHeader from '../AdminHeader/AdminHeader';
-import AdminFooter from '../AdminFooter/AdminFooter';
-import AdminHome from '../../../pages/admin/AdminHome';
-import AdminLogin from '../../../pages/admin/AdminLogin';
-import AdminPrivateRoute from '../../AdminPrivateRoute';
+import AdminHeader from '../../components/admin/AdminHeader/AdminHeader';
+import AdminFooter from '../../components/admin/AdminFooter/AdminFooter';
+import AdminHome from '../../pages/admin/AdminHome';
+import AdminLogin from '../../pages/admin/AdminLogin';
+import AdminPrivateRoute from '../../components/Private/AdminPrivateRoute';
 import { useDispatch, useSelector } from 'react-redux';
-import { set_Authentication } from '../../../Redux/authentication/authenticationSlice';
-import { set_user_basic_details } from '../../../Redux/userBasicDetails/userBasicDetailsSlice';
+import { set_Authentication } from '../../Redux/authentication/authenticationSlice';
+import { set_user_basic_details } from '../../Redux/userBasicDetails/userBasicDetailsSlice';
 import axios from 'axios';
-import isAuthAdmin from '../../../utils/isAuthAdmin';
-import AdminCreateUser from '../../../pages/admin/AdminCreateUser';
-import AdminUpdateUser from '../../../pages/admin/AdminUpdateUser';
-import AdminSignin from '../../../pages/admin/AdminSignin';
+import isAuthAdmin from '../../utils/isAuthAdmin';
+import AdminCreateUser from '../../pages/admin/AdminCreateUser';
+import AdminUpdateUser from '../../pages/admin/AdminUpdateUser';
+import AdminSignin from '../../pages/admin/AdminSignin';
 
 function AdminWrapper() {
   const dispatch = useDispatch();
@@ -33,22 +33,22 @@ function AdminWrapper() {
         })
       );
 
-      if (isAuthenticated.isAuthenticated) {
-        const res = await axios.get(baseURL + '/api/accounts/user/details/', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-        });
+      // if (isAuthenticated.isAuthenticated) {
+      //   const res = await axios.get(baseURL + '/api/accounts/user/details/', {
+      //     headers: {
+      //       Authorization: `Bearer ${token}`,
+      //       Accept: 'application/json',
+      //       'Content-Type': 'application/json',
+      //     },
+      //   });
 
-        dispatch(
-          set_user_basic_details({
-            name: res.data.first_name,
-            profile_pic: res.data.profile_pic,
-          })
-        );
-      }
+      //   dispatch(
+      //     set_user_basic_details({
+      //       name: res.data.first_name,
+      //       profile_pic: res.data.profile_pic,
+      //     })
+      //   );
+      // }
     } catch (error) {
       console.log(error);
     }

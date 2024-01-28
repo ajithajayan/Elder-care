@@ -9,7 +9,7 @@ import { baseUrl } from "../../utils/constants/Constants";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 
-const Register = () => {
+const DoctorRegister = () => {
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -17,10 +17,10 @@ const Register = () => {
     phone_number: "",
     password: "",
     re_password: "",
-    user_type: "client",
+    user_type: "doctor",
   });
 
-  const { first_name, last_name, email, phone_number, password, re_password ,user_type} =
+  const { first_name, last_name, email, phone_number, password, re_password,user_type } =
     formData;
 
   const dispatch = useDispatch();
@@ -87,7 +87,7 @@ const Register = () => {
     formData.append("email", user_detail.email)
     formData.append("first_name", user_detail.given_name)
     formData.append("last_name", user_detail.family_name)
-    formData.append("user_type", 'client')
+    formData.append("user_type", 'doctor')
     formData.append("password", "12345678874")
     try {
         const res = await axios.post(baseUrl + 'auth/register', formData)
@@ -124,7 +124,7 @@ const Register = () => {
   return (
     <div className="regis">
       <form className="form">
-        <p className="title">Register</p>
+        <p className="title"> Doctor Register</p>
         <p className="message">Signup now and get full access to our app.</p>
         <div className="flex">
           <label>
@@ -259,8 +259,8 @@ const Register = () => {
         />
       </svg>
     </span>
-    <Link to="/auth/doctor/register"><span className="relative w-full text-left transition-colors duration-200 ease-in-out group-hover:text-white dark:group-hover:text-gray-200">
-    Register as A Doctor
+    <Link to="/auth/register"><span className="relative w-full text-left transition-colors duration-200 ease-in-out group-hover:text-white dark:group-hover:text-gray-200">
+    Register as A Patient
     </span></Link>
   </div>
 </div>          
@@ -268,4 +268,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default DoctorRegister;

@@ -14,5 +14,11 @@ urlpatterns = [
     path("", views.getAccountsRoutes.as_view(), name="accounts-routes"),
     path("register", views.RegisterView.as_view(), name="user-register"),
     path("login", views.UserLogin.as_view(), name="user-login"),
+    path("user/update/<str:pk>", views.UserDetailsUpdate.as_view(), name="user-update"),
+    path("user/list/<str:pk>", views.UserDetailsUpdate().as_view(), name="user-list"),
+    path('users/<uuid:user_id>/address/', views.UserAddressUpdate.as_view(), name='user-address-update'),
+    
+
+
 
 ]

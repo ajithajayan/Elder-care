@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import isAuthAdmin from '../utils/isAuthAdmin';
-import Loader from './loader/Loader';
+import isAuthAdmin from '../../utils/isAuthAdmin';
+import Loader from '../loader/Loader';
 
 
-function AdminPrivateRoute({ children }) {
+function DoctorPrivateRoute({ children }) {
   
   const [isAuthenticated, setIsAuthenticated] = useState({
     'is_authenticated' : false,
     'is_admin' : false,
+    'is_doctor' : false,
   });
   const [isLoading, setLoading] = useState(true);
 
@@ -45,4 +46,4 @@ function AdminPrivateRoute({ children }) {
 }
 
 
-export default AdminPrivateRoute;
+export default DoctorPrivateRoute;

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 // import isAuthUser from '../utils/isAuthUser';
-import isAuthUser from '../utils/IsAuthUser';
-import Loader from './loader/Loader';
+import isAuthUser from '../../utils/IsAuthUser';
+import Loader from '../loader/Loader';
 
 
 function PrivateRoute({ children }) {

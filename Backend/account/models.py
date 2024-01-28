@@ -95,11 +95,17 @@ class User(AbstractBaseUser):
 
     def has_module_perms(self, add_label):
         return True
+    
+    def is_doctor(self):
+        return self.user_type == 'doctor'
 
 class Address(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User,related_name='address', on_delete=models.CASCADE)
     street = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
     state = models.CharField(max_length=255)
     zip_code = models.CharField(max_length=20)
     country = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.user.first_name

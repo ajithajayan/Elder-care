@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, Navigate, useNavigate } from 'react-router-dom';
 import { logout, reset } from '../../features/authSlice';
 import { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
@@ -69,7 +69,7 @@ const accountIcon = (
 );
 
 
-const Navbar = () => {
+const DocotrHeader = () => {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -79,6 +79,8 @@ const Navbar = () => {
     
     localStorage.removeItem("access");
     localStorage.removeItem("refresh");
+    navigate('/auth/login');
+
     window.location.reload();
   };
 
@@ -108,7 +110,7 @@ const Navbar = () => {
         </NavLink>
 
         <NavLink className="flex text-gray-800 hover:text-blue-500 cursor-pointer transition-colors duration-300">
-          Find Doctor
+          My profile
         </NavLink>
 
         <NavLink className="flex text-gray-800 hover:text-blue-500 cursor-pointer transition-colors duration-300">
@@ -193,4 +195,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default DocotrHeader;
