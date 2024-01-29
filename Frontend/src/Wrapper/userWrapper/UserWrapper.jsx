@@ -16,6 +16,7 @@ import { set_Authentication } from '../../Redux/authentication/authenticationSli
 import { set_user_basic_details } from '../../Redux/userBasicDetails/userBasicDetailsSlice'
 import axios from 'axios'
 import Authenticator from "../../pages/Authentication/Authenticator";
+import Page404 from "../../components/404/Page404";
 
 
 function UserWrapper() {
@@ -87,7 +88,7 @@ function UserWrapper() {
     ],
   },
   {
-    element: <div> not found 404</div>, path:'*'
+    element: <Page404/>, path:'*'
   }
 ])
 

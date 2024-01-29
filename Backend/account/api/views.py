@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from account.models import Address, User
-from .serializers import AddressSerializer, UserDetailWithAddressSerializer, UserDetailsUpdateSerializer, UserRegisterSerializer
+from .serializers import AddressSerializer, UserDetailWithAddressSerializer, UserDetailsUpdateSerializer, UserRegisterSerializer, UserSerializer
 from django.contrib.auth import authenticate
 import random
 from django.core.mail import send_mail
@@ -146,3 +146,20 @@ class UserAddressUpdate(generics.UpdateAPIView):
         # Retrieve the address associated with the user
         address = get_object_or_404(Address, user=user)
         return address
+    
+
+class UserDetails(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        user = User.objects.get(id=request.user.id)
+       
+        data = UserSerializer(user).data
+        try :
+            profile_pic = user.profile_picture
+            data['profile_pic'] = request.build_absolute_uri('/')[:-1]+profile_pic.url
+        except:
+            profile_pic = ''
+            data['profile_pic']=''
+            
+        content = data
+        return Response(content,status=status.HTTP_200_OK)

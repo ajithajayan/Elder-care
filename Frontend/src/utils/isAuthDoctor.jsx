@@ -46,10 +46,7 @@
     
 //   }
 
-// };
-// const isAuthAdmin = async () => {
-
-//     const accessToken = localStorage.getItem("access");
+// };</DoctorPrivateRoute>etItem("access");
    
 //     if(!accessToken)
 //     {
@@ -115,7 +112,7 @@ const fetchisDoctor = async () => {
         const token = localStorage.getItem('access');
         
         try {
-            const res = await axios.get(baseURL + '/api/accounts/user/details/', {
+            const res = await axios.get(baseUrl + 'auth/user/details/', {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Accept': 'application/json',
@@ -123,7 +120,7 @@ const fetchisDoctor = async () => {
                 }
             });
     
-            return res.data.is_superuser; // Return directly from the function
+            return res.data.user_type==='doctor'; // Return directly from the function
     
         } catch (error) {
             return false;
@@ -143,15 +140,15 @@ const isAuthDoctor = async () => {
     let decoded = jwtDecode(accessToken);
 
     if (decoded.exp > currentTime) {
-        let checkAdmin = await fetchisAdmin(); // Await the result
-        return { 'name': decoded.first_name, isAuthenticated: true, isAdmin: checkAdmin };
+        let checkDoc = await fetchisDoctor(); // Await the result
+        return { 'name': decoded.first_name, isAuthenticated: true,isAdmin: false, is_doctor:checkDoc  };
     } else {
-        const updateSuccess = await updateAdminToken();
+        const updateSuccess = await updateDocToken();
 
         if (updateSuccess) {
             let decoded = jwtDecode(accessToken);
-            let checkAdmin = await fetchisAdmin(); // Await the result
-            return { 'name': decoded.first_name, isAuthenticated: true, isAdmin: checkAdmin };
+            let checkAdmin = await fetchisDoctor(); // Await the result
+            return { 'name': decoded.first_name, isAuthenticated: true,isAdmin: false, is_doctor: checkAdmin };
         } else {
             return { 'name': null, isAuthenticated: false, isAdmin: false ,is_doctor:false };
         }

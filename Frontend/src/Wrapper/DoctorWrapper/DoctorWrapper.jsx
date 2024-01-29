@@ -19,6 +19,10 @@ import Authenticator from "../../pages/Authentication/Authenticator";
 import DoctorHome from "../../pages/Doctor/DoctorHome";
 import DoctorHeader from "../../components/Doctor/DoctorHeader";
 import DoctorFooter from "../../components/Doctor/Doctorfooter";
+import DoctorPrivateRoute from "../../components/Private/DoctorPrivateRoute";
+import isAuthDoctor from "../../utils/isAuthDoctor";
+import { baseUrl } from "../../utils/constants/Constants";
+import Page404 from "../../components/404/Page404";
 
 
 
@@ -31,41 +35,42 @@ function DoctorWrapper() {
   
 
   const checkAuth = async () => {
-    const isAuthenticated = await isAuthUser();
+    const isAuthenticated = await isAuthDoctor();
     dispatch(
       set_Authentication({
         name: isAuthenticated.name,
-        isAuthenticated: isAuthenticated.isAuthenticated
+        isAuthenticated: isAuthenticated.isAuthenticated,
+        is_doctor: isAuthenticated.is_doctor,
       })
     );
   };
 
   const token = localStorage.getItem('access');
 
-  // const fetchUserData = async () => {
-  //   try {
-  //       // const res = await axios.post(baseURL+'/api/accounts/user/details/',{headers: {Authorization: `Bearer ${token}`}})
-  //       const res = await axios.get(baseURL+'/api/accounts/user/details/',{headers: {
-  //         'authorization': `Bearer ${token}`,
-  //         'Accept' : 'application/json',
-  //         'Content-Type': 'application/json'
-  //     }})
-  //       .then(res => {
+  const fetchUserData = async () => {
+    try {
+        // const res = await axios.post(baseURL+'/api/accounts/user/details/',{headers: {Authorization: `Bearer ${token}`}})
+        const res = await axios.get(baseUrl+'auth/user/details/',{headers: {
+          'authorization': `Bearer ${token}`,
+          'Accept' : 'application/json',
+          'Content-Type': 'application/json'
+      }})
+        .then(res => {
             
-  //           dispatch(
-  //             set_user_basic_details({
-  //               name : res.data.first_name,
-  //               profile_pic : res.data.profile_pic
-  //             })
-  //           );
-  //         })
-  //   }
-  //   catch (error) {
-  //     console.log(error);
+            dispatch(
+              set_user_basic_details({
+                name : res.data.first_name,
+                profile_pic : res.data.profile_pic
+              })
+            );
+          })
+    }
+    catch (error) {
+      console.log(error);
       
-  //   }
+    }
 
-  // };
+  };
 
 
   useEffect(() => {
@@ -82,17 +87,19 @@ function DoctorWrapper() {
     element: (
       <>
      <DoctorHeader/>
+      <DoctorPrivateRoute>
       <Outlet/>
+      </DoctorPrivateRoute>
       <DoctorFooter/>
       </>
     ),
     children:[
-      {path: "/doctor/*", element:<Authenticator/>},
-      {path: "/dashboard", element: <DoctorHome/>}
+    
+      {path: "/dashboard", element: <DoctorHome/>},
     ],
   },
   {
-    element: <div> not found 404</div>, path:'*'
+    element: <Page404/>, path:'*'
   }
 ])
 

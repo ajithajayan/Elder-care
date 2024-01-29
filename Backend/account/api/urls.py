@@ -13,6 +13,7 @@ urlpatterns = [
     
     path("", views.getAccountsRoutes.as_view(), name="accounts-routes"),
     path("register", views.RegisterView.as_view(), name="user-register"),
+    path("user/details/", views.UserDetails.as_view(), name="user-details"),
     path("login", views.UserLogin.as_view(), name="user-login"),
     path("user/update/<str:pk>", views.UserDetailsUpdate.as_view(), name="user-update"),
     path("user/list/<str:pk>", views.UserDetailsUpdate().as_view(), name="user-list"),

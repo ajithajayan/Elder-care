@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import isAuthAdmin from '../../utils/isAuthAdmin';
 import Loader from '../loader/Loader';
+import isAuthDoctor from '../../utils/isAuthDoctor';
 
 
 function DoctorPrivateRoute({ children }) {
@@ -15,10 +15,11 @@ function DoctorPrivateRoute({ children }) {
 
   useEffect(() => {
     const fetchData = async () => {
-      const authInfo = await isAuthAdmin();
+      const authInfo = await isAuthDoctor();
       setIsAuthenticated({
         'is_authenticated' : authInfo.isAuthenticated,
         'is_admin' : authInfo.isAdmin,
+        'is_doctor' : authInfo.is_doctor,
       });
       setLoading(false);
     };
@@ -31,14 +32,14 @@ function DoctorPrivateRoute({ children }) {
     return <Loader/>;
   }
 
-  if(!isAuthenticated.is_authenticated)
+  if(!isAuthenticated.is_authenticated || !isAuthenticated.is_doctor)
   {
-    return <Navigate to="/admincontrol/login" />;
+    return <Navigate to="/auth/login" />;
   }
 
-  if ((!isAuthenticated.is_admin)) {
+  else if ((!isAuthenticated.is_doctor)) {
     // If not authenticated, redirect to login page with the return URL
-    return <Navigate to="/admincontrol/login" />;
+    return <Navigate to="/auth/login" />;
   }
 
   // If authenticated, render the child components

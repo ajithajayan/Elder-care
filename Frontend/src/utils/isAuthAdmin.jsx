@@ -110,24 +110,24 @@ const updateAdminToken = async () => {
     }
 };
 
-// const fetchisAdmin = async () => {
-//     const token = localStorage.getItem('access');
+const fetchisAdmin = async () => {
+    const token = localStorage.getItem('access');
     
-//     try {
-//         const res = await axios.get(baseURL + '/api/accounts/user/details/', {
-//             headers: {
-//                 'Authorization': `Bearer ${token}`,
-//                 'Accept': 'application/json',
-//                 'Content-Type': 'application/json'
-//             }
-//         });
+    try {
+        const res = await axios.get(baseUrl + 'auth/user/details/', {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
 
-//         return res.data.is_superuser; // Return directly from the function
+        return res.data.is_superuser; // Return directly from the function
 
-//     } catch (error) {
-//         return false;
-//     }
-// };
+    } catch (error) {
+        return false;
+    }
+};
 
 const isAuthAdmin = async () => {
     const accessToken = localStorage.getItem("access");

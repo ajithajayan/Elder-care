@@ -14,12 +14,12 @@ import isAuthAdmin from '../../utils/isAuthAdmin';
 import AdminCreateUser from '../../pages/admin/AdminCreateUser';
 import AdminUpdateUser from '../../pages/admin/AdminUpdateUser';
 import AdminSignin from '../../pages/admin/AdminSignin';
+import { baseUrl } from '../../utils/constants/Constants';
 
 function AdminWrapper() {
   const dispatch = useDispatch();
   const authentication_user = useSelector(state => state.authentication_user);
 
-  const baseURL = 'http://127.0.0.1:8000';
   const token = localStorage.getItem('access');
 
   const checkAuthAndFetchUserData = async () => {
@@ -33,22 +33,22 @@ function AdminWrapper() {
         })
       );
 
-      // if (isAuthenticated.isAuthenticated) {
-      //   const res = await axios.get(baseURL + '/api/accounts/user/details/', {
-      //     headers: {
-      //       Authorization: `Bearer ${token}`,
-      //       Accept: 'application/json',
-      //       'Content-Type': 'application/json',
-      //     },
-      //   });
+      if (isAuthenticated.isAuthenticated) {
+        const res = await axios.get(baseUrl + 'auth/user/details/', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+        });
 
-      //   dispatch(
-      //     set_user_basic_details({
-      //       name: res.data.first_name,
-      //       profile_pic: res.data.profile_pic,
-      //     })
-      //   );
-      // }
+        dispatch(
+          set_user_basic_details({
+            name: res.data.first_name,
+            profile_pic: res.data.profile_pic,
+          })
+        );
+      }
     } catch (error) {
       console.log(error);
     }
