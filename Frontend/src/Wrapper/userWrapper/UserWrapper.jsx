@@ -3,11 +3,6 @@ import UserHeader from '../../components/userside/UserHeader'
 import Userfooter from '../../components/userside/Userfooter'
 import UserHome from '../../pages/userSide/UserHome'
 
-import { Routes,Route} from 'react-router-dom'
-import UserRegiser from '../../pages/userSide/UserRegiser'
-import UserLogin from '../../pages/userSide/UserLogin'
-
-import UserProfile from '../../pages/userSide/UserProfile'
 import { Outlet, useRoutes } from 'react-router-dom'
 import PrivateRoute from "../../components/Private/PrivateRoute";
 import isAuthUser from '../../utils/IsAuthUser'

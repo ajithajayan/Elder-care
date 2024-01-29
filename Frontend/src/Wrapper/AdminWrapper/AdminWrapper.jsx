@@ -4,7 +4,6 @@ import { Routes, Route } from 'react-router-dom';
 import AdminHeader from '../../components/admin/AdminHeader/AdminHeader';
 import AdminFooter from '../../components/admin/AdminFooter/AdminFooter';
 import AdminHome from '../../pages/admin/AdminHome';
-import AdminLogin from '../../pages/admin/AdminLogin';
 import AdminPrivateRoute from '../../components/Private/AdminPrivateRoute';
 import { useDispatch, useSelector } from 'react-redux';
 import { set_Authentication } from '../../Redux/authentication/authenticationSlice';
@@ -15,6 +14,13 @@ import AdminCreateUser from '../../pages/admin/AdminCreateUser';
 import AdminUpdateUser from '../../pages/admin/AdminUpdateUser';
 import AdminSignin from '../../pages/admin/AdminSignin';
 import { baseUrl } from '../../utils/constants/Constants';
+import { Outlet, useRoutes } from 'react-router-dom'
+import Page404 from '../../components/404/Page404';
+import Main from '../../components/admin/layout/Main';
+import '../../assets/Styles/main.scss'
+import Doctor from '../../pages/admin/Doctor';
+import Patient from '../../pages/admin/Patient';
+
 
 function AdminWrapper() {
   const dispatch = useDispatch();
@@ -60,17 +66,42 @@ function AdminWrapper() {
     }
   }, []);
 
-  return (
-    <>
-      <Routes>
-        <Route path="login" element={<AdminSignin/>} />
-        <Route path="/" element={<AdminPrivateRoute><AdminHome /></AdminPrivateRoute>} />
-        <Route path="/user/create" element={<AdminPrivateRoute><AdminCreateUser /></AdminPrivateRoute>} />
-        <Route path="/user/update/:id" element={<AdminPrivateRoute><AdminUpdateUser /></AdminPrivateRoute>} />
-      </Routes>
-      <AdminFooter />
-    </>
-  );
+  const routes = useRoutes([
+    {
+      path: "/login",
+      element: <AdminSignin />
+    },
+    {
+      element: (
+        <>
+          <div className='main'>
+          <AdminPrivateRoute>
+            <Main>
+            <Outlet/>
+            </Main>
+          </AdminPrivateRoute>
+          </div>
+        </>
+      ),
+      children: [    
+        {path: "/", element: <AdminHome />},
+        {path: "/doctor", element: <Doctor/>},
+        {path: "/patient", element: <Patient/>},
+        {path: "user/create", element: <AdminCreateUser />},  
+        {path: "/user/update/:id", element: <AdminUpdateUser />},
+      ]
+    },
+    {
+      path: "*",
+      element: <Page404 />
+    }
+  ]);
+
+
+  
+
+  return routes;
+    
 }
 
 export default AdminWrapper;

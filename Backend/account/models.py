@@ -58,12 +58,17 @@ class User(AbstractBaseUser):
         ('doctor', 'Doctor'),
         ('caretaker', 'Caretaker'),
     ]
+    gender_type_choices = [
+        ('male', 'Male'),
+        ('female', 'Female'),
+    ]
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     username = models.CharField(max_length=50, blank=True)
     password = models.CharField(max_length=100)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50, blank=True)
+    gender = models.CharField(max_length=10, choices=gender_type_choices, default='male')
     phone_number = models.CharField(max_length=12, unique=True, blank=True, null=True)
     email = models.EmailField(max_length=100, unique=True)
     date_of_birth = models.DateField(null=True, blank=True)

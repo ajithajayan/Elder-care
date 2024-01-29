@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import BIRDS from "vanta/dist/vanta.waves.min";
 import * as THREE from "three";
-import "../../Styles/auth.scss";
+import "../../assets/Styles/auth.scss";
 import { Route, Routes } from "react-router-dom";
 import Register from "../userSide/UserRegiser";
 import UserLogin from "../userSide/UserLogin";

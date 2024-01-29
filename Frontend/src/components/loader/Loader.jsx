@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import "../../Styles/loader.scss";
+import "../../assets/Styles/loader.scss";
 
 
 
