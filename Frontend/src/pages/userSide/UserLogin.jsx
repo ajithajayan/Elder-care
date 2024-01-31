@@ -9,6 +9,7 @@ import { GoogleLogin } from '@react-oauth/google';
 
 
 
+
 function UserLogin() {
   const { state } = useLocation();
   const [message, setmessage] = useState(null)
@@ -52,6 +53,7 @@ function UserLogin() {
           })
         );
         console.log(res.data.is_doctor,"this is the status");
+        console.log(res.data.is_doctor);
         if (res.data.is_doctor){
           navigate('/doctor/dashboard')
           return res 

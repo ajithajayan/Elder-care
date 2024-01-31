@@ -13,6 +13,7 @@ import DoctorPrivateRoute from "../../components/Private/DoctorPrivateRoute";
 import isAuthDoctor from "../../utils/isAuthDoctor";
 import { baseUrl } from "../../utils/constants/Constants";
 import Page404 from "../../components/404/Page404";
+import DoctorProfile from "../../pages/Doctor/DoctorProfile";
 
 
 
@@ -86,6 +87,7 @@ function DoctorWrapper() {
     children:[
     
       {path: "/dashboard", element: <DoctorHome/>},
+      {path: "/profile", element: <DoctorProfile/>},
     ],
   },
   {

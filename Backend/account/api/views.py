@@ -125,10 +125,24 @@ class UserLogin(APIView):
 #             print('error', user_update_details_serializer.errors)
 #             return Response(user_update_details_serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
     
-class UserDetailsUpdate(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Address.objects.select_related('user')
+class UserDetailsUpdate(generics.ListAPIView):
+    queryset = User.objects.filter(user_type='doctor')
     parser_classes = (MultiPartParser, FormParser)
     serializer_class = UserDetailsUpdateSerializer
+    
+class UseDetailsUpdate(generics.ListAPIView):
+    queryset = User.objects.filter(user_type='client')
+    parser_classes = (MultiPartParser, FormParser)
+    serializer_class = UserDetailsUpdateSerializer
+
+
+
+class DocDetailsUpdate(generics.RetrieveUpdateAPIView):
+    queryset = User.objects.all()
+    parser_classes = (MultiPartParser, FormParser)
+    serializer_class = UserDetailsUpdateSerializer
+    
+    
 
     
     

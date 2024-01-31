@@ -39,6 +39,9 @@ import face4 from "../../assets/images/face-4.jpg";
 import face5 from "../../assets/images/face-5.jpeg";
 import face6 from "../../assets/images/face-6.jpeg";
 import pencil from "../../assets/images/pencil.svg";
+import { useEffect, useState } from "react";
+import { baseUrl } from "../../utils/constants/Constants";
+import axios from "axios";
 
 const { Title } = Typography;
 
@@ -588,6 +591,19 @@ const dataproject = [
 
 function Doctor() {
   const onChange = (e) => console.log(`radio checked:${e.target.value}`);
+  const [doctorData,setDoctorData] = useState([])
+  useEffect(()=>{
+
+    axios.get(baseUrl+`auth/doctor/details`).then((req)=>{
+      setDoctorData(req.data.results)
+      console.log(req.data.results)
+      // setDoctorData(req.data)
+    }).catch((err)=>{
+      console.log(err)
+    })
+
+
+  },[])
 
   return (
     <>
@@ -707,10 +723,10 @@ function Doctor() {
           </div>
         </th>
         <th scope="col" className="px-6 py-3">
-          Name
+          Name 
         </th>
         <th scope="col" className="px-6 py-3">
-          Position
+          Email
         </th>
         <th scope="col" className="px-6 py-3">
           Status
@@ -721,7 +737,8 @@ function Doctor() {
       </tr>
     </thead>
     <tbody>
-      <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+      {doctorData.map((item,index)=>{
+      return (<tr key={index} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
         <td className="w-4 p-4">
           <div className="flex items-center">
             <input
@@ -744,13 +761,13 @@ function Doctor() {
             alt="Jese image"
           />
           <div className="ps-3">
-            <div className="text-base font-semibold">Neil Sims</div>
+            <div className="text-base font-semibold">{item.first_name}</div>
             <div className="font-normal text-gray-500">
-              neil.sims@flowbite.com
+            {item.last_name}
             </div>
           </div>
         </th>
-        <td className="px-6 py-4">React Developer</td>
+        <td className="px-6 py-4">{item.email}</td>
         <td className="px-6 py-4">
           <div className="flex items-center">
             <div className="h-2.5 w-2.5 rounded-full bg-green-500 me-2" />{" "}
@@ -765,8 +782,8 @@ function Doctor() {
             Edit user
           </a>
         </td>
-      </tr>
-      
+      </tr>)
+      })}
     </tbody>
   </table>
 </div>

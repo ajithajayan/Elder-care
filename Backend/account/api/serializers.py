@@ -23,7 +23,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        exclude = ('password',)
+        exclude = ('password',  )
 
 
         
@@ -44,7 +44,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 class UserDetailsUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['address','first_name', 'last_name', 'profile_picture', 'date_of_birth', 'username']
+        fields = ['first_name', 'last_name', 'profile_picture', 'date_of_birth', 'username','gender','email','phone_number']
 
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:
@@ -65,3 +65,8 @@ class UserDetailWithAddressSerializer(serializers.ModelSerializer):
             Address.objects.create(user=user, **track_data)
         return user    
         
+
+class DocSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        exclude = ('password','is_id_verified','is_email_verified','is_staff','is_active','is_superuser','user_type','approval_status','id')

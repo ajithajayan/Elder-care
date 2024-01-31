@@ -20,6 +20,7 @@ import Main from '../../components/admin/layout/Main';
 import '../../assets/Styles/main.scss'
 import Doctor from '../../pages/admin/Doctor';
 import Patient from '../../pages/admin/Patient';
+import Profile from '../../pages/admin/Profile';
 
 
 function AdminWrapper() {
@@ -73,20 +74,19 @@ function AdminWrapper() {
     },
     {
       element: (
-        <>
-          <div className='main'>
+          <div className='main_admin'>
           <AdminPrivateRoute>
             <Main>
             <Outlet/>
             </Main>
           </AdminPrivateRoute>
           </div>
-        </>
       ),
       children: [    
         {path: "/", element: <AdminHome />},
         {path: "/doctor", element: <Doctor/>},
         {path: "/patient", element: <Patient/>},
+        {path: "/profile", element: <Profile/>},
         {path: "user/create", element: <AdminCreateUser />},  
         {path: "/user/update/:id", element: <AdminUpdateUser />},
       ]

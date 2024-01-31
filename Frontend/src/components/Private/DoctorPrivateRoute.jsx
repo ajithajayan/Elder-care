@@ -16,11 +16,13 @@ function DoctorPrivateRoute({ children }) {
   useEffect(() => {
     const fetchData = async () => {
       const authInfo = await isAuthDoctor();
+      console.log("this is the log",authInfo);
       setIsAuthenticated({
         'is_authenticated' : authInfo.isAuthenticated,
         'is_admin' : authInfo.isAdmin,
         'is_doctor' : authInfo.is_doctor,
       });
+      console.log(authInfo.is_doctor);
       setLoading(false);
     };
 

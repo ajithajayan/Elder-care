@@ -105,11 +105,11 @@ const DocotrHeader = () => {
 
       {/* Links Section - Hidden on Small Screens */}
       <div className={`items-center hidden space-x-8 lg:flex ${isMobileMenuOpen ? 'hidden' : ''}`}>
-        <NavLink to="" className="flex text-gray-800 hover:text-blue-500 cursor-pointer transition-colors duration-300">
+        <NavLink to="/doctor/dashboard" className="flex text-gray-800 hover:text-blue-500 cursor-pointer transition-colors duration-300">
           Home
         </NavLink>
 
-        <NavLink className="flex text-gray-800 hover:text-blue-500 cursor-pointer transition-colors duration-300">
+        <NavLink to="/doctor/profile"  className="flex text-gray-800 hover:text-blue-500 cursor-pointer transition-colors duration-300">
           My profile
         </NavLink>
 

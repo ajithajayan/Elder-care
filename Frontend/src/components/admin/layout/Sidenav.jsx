@@ -237,7 +237,7 @@ function Sidenav({ color }) {
           Account Pages
         </Menu.Item>
         <Menu.Item key="6">
-          <NavLink to="/profile">
+          <NavLink to="/admincontrol/profile">
             <span
               className="icon"
               style={{
