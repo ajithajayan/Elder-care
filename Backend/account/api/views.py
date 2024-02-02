@@ -143,6 +143,7 @@ class DocDetailsUpdate(generics.RetrieveUpdateAPIView):
     serializer_class = UserDetailsUpdateSerializer
     
     
+    
 
     
     
