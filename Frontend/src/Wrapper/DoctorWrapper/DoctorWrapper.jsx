@@ -14,6 +14,7 @@ import isAuthDoctor from "../../utils/isAuthDoctor";
 import { baseUrl } from "../../utils/constants/Constants";
 import Page404 from "../../components/404/Page404";
 import DoctorProfile from "../../pages/Doctor/DoctorProfile";
+import ImageUpload from "../../pages/Doctor/ImageUpload";
 
 
 
@@ -87,6 +88,7 @@ function DoctorWrapper() {
     children:[
     
       {path: "/dashboard", element: <DoctorHome/>},
+      {path: "/image", element: <ImageUpload/>},
       {path: "/profile", element: <DoctorProfile/>},
     ],
   },

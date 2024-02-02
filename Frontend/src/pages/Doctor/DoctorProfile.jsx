@@ -2,6 +2,7 @@ import axios from 'axios'
 import { jwtDecode } from 'jwt-decode';
 import React, { useEffect, useState } from 'react'
 import { baseUrl } from '../../utils/constants/Constants';
+import ImageUploading from 'react-images-uploading';
 
 
 
@@ -10,30 +11,36 @@ function DoctorProfile() {
   const [profile,setProfile]=useState(null)
   const[about,setAbout]=useState([])
   const[id,setId]=useState(null)
+  const onChange = (imageList, addUpdateIndex) => {
+    // data for submit
+    console.log(imageList, addUpdateIndex);
+    setProfile(imageList);
+  };
 
+  const fetchData = async () => {
+      try {
+          const token = localStorage.getItem('access');
+
+          let decoded = jwtDecode(token);
+          console.log(decoded,"hfhhhhhhhhhhhhhhhhhhhhhhhh");
+          let id = decoded.user_id;
+          console.log(id);
+          setId(id);
+
+          const doct = await axios.get(baseUrl + 'auth/doc/list/' + id);
+          if (doct.status === 200) {
+              setProfile(doct.data.profile_picture,);
+              setAbout(doct.data);
+              
+          }
+          // Handle the response data as needed
+          console.log(doct.data);
+      } catch (error) {
+          console.log(error);
+      }
+  };
+  
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const token = localStorage.getItem('access');
-
-                let decoded = jwtDecode(token);
-                console.log(decoded,"hfhhhhhhhhhhhhhhhhhhhhhhhh");
-                let id = decoded.user_id;
-                console.log(id);
-                setId(id);
-    
-                const doct = await axios.get(baseUrl + 'auth/doc/list/' + id);
-                if (doct.status === 200) {
-                    setProfile(doct.data.profile_picture,);
-                    setAbout(doct.data);
-                    
-                }
-                // Handle the response data as needed
-                console.log(doct.data);
-            } catch (error) {
-                console.log(error);
-            }
-        };
     
         fetchData();
     }, []);
@@ -148,6 +155,7 @@ function DoctorProfile() {
     alt="Profile picture"
   />
   <div>
+  
     <h3 className="mb-1 text-xl font-bold text-gray-900 dark:text-white">
       Profile picture
     </h3>
