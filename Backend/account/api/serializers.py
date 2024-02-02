@@ -46,6 +46,18 @@ class UserDetailsUpdateSerializer(serializers.ModelSerializer):
         model = User
         fields = ['first_name', 'last_name', 'profile_picture', 'date_of_birth', 'username','gender','email','phone_number']
 
+    def update(self, instance, validated_data):
+        # Access PATCH data
+        patch_data = self.initial_data
+
+        print(patch_data,"this is the patched data")
+        # Your update logic here using both instance and patch_data
+
+        # Call the superclass update method
+        return super().update(instance, validated_data)
+
+
+
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address

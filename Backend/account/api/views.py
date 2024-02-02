@@ -137,11 +137,13 @@ class UseDetailsUpdate(generics.ListAPIView):
 
 
 
-class DocDetailsUpdate(generics.RetrieveUpdateAPIView):
+class DocDetailsUpdate(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     parser_classes = (MultiPartParser, FormParser)
     serializer_class = UserDetailsUpdateSerializer
+
     
+
     
     
 

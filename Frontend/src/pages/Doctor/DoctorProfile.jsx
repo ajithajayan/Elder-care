@@ -3,6 +3,7 @@ import { jwtDecode } from "jwt-decode";
 import React, { useEffect, useRef, useState } from "react";
 import { baseUrl } from "../../utils/constants/Constants";
 import ImageUploading from "react-images-uploading";
+import user from '../../assets/images/user.png'
 
 function DoctorProfile() {
   const [profile, setProfile] = useState(null); // it's use for storing the image
@@ -13,7 +14,6 @@ function DoctorProfile() {
 
   // ---------------------  Portion for uploding the image   ---------------------
 
-  
   const fileInputRef = useRef(null);
   const handleImageUpload = () => {
     if (fileInputRef.current) {
@@ -21,13 +21,12 @@ function DoctorProfile() {
     }
   };
 
-  const handleFileInputChange = async(event) => {
-    
-      const file=event.target.files[0]
-      let form_data = new FormData();
-      form_data.append("profile_picture", file,file.name);
-   
-      await axios
+  const handleFileInputChange = async (event) => {
+    const file = event.target.files[0];
+    let form_data = new FormData();
+    form_data.append("profile_picture", file, file.name);
+
+    await axios
       .patch(baseUrl + `auth/doc/list/${id}`, form_data)
       .then((res) => {
         fetchData();
@@ -35,13 +34,22 @@ function DoctorProfile() {
       .catch((err) => {
         console.log(err);
       });
-   
   };
 
-
-  const profileDelete =()=>{
-    
-  }
+  const profileDelete = async () => {
+    let form_data = new FormData();
+    form_data.append('profile_picture', '');  // Set to an empty string or any placeholder value
+    // Add other fields to form_data as needed
+    await axios.patch(baseUrl + `auth/doc/list/${id}`, form_data)
+      .then((res) => {
+        fetchData();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  
+  
 
   // ...................................................................................
 
@@ -175,7 +183,7 @@ function DoctorProfile() {
             <div className="items-center sm:flex xl:block 2xl:flex sm:space-x-4 xl:space-x-0 2xl:space-x-4">
               <img
                 className="mb-4 rounded-lg w-28 h-28 sm:mb-0 xl:mb-4 2xl:mb-0"
-                src={profile || "/images/users/bonnie-green-2x.png"}
+                src={profile || user}
                 alt="Profile picture"
               />
               <div>
