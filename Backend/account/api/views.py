@@ -3,8 +3,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from account.models import Address, User
-from .serializers import AddressSerializer, UserDetailWithAddressSerializer, UserDetailsUpdateSerializer, UserRegisterSerializer, UserSerializer
+from account.models import  User
+from .serializers import  UserDetailsUpdateSerializer, UserRegisterSerializer, UserSerializer
 from django.contrib.auth import authenticate
 import random
 from django.core.mail import send_mail
@@ -137,32 +137,19 @@ class UseDetailsUpdate(generics.ListAPIView):
 
 
 
-class DocDetailsUpdate(generics.RetrieveUpdateDestroyAPIView):
+class DocDetailsUpdate(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
     parser_classes = (MultiPartParser, FormParser)
     serializer_class = UserDetailsUpdateSerializer
-
+    lookup_field = 'pk'
     
 
     
     
 
-    
-    
 
 
 
-class UserAddressUpdate(generics.UpdateAPIView):
-    queryset = Address.objects.all()  # Target all address objects
-    serializer_class = AddressSerializer
-
-    def get_object(self):
-        user_id = self.kwargs.get('user_id')  # Retrieve the user ID from the URL
-        user = get_object_or_404(User, id=user_id)
-        
-        # Retrieve the address associated with the user
-        address = get_object_or_404(Address, user=user)
-        return address
     
 
 class UserDetails(APIView):

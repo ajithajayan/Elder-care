@@ -79,6 +79,11 @@ class User(AbstractBaseUser):
         choices=APPROVAL_STATUS_CHOICES,
         default='PENDING',
     )
+    street = models.CharField(max_length=255, blank=True, null=True)
+    city = models.CharField(max_length=255, blank=True, null=True)
+    state = models.CharField(max_length=255, blank=True, null=True)
+    zip_code = models.CharField(max_length=20, blank=True, null=True)
+    country = models.CharField(max_length=255, blank=True, null=True)
     is_id_verified = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(auto_now_add=True)
@@ -104,13 +109,4 @@ class User(AbstractBaseUser):
     def is_doctor(self):
         return self.user_type == 'doctor'
 
-class Address(models.Model):
-    user = models.ForeignKey(User,related_name='address', on_delete=models.CASCADE)
-    street = models.CharField(max_length=255)
-    city = models.CharField(max_length=255)
-    state = models.CharField(max_length=255)
-    zip_code = models.CharField(max_length=20)
-    country = models.CharField(max_length=255)
 
-    def __str__(self):
-        return self.user.first_name
