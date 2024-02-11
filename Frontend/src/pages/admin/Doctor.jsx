@@ -38,7 +38,7 @@ function Doctor() {
     })
 
 
-  },[])
+  },[isEditModalVisible])
 
   return (
     <>
@@ -483,6 +483,8 @@ function Doctor() {
                     <EditDoctor 
                     doctorId={doctEditData}
                     setIsDataFetched={setIsDataFetched}
+                    setEditModalVisible={setEditModalVisible}
+
                     />
                   </div>
                   {/* Modal footer */}

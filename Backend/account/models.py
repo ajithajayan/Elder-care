@@ -71,7 +71,7 @@ class User(AbstractBaseUser):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50, blank=True)
     gender = models.CharField(max_length=10, choices=gender_type_choices, default='male')
-    phone_number = models.CharField(max_length=12, unique=True, blank=True, null=True)
+    phone_number = models.CharField(max_length=12, blank=True, null=True)
     email = models.EmailField(max_length=100, unique=True)
     date_of_birth = models.DateField(null=True, blank=True)
     user_type = models.CharField(max_length=20, choices=USER_TYPE_CHOICES, default='client')

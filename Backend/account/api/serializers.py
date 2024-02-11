@@ -19,11 +19,17 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         
         return token
 
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        exclude = ('password',  )
+        exclude = ('password', )
+
+
+
+class DOCUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        exclude = ('password', 'id' ,'is_staff','is_superuser','user_type','email','profile_picture')
 
 
         
@@ -60,12 +66,17 @@ class UserDetailsUpdateSerializer(serializers.ModelSerializer):
         
 
 class AdminDocUpdateSerializer(serializers.ModelSerializer):
-    user=UserSerializer()
+    user=DOCUserSerializer()
     class Meta:
         model = Doctor
         fields='__all__' 
         
-
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('user', {}) # this is used to pop out the user object and if it is not existing then we will assign a {} to it as default
+        user_serializer = UserSerializer(instance.user, data=user_data, partial=True)
+        if user_serializer.is_valid():
+            user_serializer.save()
+        return super().update(instance, validated_data)
 
 
 
