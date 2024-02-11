@@ -144,12 +144,18 @@ class DocDetailsUpdate(generics.RetrieveUpdateAPIView):
     lookup_field = 'pk'
     
 
-class AdminDocUpdate(generics.RetrieveUpdateDestroyAPIView):
+class AdminDocUpdate(generics.RetrieveUpdateAPIView):
     queryset = Doctor.objects.all()
     parser_classes = (MultiPartParser, FormParser)
     serializer_class = AdminDocUpdateSerializer
     lookup_field = 'pk'
 
+
+class AdminDocDelete(generics.RetrieveDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    lookup_field = 'pk'
+    
 
 
 

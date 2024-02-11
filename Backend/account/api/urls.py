@@ -28,6 +28,7 @@ urlpatterns = [
 
 
     path("admin/doc/<str:pk>", views.AdminDocUpdate().as_view(), name="adminDoc-update"),
+    path("admin/doc/delete/<str:pk>", views.AdminDocDelete().as_view(), name="adminDoc-delete"),
 
 
 ]

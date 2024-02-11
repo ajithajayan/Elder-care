@@ -60,7 +60,7 @@ class UserDetailsUpdateSerializer(serializers.ModelSerializer):
     doctor_user=DoctorSerializer(read_only=True)
     class Meta:
         model = User
-        exclude = ('password','is_id_verified','is_email_verified','is_staff','is_superuser','user_type','id')
+        exclude = ('password','is_id_verified','is_email_verified','is_staff','is_superuser','user_type')
     
     
         
