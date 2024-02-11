@@ -7,6 +7,8 @@ import { baseUrl } from "../../utils/constants/Constants";
 import axios from "axios";
 import avatar from "../../assets/images/user.png"
 import EditDoctor from "../../components/admin/elements/Modal/EditDoctor";
+import DocCrump from "../../components/admin/elements/BreadCrumps/DocCrump";
+import { toast } from "react-toastify";
 
 
 function Doctor() {
@@ -16,8 +18,23 @@ function Doctor() {
   const [checked,setChecked] = useState(true)
   const [isEditModalVisible, setEditModalVisible] = useState(false);
   const [doctEditData,setEditingDoctorId]=useState(null)
-  const handleCheckboxChange = () => {
-    setChecked(!checked);
+
+
+  const handleCheckboxChange = (docId, currentStatus) => {
+    const formData = new FormData();
+    formData.append("user.is_active", !currentStatus);
+  
+    axios.patch(baseUrl + `auth/admin/doc/${docId}`, formData)
+      .then((res) => {
+        console.log('Data updated successfully:', res.data);
+        toast.success("Data updated successfully");
+        // Optionally, you can update the state or handle other actions
+        setChecked(!currentStatus)
+      })
+      .catch((err) => {
+        console.error('Error updating data:', err);
+        // Handle the error as needed
+      });
   };
   
   const doctorEdit=(custom_id)=>{
@@ -38,7 +55,7 @@ function Doctor() {
     })
 
 
-  },[isEditModalVisible])
+  },[isEditModalVisible,checked])
 
   return (
     <>
@@ -48,75 +65,7 @@ function Doctor() {
 
     <div className="p-4 bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5 dark:bg-gray-800 dark:border-gray-700">
   <div className="w-full mb-1">
-    <div className="mb-4">
-      <nav className="flex mb-5" aria-label="Breadcrumb">
-        <ol className="inline-flex items-center space-x-1 text-sm font-medium md:space-x-2">
-          <li className="inline-flex items-center">
-            <a
-              href="#"
-              className="inline-flex items-center text-gray-700 hover:text-primary-600 dark:text-gray-300 dark:hover:text-white"
-            >
-              <svg
-                className="w-5 h-5 mr-2.5"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-              </svg>
-              Home
-            </a>
-          </li>
-          <li>
-            <div className="flex items-center">
-              <svg
-                className="w-6 h-6 text-gray-400"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <a
-                href="#"
-                className="ml-1 text-gray-700 hover:text-primary-600 md:ml-2 dark:text-gray-300 dark:hover:text-white"
-              >
-                Users
-              </a>
-            </div>
-          </li>
-          <li>
-            <div className="flex items-center">
-              <svg
-                className="w-6 h-6 text-gray-400"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span
-                className="ml-1 text-gray-400 md:ml-2 dark:text-gray-500"
-                aria-current="page"
-              >
-                List
-              </span>
-            </div>
-          </li>
-        </ol>
-      </nav>
-      <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
-        All users
-      </h1>
-    </div>
+    <DocCrump/>
     <div className="sm:flex">
       <div className="items-center hidden mb-3 sm:flex sm:divide-x sm:divide-gray-100 sm:mb-0 dark:divide-gray-700">
         <form className="lg:pr-3" action="#" method="GET">
@@ -370,8 +319,7 @@ function Doctor() {
                           type="checkbox"
                           checked={item.is_active}
                           className="sr-only peer"
-                          onClick={handleCheckboxChange}
-                          onChange={() => handleCheckboxChange(item.doctor_user.custom_id)}
+                          onChange={() => handleCheckboxChange(item.doctor_user.custom_id, item.is_active)}
                         />
                         <div
                           className={`peer ring-0 bg-rose-400 rounded-full outline-none duration-300 after:duration-500 w-8 h-8 shadow-md ${
