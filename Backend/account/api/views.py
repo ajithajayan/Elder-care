@@ -3,8 +3,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from account.models import  User
-from .serializers import  UserDetailsUpdateSerializer, UserRegisterSerializer, UserSerializer
+from account.models import  Doctor, User
+from .serializers import  AdminDocUpdateSerializer, UserDetailsUpdateSerializer, UserRegisterSerializer, UserSerializer
 from django.contrib.auth import authenticate
 import random
 from django.core.mail import send_mail
@@ -144,8 +144,11 @@ class DocDetailsUpdate(generics.RetrieveUpdateAPIView):
     lookup_field = 'pk'
     
 
-    
-    
+class AdminDocUpdate(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Doctor.objects.all()
+    parser_classes = (MultiPartParser, FormParser)
+    serializer_class = AdminDocUpdateSerializer
+    lookup_field = 'pk'
 
 
 

@@ -26,4 +26,8 @@ urlpatterns = [
     path("doc/update/<str:pk>", views.DocDetailsUpdate().as_view(), name="doc-update"),
 
 
+
+    path("admin/doc/<str:pk>", views.AdminDocUpdate().as_view(), name="adminDoc-update"),
+
+
 ]

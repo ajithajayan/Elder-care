@@ -1,12 +1,28 @@
 /** @type {import('tailwindcss').Config} */
-const withMT = require("@material-tailwind/react/utils/withMT");
-module.exports=withMT( {
+module.exports = {
   content: [
     "./index.html,jsx,js",
     "./src/**/*.{js,ts,jsx,tsx}",
-    'node_modules/flowbite-react/lib/esm/**/*.js',
+    // 'node_modules/flowbite-react/lib/esm/**/*.js'
+    // './components/**/*.{html,js}',
   ],
-  darkMode: 'class',
+  safelist: [
+    'w-64',
+    'w-1/2',
+    'rounded-l-lg',
+    'rounded-r-lg',
+    'bg-gray-200',
+    'grid-cols-4',
+    'grid-cols-7',
+    'h-6',
+    'leading-6',
+    'h-9',
+    'leading-9',
+    'shadow-lg',
+    'bg-opacity-50',
+    'dark:bg-opacity-80'
+  ],
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
@@ -27,6 +43,6 @@ module.exports=withMT( {
     },
   },
   plugins: [
-    require('flowbite/plugin')
-]
-});
+    // require('flowbite/plugin')
+  ],
+}

@@ -1,6 +1,8 @@
 import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 # Create your models here.
@@ -110,3 +112,92 @@ class User(AbstractBaseUser):
         return self.user_type == 'doctor'
 
 
+
+
+class Verification(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    aadhar_card_number = models.CharField(max_length=255, blank=True, null=True)
+    aadhar_file = models.FileField(upload_to='verification_documents/aadhar', blank=True, null=True)
+    license_number = models.CharField(max_length=255, blank=True, null=True)
+    license_file = models.FileField(upload_to='verification_documents/license', blank=True, null=True)
+    degree_certificate = models.FileField(upload_to='verification_documents/degree', blank=True, null=True)
+    experience_certificate = models.FileField(upload_to='verification_documents/experience', blank=True, null=True)
+    is_verified = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Verification for {self.user.first_name}"
+
+
+
+
+class Doctor(models.Model):
+    SPECIALIZATION_CHOICES = [
+        ('Cardiologist', 'Cardiologist'),
+        ('Dermatologist', 'Dermatologist'),
+        ('Neurologist', 'Neurologist'),
+        ('Orthopedic Surgeon', 'Orthopedic Surgeon'),
+        ('Ophthalmologist', 'Ophthalmologist'),
+        ('Gastroenterologist', 'Gastroenterologist'),
+        ('Endocrinologist', 'Endocrinologist'),
+        ('Pulmonologist', 'Pulmonologist'),
+        ('Nephrologist', 'Nephrologist'),
+        ('Pediatrician', 'Pediatrician'),
+        ('Psychiatrist', 'Psychiatrist'),
+        ('General', 'General'),
+        ('Rheumatologist', 'Rheumatologist'),
+        ('Hematologist', 'Hematologist'),
+        ('Urologist', 'Urologist'),
+        ('Otolaryngologist', 'Otolaryngologist'),
+        ('Radiologist', 'Radiologist'),
+    ]
+    custom_id = models.CharField(max_length=10, primary_key=True, unique=True, editable=False)
+    user = models.OneToOneField(User, on_delete=models.CASCADE,related_name='doctor_user')
+    full_name = models.CharField(max_length=255)
+    specializations = models.CharField(max_length=30, choices=SPECIALIZATION_CHOICES, default='General')
+
+    def save(self, *args, **kwargs):
+        if not self.custom_id:
+            # Auto-generate custom ID for Doctor starting from D5000
+            last_doctor = Doctor.objects.order_by('-custom_id').first()
+            if last_doctor:
+                self.custom_id = f'D{max(5000, int(last_doctor.custom_id[1:]) + 1)}'
+            else:
+                self.custom_id = 'D5000'
+        super().save(*args, **kwargs)
+
+
+
+
+class Patient(models.Model):
+    custom_id = models.CharField(max_length=10, primary_key=True, unique=True, editable=False)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    full_name = models.CharField(max_length=255)
+
+    def save(self, *args, **kwargs):
+        if not self.custom_id:
+            # Auto-generate custom ID for Patient starting from P5000
+            last_patient = Patient.objects.order_by('-custom_id').first()
+            if last_patient:
+                self.custom_id = f'P{max(5000, int(last_patient.custom_id[1:]) + 1)}'
+            else:
+                self.custom_id = 'P5000'
+        super().save(*args, **kwargs)
+
+
+
+
+# Signal receiver to create profile instances
+@receiver(post_save, sender=User)
+def create_profile(sender, instance, created, **kwargs):
+    if created:
+        # Check user_type and create the corresponding profile instance
+        if instance.is_doctor():
+            Doctor.objects.create(user=instance, full_name=instance.first_name+" "+instance.last_name)  # You can customize as needed
+            Verification.objects.create(user=instance)
+
+        elif instance.user_type == 'client':
+            Patient.objects.create(user=instance, full_name=instance.first_name+" "+instance.last_name)  # Customize as per your requirements
+
+
+# Connect the signal receiver function
+post_save.connect(create_profile, sender=User)

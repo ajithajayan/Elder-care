@@ -1,5 +1,5 @@
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer,TokenRefreshSerializer
-from account.models import User
+from account.models import Doctor, User
 
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
@@ -42,20 +42,30 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
 
 
-      
+
+class DoctorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Doctor
+        fields = '__all__'
+
+
 
 class UserDetailsUpdateSerializer(serializers.ModelSerializer):
+    doctor_user=DoctorSerializer(read_only=True)
     class Meta:
         model = User
-        exclude = ('password','is_id_verified','is_email_verified','is_staff','is_active','is_superuser','user_type','approval_status','id')
+        exclude = ('password','is_id_verified','is_email_verified','is_staff','is_superuser','user_type','id')
     
     
         
 
-    
+class AdminDocUpdateSerializer(serializers.ModelSerializer):
+    user=UserSerializer()
+    class Meta:
+        model = Doctor
+        fields='__all__' 
         
 
-class DocSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        exclude = ('password','is_id_verified','is_email_verified','is_staff','is_active','is_superuser','user_type','approval_status','id')
+
+
+

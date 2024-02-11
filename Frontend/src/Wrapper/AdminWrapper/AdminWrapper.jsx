@@ -1,26 +1,25 @@
 
 import React, { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import AdminHeader from '../../components/admin/AdminHeader/AdminHeader';
-import AdminFooter from '../../components/admin/AdminFooter/AdminFooter';
-import AdminHome from '../../pages/admin/AdminHome';
+
+
 import AdminPrivateRoute from '../../components/Private/AdminPrivateRoute';
 import { useDispatch, useSelector } from 'react-redux';
 import { set_Authentication } from '../../Redux/authentication/authenticationSlice';
 import { set_user_basic_details } from '../../Redux/userBasicDetails/userBasicDetailsSlice';
 import axios from 'axios';
 import isAuthAdmin from '../../utils/isAuthAdmin';
-import AdminCreateUser from '../../pages/admin/AdminCreateUser';
-import AdminUpdateUser from '../../pages/admin/AdminUpdateUser';
+
 import AdminSignin from '../../pages/admin/AdminSignin';
 import { baseUrl } from '../../utils/constants/Constants';
 import { Outlet, useRoutes } from 'react-router-dom'
 import Page404 from '../../components/404/Page404';
-import Main from '../../components/admin/layout/Main';
+import ThemeProvider from '../../components/admin/elements/theme';
 import '../../assets/Styles/main.scss'
 import Doctor from '../../pages/admin/Doctor';
 import Patient from '../../pages/admin/Patient';
-import Profile from '../../pages/admin/Profile';
+import DashboardLayout from '../../pages/admin/DashboardLayout';
+import Dashboard from '../../pages/admin/Dashboard';
 
 
 function AdminWrapper() {
@@ -74,21 +73,22 @@ function AdminWrapper() {
     },
     {
       element: (
-          <div className='main_admin'>
-          <AdminPrivateRoute>
-            <Main>
-            <Outlet/>
-            </Main>
-          </AdminPrivateRoute>
-          </div>
+          <ThemeProvider>
+              <DashboardLayout>
+               <AdminPrivateRoute>
+                    <Outlet/>
+                </AdminPrivateRoute>
+              </DashboardLayout>
+            </ThemeProvider>
+        
       ),
       children: [    
-        {path: "/", element: <AdminHome />},
+        {path: "/", element: <Dashboard />},
         {path: "/doctor", element: <Doctor/>},
         {path: "/patient", element: <Patient/>},
-        {path: "/profile", element: <Profile/>},
-        {path: "user/create", element: <AdminCreateUser />},  
-        {path: "/user/update/:id", element: <AdminUpdateUser />},
+        // // {path: "/profile", element: <Profile/>},
+        // {path: "user/create", element: <AdminCreateUser />},  
+        // {path: "/user/update/:id", element: <AdminUpdateUser />},
       ]
     },
     {
