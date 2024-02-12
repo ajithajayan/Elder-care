@@ -6,6 +6,7 @@ import {jwtDecode} from "jwt-decode";
 import { set_Authentication } from '../../Redux/authentication/authenticationSlice';
 import { baseUrl } from '../../utils/constants/Constants';
 import { GoogleLogin } from '@react-oauth/google';
+import { toast } from 'react-toastify';
 
 
 
@@ -66,6 +67,7 @@ function UserLogin() {
     }
     catch (error) {
       console.log(error);
+      toast.error(error.response.data.detail)
       // if (error.response.status===401)
       // {
        

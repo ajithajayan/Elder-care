@@ -20,8 +20,15 @@ const Register = () => {
     user_type: "client",
   });
 
-  const { first_name, last_name, email, phone_number, password, re_password ,user_type} =
-    formData;
+  const {
+    first_name,
+    last_name,
+    email,
+    phone_number,
+    password,
+    re_password,
+    user_type,
+  } = formData;
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -81,32 +88,27 @@ const Register = () => {
     }
   };
 
-
   const Google_reg = async (user_detail) => {
     const formData = new FormData();
-    formData.append("email", user_detail.email)
-    formData.append("first_name", user_detail.given_name)
-    formData.append("last_name", user_detail.family_name)
-    formData.append("user_type", 'client')
-    formData.append("password", "12345678874")
+    formData.append("email", user_detail.email);
+    formData.append("first_name", user_detail.given_name);
+    formData.append("last_name", user_detail.family_name);
+    formData.append("user_type", "client");
+    formData.append("password", "12345678874");
     try {
-        const res = await axios.post(baseUrl + 'auth/register', formData)
-        console.log(res);
-        if (res.status === 201) {
-            console.log("Saved successfully man");
-            navigate('/auth/login',
-                {
-                    state: res.data.Message
-                })
-            return res
-        }
+      const res = await axios.post(baseUrl + "auth/register", formData);
+      console.log(res);
+      if (res.status === 201) {
+        console.log("Saved successfully man");
+        navigate("/auth/login", {
+          state: res.data.Message,
+        });
+        return res;
+      }
+    } catch (error) {
+      console.log("DafdAA\n\n", error);
     }
-    catch (error) {
-        console.log("DafdAA\n\n", error);
-    }
-}
-
-
+  };
 
   useEffect(() => {
     if (isError) {
@@ -123,7 +125,7 @@ const Register = () => {
 
   return (
     <div className="regis">
-      <form className="form">
+      <form className="form" onSubmit={handleSubmit}>
         <p className="title">Register</p>
         <p className="message">Signup now and get full access to our app.</p>
         <div className="flex">
@@ -170,7 +172,7 @@ const Register = () => {
             required
             placeholder=""
             type="tel"
-            pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+            pattern="\d{10}"
             className="input"
             name="phone_number"
             value={phone_number}
@@ -178,6 +180,7 @@ const Register = () => {
           />
           <span>Phone Number</span>
         </label>
+
         <label>
           <input
             required
@@ -203,67 +206,66 @@ const Register = () => {
           <span>Confirm password</span>
         </label>
         <div className="flex-1 flex-row">
-        <GoogleLogin
-          onSuccess={(credentialResponse) => {
-            Google_reg(jwtDecode(credentialResponse.credential))
-            console.log(jwtDecode(credentialResponse.credential));
-          }}
-          onError={() => {
-            console.log("Login Failed");
-          }}
-        />
-        <button type="submit" className="submit" onClick={handleSubmit}>
-          Submit
-        </button>
-        
+          <GoogleLogin
+            onSuccess={(credentialResponse) => {
+              Google_reg(jwtDecode(credentialResponse.credential));
+              console.log(jwtDecode(credentialResponse.credential));
+            }}
+            onError={() => {
+              toast.error("Login Failed");
+            }}
+          />
+          <button type="submit" className="submit">
+            Submit
+          </button>
         </div>
         <p className="signin">
           Already have an account? <Link to="/auth/login">Sign in</Link>
         </p>
-
-       
       </form>
 
       <div className="w-full h-40 flex items-center justify-center cursor-pointer">
-  <div className="relative inline-flex items-center justify-start py-3 pl-4 pr-12 overflow-hidden font-semibold shadow text-indigo-600 transition-all duration-150 ease-in-out rounded hover:pl-10 hover:pr-6 bg-gray-50 dark:bg-gray-700 dark:text-white dark:hover:text-gray-200 dark:shadow-none group">
-    <span className="absolute bottom-0 left-0 w-full h-1 transition-all duration-150 ease-in-out bg-indigo-600 group-hover:h-full" />
-    <span className="absolute right-0 pr-4 duration-200 ease-out group-hover:translate-x-12">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        fill="none"
-        className="w-5 h-5 text-green-400"
-      >
-        <path
-          d="M14 5l7 7m0 0l-7 7m7-7H3"
-          strokeWidth={2}
-          strokeLinejoin="round"
-          strokeLinecap="round"
-        />
-      </svg>
-    </span>
-    <span className="absolute left-0 pl-2.5 -translate-x-12 group-hover:translate-x-0 ease-out duration-200">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        fill="none"
-        className="w-5 h-5 text-green-400"
-      >
-        <path
-          d="M14 5l7 7m0 0l-7 7m7-7H3"
-          strokeWidth={2}
-          strokeLinejoin="round"
-          strokeLinecap="round"
-        />
-      </svg>
-    </span>
-    <Link to="/auth/doctor/register"><span className="relative w-full text-left transition-colors duration-200 ease-in-out group-hover:text-white dark:group-hover:text-gray-200">
-    Register as A Doctor
-    </span></Link>
-  </div>
-</div>          
+        <div className="relative inline-flex items-center justify-start py-3 pl-4 pr-12 overflow-hidden font-semibold shadow text-indigo-600 transition-all duration-150 ease-in-out rounded hover:pl-10 hover:pr-6 bg-gray-50 dark:bg-gray-700 dark:text-white dark:hover:text-gray-200 dark:shadow-none group">
+          <span className="absolute bottom-0 left-0 w-full h-1 transition-all duration-150 ease-in-out bg-indigo-600 group-hover:h-full" />
+          <span className="absolute right-0 pr-4 duration-200 ease-out group-hover:translate-x-12">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              fill="none"
+              className="w-5 h-5 text-green-400"
+            >
+              <path
+                d="M14 5l7 7m0 0l-7 7m7-7H3"
+                strokeWidth={2}
+                strokeLinejoin="round"
+                strokeLinecap="round"
+              />
+            </svg>
+          </span>
+          <span className="absolute left-0 pl-2.5 -translate-x-12 group-hover:translate-x-0 ease-out duration-200">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              fill="none"
+              className="w-5 h-5 text-green-400"
+            >
+              <path
+                d="M14 5l7 7m0 0l-7 7m7-7H3"
+                strokeWidth={2}
+                strokeLinejoin="round"
+                strokeLinecap="round"
+              />
+            </svg>
+          </span>
+          <Link to="/auth/doctor/register">
+            <span className="relative w-full text-left transition-colors duration-200 ease-in-out group-hover:text-white dark:group-hover:text-gray-200">
+              Register as A Doctor
+            </span>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 };

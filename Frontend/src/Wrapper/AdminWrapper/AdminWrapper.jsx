@@ -20,56 +20,57 @@ import Doctor from '../../pages/admin/Doctor';
 import Patient from '../../pages/admin/Patient';
 import DashboardLayout from '../../pages/admin/DashboardLayout';
 import Dashboard from '../../pages/admin/Dashboard';
-
+import AdminLogRoute from '../../components/Private/AdminLogRoute';
 
 function AdminWrapper() {
-  const dispatch = useDispatch();
-  const authentication_user = useSelector(state => state.authentication_user);
+  // const dispatch = useDispatch();
+  // const authentication_user = useSelector(state => state.authentication_user);
 
-  const token = localStorage.getItem('access');
+  // const token = localStorage.getItem('access');
 
-  const checkAuthAndFetchUserData = async () => {
-    try {
-      const isAuthenticated = await isAuthAdmin();
-      dispatch(
-        set_Authentication({
-          name: isAuthenticated.name,
-          isAuthenticated: isAuthenticated.isAuthenticated,
-          isAdmin: isAuthenticated.isAdmin,
-        })
-      );
+  // const checkAuthAndFetchUserData = async () => {
+  //   try {
+  //     const isAuthenticated = await isAuthAdmin();
+  //     dispatch(
+  //       set_Authentication({
+  //         name: isAuthenticated.name,
+  //         isAuthenticated: isAuthenticated.isAuthenticated,
+  //         isAdmin: isAuthenticated.isAdmin,
+  //       })
+  //     );
 
-      if (isAuthenticated.isAuthenticated) {
-        const res = await axios.get(baseUrl + 'auth/user/details/', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-        });
+  //     if (isAuthenticated.isAuthenticated) {
+  //       const res = await axios.get(baseUrl + 'auth/user/details/', {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //           Accept: 'application/json',
+  //           'Content-Type': 'application/json',
+  //         },
+  //       });
 
-        dispatch(
-          set_user_basic_details({
-            name: res.data.first_name,
-            profile_pic: res.data.profile_pic,
-          })
-        );
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  //       dispatch(
+  //         set_user_basic_details({
+  //           name: res.data.first_name,
+  //           profile_pic: res.data.profile_pic,
+  //         })
+  //       );
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
-  useEffect(() => {
-    if (!authentication_user.name) {
-      checkAuthAndFetchUserData();
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (!authentication_user.name) {
+  //     console.log("this is working in  use effect");
+  //     checkAuthAndFetchUserData();
+  //   }
+  // }, []);
 
   const routes = useRoutes([
     {
       path: "/login",
-      element: <AdminSignin />
+      element: <AdminLogRoute><AdminSignin /></AdminLogRoute>
     },
     {
       element: (

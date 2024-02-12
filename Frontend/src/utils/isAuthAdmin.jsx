@@ -91,6 +91,7 @@ import { baseUrl } from "./constants/Constants";
 
 const updateAdminToken = async () => {
     const refreshToken = localStorage.getItem("refresh");
+    console.log("this will display the refresh token ",refreshToken);
 
     try {
         const res = await axios.post(baseUrl + 'auth/token/refresh', {

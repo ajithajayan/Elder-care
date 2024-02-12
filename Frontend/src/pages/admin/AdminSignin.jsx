@@ -7,6 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { set_Authentication } from "../../Redux/authentication/authenticationSlice";
 import { useDispatch } from "react-redux";
 import { baseUrl } from "../../utils/constants/Constants";
+import { toast } from "react-toastify";
 
 function AdminSignin() {
   const [formError, setFormError] = useState([]);
@@ -39,11 +40,7 @@ function AdminSignin() {
       }
     } catch (error) {
       console.log(error);
-      if (error.response.status === 401) {
-        setFormError(error.response.data);
-      } else {
-        console.log(error);
-      }
+      toast.error(error.response.data.detail)
     }
   };
 

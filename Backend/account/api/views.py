@@ -3,8 +3,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from account.models import  Doctor, User
-from .serializers import  AdminDocUpdateSerializer, UserDetailsUpdateSerializer, UserRegisterSerializer, UserSerializer
+from account.models import  Doctor, Patient, User
+from .serializers import  AdminClientUpdateSerializer, AdminDocUpdateSerializer, PatientSerializer, PatientUserSerializer, UserDetailsUpdateSerializer, UserRegisterSerializer, UserSerializer
 from django.contrib.auth import authenticate
 import random
 from django.core.mail import send_mail
@@ -16,8 +16,8 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 from rest_framework.response import Response
 from rest_framework import status, generics
 from rest_framework.parsers import MultiPartParser, FormParser
-
-
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.filters import SearchFilter
 
 
 class getAccountsRoutes(APIView):
@@ -75,7 +75,7 @@ class UserLogin(APIView):
 
         if not User.objects.filter(email=email).exists():
             # raise AuthenticationFailed('Invalid Email Address')
-            return Response({'error': 'Email Does Not Exist'}, status=status.HTTP_403_FORBIDDEN)
+            return Response({'detail': 'Email Does Not Exist'}, status=status.HTTP_403_FORBIDDEN)
 
         if not User.objects.filter(email=email, is_active=True).exists():
             raise AuthenticationFailed(
@@ -129,11 +129,19 @@ class UserDetailsUpdate(generics.ListAPIView):
     queryset = User.objects.filter(user_type='doctor')
     parser_classes = (MultiPartParser, FormParser)
     serializer_class = UserDetailsUpdateSerializer
+    pagination_class = PageNumberPagination
+    filter_backends = [SearchFilter]
+    search_fields = ['first_name', 'last_name', 'email', 'phone_number']
+
+
     
-class UseDetailsUpdate(generics.ListAPIView):
+class PatientUseDetailsUpdate(generics.ListAPIView):
     queryset = User.objects.filter(user_type='client')
     parser_classes = (MultiPartParser, FormParser)
-    serializer_class = UserDetailsUpdateSerializer
+    serializer_class = PatientUserSerializer
+    pagination_class = PageNumberPagination
+    filter_backends = [SearchFilter]
+    search_fields = ['first_name', 'last_name', 'email', 'phone_number']
 
 
 
@@ -157,7 +165,10 @@ class AdminDocDelete(generics.RetrieveDestroyAPIView):
     lookup_field = 'pk'
     
 
-
+class AdminClientUpdate(generics.RetrieveUpdateAPIView):
+    queryset=Patient.objects.all()
+    serializer_class = AdminClientUpdateSerializer
+    lookup_field = 'pk'
 
     
 

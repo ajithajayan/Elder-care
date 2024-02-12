@@ -1,5 +1,5 @@
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer,TokenRefreshSerializer
-from account.models import Doctor, User
+from account.models import Doctor, Patient, User
 
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
@@ -32,11 +32,13 @@ class DOCUserSerializer(serializers.ModelSerializer):
         exclude = ('password', 'id' ,'is_staff','is_superuser','user_type','email','profile_picture')
 
 
-        
+
+
+
 class UserRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'email', 'password', 'is_active', 'first_name', 'last_name','user_type']
+        fields = ['id', 'email', 'password', 'is_active', 'first_name', 'last_name','user_type','phone_number']
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -47,6 +49,11 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return super(UserRegisterSerializer, self).create(validated_data)
 
 
+
+class PatientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Patient
+        fields = '__all__'
 
 
 class DoctorSerializer(serializers.ModelSerializer):
@@ -62,7 +69,15 @@ class UserDetailsUpdateSerializer(serializers.ModelSerializer):
         model = User
         exclude = ('password','is_id_verified','is_email_verified','is_staff','is_superuser','user_type')
     
+
+class PatientUserSerializer(serializers.ModelSerializer):
     
+    patient_user=PatientSerializer(read_only=True)
+
+    class Meta:
+        model = User
+        exclude = ('password','is_id_verified', 'is_email_verified', 'is_staff', 'is_superuser', 'user_type')
+          
         
 
 class AdminDocUpdateSerializer(serializers.ModelSerializer):
@@ -80,3 +95,15 @@ class AdminDocUpdateSerializer(serializers.ModelSerializer):
 
 
 
+class AdminClientUpdateSerializer(serializers.ModelSerializer):
+    user=DOCUserSerializer()
+    class Meta:
+        model = Patient
+        fields='__all__'
+
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('user', {}) # this is used to pop out the user object and if it is not existing then we will assign a {} to it as default
+        user_serializer = UserSerializer(instance.user, data=user_data, partial=True)
+        if user_serializer.is_valid():
+            user_serializer.save()
+        return super().update(instance, validated_data)

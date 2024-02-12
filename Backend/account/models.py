@@ -1,3 +1,4 @@
+import datetime
 import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
@@ -154,6 +155,11 @@ class Doctor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE,related_name='doctor_user')
     full_name = models.CharField(max_length=255)
     specializations = models.CharField(max_length=30, choices=SPECIALIZATION_CHOICES, default='General')
+    consultaion_fees = models.DecimalField(max_digits=10, decimal_places=3, default=300)
+    consultation_duration = models.DurationField(default=datetime.timedelta(hours=1))
+    consultation_slots = models.IntegerField(default=3)
+   
+    
 
     def save(self, *args, **kwargs):
         if not self.custom_id:
@@ -169,10 +175,21 @@ class Doctor(models.Model):
 
 
 class Patient(models.Model):
-    custom_id = models.CharField(max_length=10, primary_key=True, unique=True, editable=False)
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    full_name = models.CharField(max_length=255)
+    blood_group=[
+        ('A+', 'A+'),
+        ('A-', 'A-'),
+        ('B+', 'B+'),
+        ('B-', 'B-'),
+        ('O+', 'O+'),
+        ('O-', 'O-'),
+        ('AB+', 'AB+'),
+        ('AB-', 'AB-'),
 
+    ]
+    custom_id = models.CharField(max_length=10, primary_key=True, unique=True, editable=False)
+    user = models.OneToOneField(User, on_delete=models.CASCADE,related_name='patient_user')
+    full_name = models.CharField(max_length=255)
+    blood_group = models.CharField(max_length=5, choices=blood_group, default='A+') 
     def save(self, *args, **kwargs):
         if not self.custom_id:
             # Auto-generate custom ID for Patient starting from P5000

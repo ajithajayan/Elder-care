@@ -3,7 +3,7 @@ import { baseUrl } from "../../../../utils/constants/Constants";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-function EditDoctor({ doctorId, setIsDataFetched, setEditModalVisible }) {
+function EditPatient({ doctorId, setIsDataFetched, setEditModalVisible }) {
   const UserFields = [
     "username",
     "first_name",
@@ -39,28 +39,20 @@ function EditDoctor({ doctorId, setIsDataFetched, setEditModalVisible }) {
     date_joined: "text",
     is_email_verified: "checkbox",
     is_active: "checkbox",
-    specializations: "text",
+    blood_group: "text",
   };
 
-  const specializationOptions = [
-    "Cardiologist",
-    "Dermatologist",
-    "Neurologist",
-    "Orthopedic Surgeon",
-    "Ophthalmologist",
-    "Gastroenterologist",
-    "Endocrinologist",
-    "Pulmonologist",
-    "Nephrologist",
-    "Pediatrician",
-    "Psychiatrist",
-    "General",
-    "Rheumatologist",
-    "Hematologist",
-    "Urologist",
-    "Otolaryngologist",
-    "Radiologist",
-  ];
+  const blood_groupOptions = [
+    "A+",
+    "A-",
+    "B+",
+    "B-",
+    "AB+",
+    "AB-",
+    "O+",
+    "O-",
+];
+
 
   const [user, setUser] = useState({});
   const [specializations, setSpecializations] = useState("");
@@ -83,7 +75,7 @@ function EditDoctor({ doctorId, setIsDataFetched, setEditModalVisible }) {
   const handleSelectChange = (e, field) => {
     const value = e.target.value;
 
-    if (field === "specializations") {
+    if (field === "blood_group") {
       setSpecializations(value);
     } else if (field.includes(".")) {
       const [nestedField, subField] = field.split(".");
@@ -111,11 +103,11 @@ function EditDoctor({ doctorId, setIsDataFetched, setEditModalVisible }) {
     });
 
     // Append other data to the form data
-    formData.append("specializations", specializations);
+    formData.append("blood_group", specializations);
 
     // Make the API request
     axios
-      .patch(baseUrl + `auth/admin/doc/${doctorId}`, formData)
+      .patch(baseUrl + `auth/admin/client/${doctorId}`, formData)
       .then((res) => {
         console.log("Data updated successfully:", res.data);
         toast.success("Data updated successfully");
@@ -131,10 +123,10 @@ function EditDoctor({ doctorId, setIsDataFetched, setEditModalVisible }) {
 
   useEffect(() => {
     axios
-      .get(baseUrl + `auth/admin/doc/${doctorId}`)
+      .get(baseUrl + `auth/admin/client/${doctorId}`)
       .then((res) => {
         setUser({ ...res.data.user }); // Spread the user object to avoid mutation
-        setSpecializations(res.data.specializations || "");
+        setSpecializations(res.data.blood_group || "");
         setDocDetail(res.data);
         console.log(res.data, "reached to the editing component");
         setIsDataFetched(true);
@@ -159,21 +151,21 @@ function EditDoctor({ doctorId, setIsDataFetched, setEditModalVisible }) {
               {/* Display Specializations */}
               <div className="col-span-6 sm:col-span-3">
                 <label
-                  htmlFor="specializations"
+                  htmlFor="blood_group"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
-                  Specializations
+                  Blood Group
                 </label>
                 <select
-                  name="specializations"
-                  value={specializations}
-                  onChange={(e) => handleSelectChange(e, "specializations")}
+                  name="blood_group"
+                  Value={specializations}
+                  onChange={(e) => handleSelectChange(e, "blood_group")}
                   id="specializations"
                   className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                   required=""
                 >
-                  <option value="">Select Specialization</option>
-                  {specializationOptions.map((option) => (
+                  <option value={specializations}>Select blood groups</option>
+                  {blood_groupOptions.map((option) => (
                     <option key={option} value={option}>
                       {option}
                     </option>
@@ -261,4 +253,4 @@ function EditDoctor({ doctorId, setIsDataFetched, setEditModalVisible }) {
   );
 }
 
-export default EditDoctor;
+export default EditPatient;
