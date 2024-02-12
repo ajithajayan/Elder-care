@@ -20,13 +20,14 @@ urlpatterns = [
     path("user/list/<str:pk>", views.UserDetailsUpdate().as_view(), name="user-list"),
 
     
-    path("patient/details/", views.PatientUseDetailsUpdate.as_view(), name="patient-details"),
+    path("patient/details", views.PatientUseDetailsUpdate.as_view(), name="patient-details"),
 
 
 
     path("doc/list/<str:pk>", views.DocDetailsUpdate().as_view(), name="doc-list"),
     path("doc/update/<str:pk>", views.DocDetailsUpdate().as_view(), name="doc-update"),
 
+    path("patient/list/<str:pk>", views.ClientDetailsUpdate().as_view(), name="patient-list"),
 
 
     path("admin/doc/<str:pk>", views.AdminDocUpdate().as_view(), name="adminDoc-update"),

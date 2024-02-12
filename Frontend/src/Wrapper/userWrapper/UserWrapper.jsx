@@ -12,6 +12,7 @@ import { set_user_basic_details } from '../../Redux/userBasicDetails/userBasicDe
 import axios from 'axios'
 import Authenticator from "../../pages/Authentication/Authenticator";
 import Page404 from "../../components/404/Page404";
+import UserProfile from "../../pages/userSide/UserProfile";
 
 
 function UserWrapper() {
@@ -79,7 +80,8 @@ function UserWrapper() {
     ),
     children:[
       {path: "/auth/*", element:<Authenticator/>},
-      {path: "/", element: <UserHome/>}
+      {path: "/", element: <UserHome/>},
+      {path: "/profile", element: <UserProfile/>},
     ],
   },
   {

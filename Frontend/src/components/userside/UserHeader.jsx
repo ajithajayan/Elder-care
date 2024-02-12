@@ -111,8 +111,8 @@ const Navbar = () => {
           Find Doctor
         </NavLink>
 
-        <NavLink className="flex text-gray-800 hover:text-blue-500 cursor-pointer transition-colors duration-300">
-          Packages
+        <NavLink to="/profile" className="flex text-gray-800 hover:text-blue-500 cursor-pointer transition-colors duration-300">
+          My Profile
         </NavLink>
 
         <NavLink className="flex text-gray-800 hover:text-blue-500 cursor-pointer transition-colors duration-300">

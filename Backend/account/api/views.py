@@ -169,8 +169,13 @@ class AdminClientUpdate(generics.RetrieveUpdateAPIView):
     queryset=Patient.objects.all()
     serializer_class = AdminClientUpdateSerializer
     lookup_field = 'pk'
-
     
+
+class ClientDetailsUpdate(generics.RetrieveUpdateAPIView):
+    queryset = User.objects.all()
+    parser_classes = (MultiPartParser, FormParser)
+    serializer_class = PatientUserSerializer
+    lookup_field = 'pk'    
 
 class UserDetails(APIView):
     permission_classes = [IsAuthenticated]

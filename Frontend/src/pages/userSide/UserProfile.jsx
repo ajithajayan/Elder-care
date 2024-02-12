@@ -6,7 +6,7 @@ import ImageUploading from "react-images-uploading";
 import userImage from "../../assets/images/user.png";
 import { toast } from "react-toastify";
 
-function DoctorProfile() {
+function UserProfile() {
   const UserFields = [
     "username",
     "first_name",
@@ -38,23 +38,14 @@ function DoctorProfile() {
   };
 
   const specializationOptions = [
-    "Cardiologist",
-    "Dermatologist",
-    "Neurologist",
-    "Orthopedic Surgeon",
-    "Ophthalmologist",
-    "Gastroenterologist",
-    "Endocrinologist",
-    "Pulmonologist",
-    "Nephrologist",
-    "Pediatrician",
-    "Psychiatrist",
-    "General",
-    "Rheumatologist",
-    "Hematologist",
-    "Urologist",
-    "Otolaryngologist",
-    "Radiologist",
+    "A+",
+    "A-",
+    "B+",
+    "B-",
+    "AB+",
+    "AB-",
+    "O+",
+    "O-",
   ];
 
   const [profile, setProfile] = useState(null); // it's use for storing the image
@@ -122,13 +113,13 @@ function DoctorProfile() {
       console.log(id);
       setId(id);
 
-      const doct = await axios.get(baseUrl + "auth/doc/list/" + id);
+      const doct = await axios.get(baseUrl + "auth/patient/list/" + id);
       if (doct.status === 200) {
         setProfile(doct.data.profile_picture);
         setAbout(doct.data);
-        setdocid(doct.data.doctor_user.custom_id);
+        setdocid(doct.data.patient_user.custom_id);
         axios
-          .get(baseUrl + `auth/admin/doc/${doct.data.doctor_user.custom_id}`)
+          .get(baseUrl + `auth/admin/client/${doct.data.patient_user.custom_id}`)
           .then((res) => {
             setUser({ ...res.data.user }); // Spread the user object to avoid mutation
             setSpecializations(res.data.specializations || "");
@@ -204,7 +195,7 @@ function DoctorProfile() {
 
     // Make the API request
     axios
-      .patch(baseUrl + `auth/admin/doc/${docid}`, formData)
+      .patch(baseUrl + `auth/admin/client/${docid}`, formData)
       .then((res) => {
         console.log("Data updated successfully:", res.data);
         toast.success("Data updated successfully");
@@ -413,7 +404,7 @@ function DoctorProfile() {
                     htmlFor="specializations"
                     className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                   >
-                    Specializations
+                    Blood Group
                   </label>
                   <select
                     name="specializations"
@@ -423,7 +414,7 @@ function DoctorProfile() {
                     className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                     required=""
                   >
-                    <option value="">Select Specialization</option>
+                    <option value="">Select Blood group</option>
                     {specializationOptions.map((option) => (
                       <option key={option} value={option}>
                         {option}
@@ -515,4 +506,4 @@ function DoctorProfile() {
   );
 }
 
-export default DoctorProfile;
+export default UserProfile;
