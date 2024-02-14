@@ -116,11 +116,8 @@ class User(AbstractBaseUser):
 
 
 class Verification(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-    aadhar_card_number = models.CharField(max_length=255, blank=True, null=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True,related_name='doc_verification')
     aadhar_file = models.FileField(upload_to='verification_documents/aadhar', blank=True, null=True)
-    license_number = models.CharField(max_length=255, blank=True, null=True)
-    license_file = models.FileField(upload_to='verification_documents/license', blank=True, null=True)
     degree_certificate = models.FileField(upload_to='verification_documents/degree', blank=True, null=True)
     experience_certificate = models.FileField(upload_to='verification_documents/experience', blank=True, null=True)
     is_verified = models.BooleanField(default=False)
@@ -218,3 +215,15 @@ def create_profile(sender, instance, created, **kwargs):
 
 # Connect the signal receiver function
 post_save.connect(create_profile, sender=User)
+
+
+
+
+
+class OTPModel(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    otp = models.IntegerField()
+    timestamp = models.DateTimeField()
+
+    def __str__(self):
+        return f"{self.user.username} - {self.otp}"

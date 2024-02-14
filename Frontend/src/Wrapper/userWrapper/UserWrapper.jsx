@@ -13,6 +13,7 @@ import axios from 'axios'
 import Authenticator from "../../pages/Authentication/Authenticator";
 import Page404 from "../../components/404/Page404";
 import UserProfile from "../../pages/userSide/UserProfile";
+import UserRoute from "../../components/Private/UserRoute";
 
 
 function UserWrapper() {
@@ -81,7 +82,23 @@ function UserWrapper() {
     children:[
       {path: "/auth/*", element:<Authenticator/>},
       {path: "/", element: <UserHome/>},
+
+    ],
+  },
+  {
+    element: (
+      <>
+      <UserRoute>
+     <UserHeader/>
+      <Outlet/>
+      <Userfooter/>
+      </UserRoute>
+      </>
+    ),
+    children:[
+
       {path: "/profile", element: <UserProfile/>},
+
     ],
   },
   {

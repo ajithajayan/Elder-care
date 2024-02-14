@@ -1,5 +1,5 @@
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer,TokenRefreshSerializer
-from account.models import Doctor, Patient, User
+from account.models import Doctor, Patient, User, Verification
 
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
@@ -38,13 +38,13 @@ class DOCUserSerializer(serializers.ModelSerializer):
 class UserRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'email', 'password', 'is_active', 'first_name', 'last_name','user_type','phone_number']
+        fields = ['id', 'email', 'password', 'is_active', 'first_name', 'last_name', 'user_type', 'phone_number']
         extra_kwargs = {
             'password': {'write_only': True}
         }
+
     def create(self, validated_data):
-        validated_data['password'] = make_password(
-            validated_data.get('password'))
+        validated_data['password'] = make_password(validated_data.get('password'))
         validated_data['is_active'] = True
         return super(UserRegisterSerializer, self).create(validated_data)
 
@@ -107,3 +107,14 @@ class AdminClientUpdateSerializer(serializers.ModelSerializer):
         if user_serializer.is_valid():
             user_serializer.save()
         return super().update(instance, validated_data)
+
+
+
+
+# verification serializer
+
+
+class VerificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Verification
+        fields = '__all__'            

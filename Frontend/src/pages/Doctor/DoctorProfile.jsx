@@ -5,6 +5,7 @@ import { baseUrl } from "../../utils/constants/Constants";
 import ImageUploading from "react-images-uploading";
 import userImage from "../../assets/images/user.png";
 import { toast } from "react-toastify";
+import DocumentVerificationForm from "../../components/Doctor/Elements/DocumentVerificationForm";
 
 function DoctorProfile() {
   const UserFields = [
@@ -134,7 +135,6 @@ function DoctorProfile() {
             setSpecializations(res.data.specializations || "");
             setDocDetail(res.data);
             console.log(res.data, "reached to the editing component");
-            
           })
           .catch((err) => {
             console.log(err);
@@ -396,6 +396,14 @@ function DoctorProfile() {
               </button>
             </div>
           </div>
+
+          {/* ***********************************************verification documents***************************************************************** */}
+          {id&&
+          <DocumentVerificationForm
+          id={id}/>
+          }
+
+
         </div>
 
         {/* **************************************************General information********************************************************/}

@@ -66,7 +66,7 @@ function Appointment() {
               className="ml-20 w-48 h-48 mb-4 text-gray-900"
             />
             <h5 class="block mb-2 font-sans text-xl antialiased font-semibold leading-snug tracking-normal text-blue-gray-900">
-              <a className="text-blue-600 hover:text-black">Book a visitr</a>
+              <a className="text-blue-600 hover:text-black">Book a visit</a>
             </h5>
             <div className="text-slate-800 text-base leading-6 mt-2 max-md:max-w-full">
             Book your time slot with doctor from your comfort zone

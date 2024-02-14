@@ -122,6 +122,18 @@ USE_I18N = True
 
 USE_TZ = True
 
+# email authentication
+
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True  # Use TLS for secure communication
+EMAIL_HOST_USER = 'ajithajayan222aa@gmail.com'
+EMAIL_HOST_PASSWORD = 'lmyhtxulfhmvioah'
+EMAIL_DEBUG = True
+
+
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/

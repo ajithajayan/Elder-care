@@ -72,18 +72,19 @@ const Register = () => {
         password,
         user_type,
       };
-      await axios
-        .post(baseUrl + "auth/register", userData)
-        .then((e) => {
-          toast.success(
-            "An activation email has been sent to your email.please check your email"
-          );
-          navigate("/auth/login");
-        })
-        .catch((e) => {
-          console.log(e);
+      try {
+        const response = await axios.post(baseUrl + "auth/register", userData);
+        toast.success("An activation OTP has been sent to your email. Please check your email");
+        console.log(userData.email);
+        
+        navigate("/auth/otp", {
+          state: { email: userData.email },
         });
-
+      } catch (error) {
+        
+        toast.error("Email already exists");
+      }
+      
       // dispatch(register(userData))
     }
   };
@@ -126,7 +127,7 @@ const Register = () => {
   return (
     <div className="regis">
       <form className="form" onSubmit={handleSubmit}>
-        <p className="title">Register</p>
+        <p className="title">Patient Register</p>
         <p className="message">Signup now and get full access to our app.</p>
         <div className="flex">
           <label>

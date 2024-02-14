@@ -65,18 +65,18 @@ const DoctorRegister = () => {
         password,
         user_type,
       };
-      await axios
-        .post(baseUrl + "auth/register", userData)
-        .then((e) => {
-          toast.success(
-            "An activation email has been sent to your email.please check your email"
-          );
-          navigate("/auth/login");
-        })
-        .catch((e) => {
-          console.log(e);
+      try {
+        const response = await axios.post(baseUrl + "auth/register", userData);
+        toast.success("An activation OTP has been sent to your email. Please check your email");
+        console.log(userData.email);
+        
+        navigate("/auth/otp", {
+          state: { email: userData.email },
         });
-
+      } catch (error) {
+        
+        toast.error("Email already exists");
+      }
       // dispatch(register(userData))
     }
   };

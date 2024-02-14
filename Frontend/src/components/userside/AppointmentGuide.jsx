@@ -71,7 +71,7 @@ function OnlineAppointment() {
                 className="aspect-square object-contain object-center w-[120px] overflow-hidden self-center max-w-full"
               />
               <div className="text-blue-500 text-center text-xl font-medium leading-6 uppercase self-center whitespace-nowrap mt-6">
-                Book a visit
+                Book a visi
               </div>
               <div className="text-slate-800 text-center text-base leading-6 whitespace-nowrap mt-2 max-md:ml-2 max-md:mr-2">
                 Book your time slot with doctor from your comfort zone
