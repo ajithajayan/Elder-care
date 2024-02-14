@@ -41,6 +41,14 @@ urlpatterns = [
 
     # for verification file for docotrs
 
-   path('verification/doctor/<str:user__id>/', views.VarificationDoctorView.as_view(), name='verification-doctor'),
+    path('verification/doctor/<str:user__id>/', views.VarificationDoctorView.as_view(), name='verification-doctor'),
+
+
+   # for verification file for admins 
+
+    path('admin/verification/doctor/<str:user__id>/', views.AdminDocVerificationView.as_view(), name='admin-verification-doctor'),
+
+
+    path("admin/doctor/verication/list/", views.AdminDoctorApprovalListView.as_view(), name="admin-verification-doctor-list"),
 
 ]

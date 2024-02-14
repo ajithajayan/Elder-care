@@ -46,7 +46,7 @@ const navConfig = [
   },
   {
     title: 'Approval',
-    path: '/admin/approval',
+    path: '/admincontrol/DocVerification',
     icon: icon('ic_lock'),
   },
   // {

@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from account.models import  Doctor, OTPModel, Patient, User, Verification
-from .serializers import  AdminClientUpdateSerializer, AdminDocUpdateSerializer, PatientSerializer, PatientUserSerializer, UserDetailsUpdateSerializer, UserRegisterSerializer, UserSerializer, VerificationSerializer
+from .serializers import  AdminClientUpdateSerializer, AdminDocUpdateSerializer, PatientSerializer, PatientUserSerializer, UserDetailsUpdateSerializer, UserRegisterSerializer, UserSerializer, VerificationSerializer, adminDocVerificationSerializer
 from django.contrib.auth import authenticate
 import random
 from django.core.mail import send_mail
@@ -22,6 +22,7 @@ from rest_framework.filters import SearchFilter
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime
 from django.utils import timezone
+from django.db.models import Q
 
 
 
@@ -279,3 +280,26 @@ class VarificationDoctorView(generics.RetrieveUpdateAPIView):
         user_id = self.kwargs.get('user__id')
         user_verification = get_object_or_404(Verification, user__id=user_id)
         return Verification.objects.filter(user=user_verification.user)
+    
+
+class AdminDocVerificationView(generics.RetrieveUpdateDestroyAPIView):
+
+    serializer_class = adminDocVerificationSerializer
+    lookup_field = 'user__id'
+
+    def get_queryset(self):
+        user_id = self.kwargs.get('user__id')
+        user_verification = get_object_or_404(Verification, user__id=user_id)
+        return Verification.objects.filter(user=user_verification.user)
+    
+
+class AdminDoctorApprovalListView(generics.ListAPIView):
+    queryset = User.objects.filter(
+    Q(user_type='doctor') & ~Q(approval_status='APPROVED')  
+) 
+
+    parser_classes = (MultiPartParser, FormParser)
+    serializer_class = UserDetailsUpdateSerializer
+    pagination_class = PageNumberPagination
+    filter_backends = [SearchFilter]
+    search_fields = ['first_name', 'last_name', 'email', 'phone_number','approval_status']    
