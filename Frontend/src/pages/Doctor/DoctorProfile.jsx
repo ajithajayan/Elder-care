@@ -6,6 +6,7 @@ import ImageUploading from "react-images-uploading";
 import userImage from "../../assets/images/user.png";
 import { toast } from "react-toastify";
 import DocumentVerificationForm from "../../components/Doctor/Elements/DocumentVerificationForm";
+import Cookies from "js-cookie";
 
 function DoctorProfile() {
   const UserFields = [
@@ -115,7 +116,7 @@ function DoctorProfile() {
 
   const fetchData = async () => {
     try {
-      const token = localStorage.getItem("access");
+      const token = Cookies.get("access");
 
       let decoded = jwtDecode(token);
       console.log(decoded, "hfhhhhhhhhhhhhhhhhhhhhhhhh");

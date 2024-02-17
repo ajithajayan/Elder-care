@@ -8,10 +8,17 @@ import { alpha } from '@mui/material/styles';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
+import Cookies from "js-cookie";
 
 import { account } from '../../../../utils/constants/userdetail'; 
+import { useNavigate } from 'react-router-dom';
+
+
+
 
 // ----------------------------------------------------------------------
+
+
 
 const MENU_OPTIONS = [
   {
@@ -31,9 +38,19 @@ const MENU_OPTIONS = [
 // ----------------------------------------------------------------------
 
 export default function AccountPopover() {
+  const navigate=useNavigate()
   const logout = () =>{
-    localStorage.removeItem("access");
-    window.location.reload();
+    Cookies.remove('access');
+    Cookies.remove('refresh');
+    console.log("rockkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk");
+    // dispatch(
+    //   set_Authentication({
+    //     name: null,
+    //     isAuthenticated: false,
+    //     isAdmin:false
+    //   })
+    // );
+    navigate('/admincontrol/login')
 
   }
   const [open, setOpen] = useState(null);

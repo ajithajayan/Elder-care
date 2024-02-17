@@ -6,6 +6,7 @@ import { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import logo from '../../assets/my logo.png';
+import Cookies from 'js-cookie';
 
 
 
@@ -75,13 +76,35 @@ const DocotrHeader = () => {
   const dispatch = useDispatch();
   const { name, isAuthenticated } = useSelector((state) => state.authentication_user);
 
-  const handleLogout = () => {
-    
-    localStorage.removeItem("access");
-    localStorage.removeItem("refresh");
-    navigate('/auth/login');
+  const handleLogout =  () => {
 
-    window.location.reload();
+    // try {
+  
+    //   const accessToken = Cookies.get('refresh');
+  
+    //   await axios.post(baseUrl+'auth/logout', {}, {
+    //     headers: {
+    //       Authorization: `Bearer ${accessToken}`  
+    //     }
+    //   })
+    //   Cookies.remove(['access', 'refresh']);
+  
+    // } catch (error) {
+    //   console.log(error);
+    // }
+    
+    Cookies.remove('access');
+    Cookies.remove('refresh');
+    dispatch(
+      set_Authentication({
+        name: null,
+        isAuthenticated: false,
+        isAdmin:false
+      })
+    );
+    navigate('/auth/login')
+
+  
   };
 
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);

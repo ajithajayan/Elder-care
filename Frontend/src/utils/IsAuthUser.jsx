@@ -1,53 +1,55 @@
-
 import {jwtDecode} from "jwt-decode";
-import axios from 'axios'
+import axios from 'axios';
+import Cookies from 'js-cookie';
 import { baseUrl } from "./constants/Constants";
 
-const updateUserToken = async ()=>{
-    const refreshToken = localStorage.getItem("refresh");
+const updateUserToken = async () => {
 
-    try {
-        const res = await axios.post(baseUrl+'auth/token/refresh', 
-        {
-            'refresh':refreshToken
-        })
-        if(res.status === 200){
-          localStorage.setItem('access', res.data.access)
-          localStorage.setItem('refresh', res.data.refresh)
-          let decoded = jwtDecode(res.data.access);
-          return {'name':decoded.first_name,isAuthenticated:true}
-        }
-        else
-        {
-            return {'name':null,isAuthenticated:false}
-        }  
-        
-      }
-      catch (error) {
-         return {'name':null,isAuthenticated:false}
-      }
+  const refreshToken = Cookies.get("refresh");
+
+  try {
+    const res = await axios.post(baseUrl+'auth/token/refresh', {
+      'refresh': refreshToken
+    });
+
+    if(res.status === 200){
+      Cookies.set('access', res.data.access);
+      Cookies.set('refresh', res.data.refresh);
+      
+      let decoded = jwtDecode(res.data.access);
+      return {'name': decoded.first_name, isAuthenticated: true};
+
+    } else {
+      return {'name': null, isAuthenticated: false};
+    }
+
+  } catch (error) {
+    return {'name': null, isAuthenticated: false};
+  }
+
 }
-
-
 
 const isAuthUser = async () => {
 
-    const accessToken = localStorage.getItem("access");
-   
-    if(!accessToken)
-    {
-        return {'name':null,isAuthenticated:false}
-    }
-    const currentTime = Date.now() / 1000;
-    let decoded = jwtDecode(accessToken);
-    if (decoded.exp > currentTime) {
-        return {'name':decoded.first_name,isAuthenticated:true}
-      } else {
-        const updateSuccess = await updateUserToken();
-        return updateSuccess;
-      }
+  const accessToken = Cookies.get("access");
+  console.log(accessToken, "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
+  if(!accessToken) {
+    return {'name': null, isAuthenticated: false};
+  }
 
+  const currentTime = Date.now() / 1000;  
+  let decoded = jwtDecode(accessToken);
 
+  if (decoded.exp > currentTime) {
+    return {'name':decoded.first_name,isAuthenticated:true};
+  
+  } else {
 
-}
-export default isAuthUser ;
+    const updateSuccess = await updateUserToken();
+    return updateSuccess;
+
+  }
+
+};
+
+export default isAuthUser;

@@ -5,6 +5,7 @@ import { baseUrl } from "../../utils/constants/Constants";
 import ImageUploading from "react-images-uploading";
 import userImage from "../../assets/images/user.png";
 import { toast } from "react-toastify";
+import Cookies from 'js-cookie';
 
 function UserProfile() {
   const UserFields = [
@@ -105,9 +106,10 @@ function UserProfile() {
 
   const fetchData = async () => {
     try {
-      const token = localStorage.getItem("access");
+      const refreshToken = Cookies.get("refresh");
+      console.log(refreshToken,"evide kittunnilla");
 
-      let decoded = jwtDecode(token);
+      let decoded = jwtDecode(refreshToken);
       console.log(decoded, "hfhhhhhhhhhhhhhhhhhhhhhhhh");
       let id = decoded.user_id;
       console.log(id);

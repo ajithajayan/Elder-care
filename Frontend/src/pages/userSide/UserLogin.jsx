@@ -7,6 +7,7 @@ import { set_Authentication } from '../../Redux/authentication/authenticationSli
 import { baseUrl } from '../../utils/constants/Constants';
 import { GoogleLogin } from '@react-oauth/google';
 import { toast } from 'react-toastify';
+import Cookies from 'js-cookie';
 
 
 
@@ -41,8 +42,10 @@ function UserLogin() {
     try {
       const res = await axios.post(baseUrl+'auth/login', formData)
       if(res.status === 200){
-        localStorage.setItem('access', res.data.access)
-        localStorage.setItem('refresh', res.data.refresh)
+        // localStorage.setItem('access', res.data.access)
+        // localStorage.setItem('refresh', res.data.refresh)
+        Cookies.set('access', res.data.access);
+        Cookies.set('refresh', res.data.refresh);
         console.log(res.data);
         dispatch(
           set_Authentication({

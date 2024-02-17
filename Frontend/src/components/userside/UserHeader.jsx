@@ -6,6 +6,9 @@ import { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import logo from '../../assets/my logo.png';
+import Cookies from 'js-cookie';
+import axios from 'axios';
+import { baseUrl } from '../../utils/constants/Constants';
 
 
 
@@ -75,11 +78,35 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const { name, isAuthenticated } = useSelector((state) => state.authentication_user);
 
-  const handleLogout = () => {
+  const handleLogout =  () => {
+
+    // try {
+  
+    //   const accessToken = Cookies.get('refresh');
+  
+    //   await axios.post(baseUrl+'auth/logout', {}, {
+    //     headers: {
+    //       Authorization: `Bearer ${accessToken}`  
+    //     }
+    //   })
+    //   Cookies.remove(['access', 'refresh']);
+  
+    // } catch (error) {
+    //   console.log(error);
+    // }
     
-    localStorage.removeItem("access");
-    localStorage.removeItem("refresh");
-    window.location.reload();
+    Cookies.remove('access');
+    Cookies.remove('refresh');
+    dispatch(
+      set_Authentication({
+        name: null,
+        isAuthenticated: false,
+        isAdmin:false
+      })
+    );
+    navigate('/')
+
+  
   };
 
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -157,7 +184,7 @@ const Navbar = () => {
       </div>
 
       {/* Hamburger Icon for Small Screens */}
-      <div className="lg:hidden mt-4">
+      <div className="lg:hidden mt-1">
         <button
           className="text-gray-600 hover:text-blue-500 focus:outline-none focus:text-blue-500 transition-colors duration-300"
           onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}

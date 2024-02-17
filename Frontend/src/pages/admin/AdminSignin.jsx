@@ -8,6 +8,7 @@ import { set_Authentication } from "../../Redux/authentication/authenticationSli
 import { useDispatch } from "react-redux";
 import { baseUrl } from "../../utils/constants/Constants";
 import { toast } from "react-toastify";
+import Cookies from "js-cookie";
 
 function AdminSignin() {
   const [formError, setFormError] = useState([]);
@@ -26,8 +27,8 @@ function AdminSignin() {
       const res = await axios.post(baseUrl + "auth/login", formData);
       if (res.status === 200) {
         console.log(res.data);
-        localStorage.setItem("access", res.data.access);
-        localStorage.setItem("refresh", res.data.refresh);
+        Cookies.set("access", res.data.access);
+        Cookies.set("refresh", res.data.refresh);
         dispatch(
           set_Authentication({
             name: jwtDecode(res.data.access).first_name,

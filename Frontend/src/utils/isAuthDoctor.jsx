@@ -1,76 +1,90 @@
-
-import {jwtDecode} from "jwt-decode";
-import axios from 'axios';
+import { jwtDecode } from "jwt-decode";
+import axios from "axios";
+import Cookies from "js-cookie";
 import { baseUrl } from "./constants/Constants";
 
-
 const updateDocToken = async () => {
-    const refreshToken = localStorage.getItem("refresh");
+  const refreshToken = Cookies.get("refresh");
 
-    try {
-        const res = await axios.post(baseUrl + 'auth/token/refresh', {
-            'refresh': refreshToken
-        });
+  try {
+    const res = await axios.post(baseUrl + "auth/token/refresh", {
+      refresh: refreshToken,
+    });
 
-        if (res.status === 200) {
-            localStorage.setItem('access', res.data.access);
-            localStorage.setItem('refresh', res.data.refresh);
-            return true;
-        } else {
-            return false;
-        }
-
-    } catch (error) {
-        return false;
+    if (res.status === 200) {
+      Cookies.set("access", res.data.access);
+      Cookies.set("refresh", res.data.refresh);
+      return true;
+    } else {
+      return false;
     }
+  } catch (error) {
+    return false;
+  }
 };
 
-
 const fetchisDoctor = async () => {
-        const token = localStorage.getItem('access');
-        
-        try {
-            const res = await axios.get(baseUrl + 'auth/user/details/', {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            return res.data.user_type==='doctor'; // Return directly from the function
-    
-        } catch (error) {
-            return false;
-        }
-    };
-    
+  const token = Cookies.get("access");
 
+  try {
+    const res = await axios.get(baseUrl + "auth/user/details/", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    });
+
+    return res.data.user_type === "doctor";
+  } catch (error) {
+    return false;
+  }
+};
 
 const isAuthDoctor = async () => {
-    const accessToken = localStorage.getItem("access");
+  const accessToken = Cookies.get("access");
 
-    if (!accessToken) {
-        return { 'name': null, isAuthenticated: false, isAdmin: false,is_doctor:false };
-    }
+  if (!accessToken) {
+    return {
+      name: null,
+      isAuthenticated: false,
+      isAdmin: false,
+      is_doctor: false,
+    };
+  }
 
-    const currentTime = Date.now() / 1000;
-    let decoded = jwtDecode(accessToken);
+  const currentTime = Date.now() / 1000;
+  let decoded = jwtDecode(accessToken);
 
-    if (decoded.exp > currentTime) {
-        let checkDoc = await fetchisDoctor(); // Await the result
-        return { 'name': decoded.first_name, isAuthenticated: true,isAdmin: false, is_doctor:checkDoc  };
+  if (decoded.exp > currentTime) {
+    let checkDoc = await fetchisDoctor();
+    return {
+      name: decoded.first_name,
+      isAuthenticated: true,
+      isAdmin: false,
+      is_doctor: checkDoc,
+    };
+  } else {
+    const updateSuccess = await updateDocToken();
+
+    if (updateSuccess) {
+      let decoded = jwtDecode(accessToken);
+      let checkAdmin = await fetchisDoctor();
+      return {
+        name: decoded.first_name,
+        isAuthenticated: true,
+        isAdmin: false,
+        is_doctor: checkAdmin,
+      };
     } else {
-        const updateSuccess = await updateDocToken();
-
-        if (updateSuccess) {
-            let decoded = jwtDecode(accessToken);
-            let checkAdmin = await fetchisDoctor(); // Await the result
-            return { 'name': decoded.first_name, isAuthenticated: true,isAdmin: false, is_doctor: checkAdmin };
-        } else {
-            return { 'name': null, isAuthenticated: false, isAdmin: false ,is_doctor:false };
-        }
+      return {
+        name: null,
+        isAuthenticated: false,
+        isAdmin: false,
+        is_doctor: false,
+      };
     }
+  }
 };
 
 export default isAuthDoctor;
