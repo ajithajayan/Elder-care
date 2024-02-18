@@ -11,7 +11,7 @@ import random
 from django.core.mail import send_mail
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.exceptions import AuthenticationFailed, ParseError
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,IsAdminUser
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
@@ -203,6 +203,7 @@ class LogoutView(APIView):
     
 class UserDetailsUpdate(generics.ListAPIView):
     queryset = User.objects.filter(user_type='doctor')
+    permission_classes = [IsAdminUser]
     parser_classes = (MultiPartParser, FormParser)
     serializer_class = UserDetailsUpdateSerializer
     pagination_class = PageNumberPagination
@@ -213,6 +214,7 @@ class UserDetailsUpdate(generics.ListAPIView):
     
 class PatientUseDetailsUpdate(generics.ListAPIView):
     queryset = User.objects.filter(user_type='client')
+    permission_classes = [IsAdminUser]
     parser_classes = (MultiPartParser, FormParser)
     serializer_class = PatientUserSerializer
     pagination_class = PageNumberPagination
@@ -299,6 +301,7 @@ class AdminDoctorApprovalListView(generics.ListAPIView):
 ) 
 
     parser_classes = (MultiPartParser, FormParser)
+    permission_classes = [IsAdminUser]
     serializer_class = UserDetailsUpdateSerializer
     pagination_class = PageNumberPagination
     filter_backends = [SearchFilter]

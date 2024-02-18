@@ -155,7 +155,10 @@ class Doctor(models.Model):
     consultaion_fees = models.DecimalField(max_digits=10, decimal_places=3, default=300)
     consultation_duration = models.DurationField(default=datetime.timedelta(hours=1))
     consultation_slots = models.IntegerField(default=3)
-   
+    education = models.TextField(max_length=50,blank=True, null=True)   
+    years_of_experience = models.IntegerField(default=0)
+    about_me = models.CharField(max_length=255, blank=True, null=True)
+    Hospital=models.TextField(max_length=50, blank=True, null=True)
     
 
     def save(self, *args, **kwargs):

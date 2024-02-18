@@ -10,6 +10,7 @@ import DocCrump from "../../components/admin/elements/BreadCrumps/DocCrump";
 import { toast } from "react-toastify";
 import DeleteDoct from "../../components/admin/elements/Modal/DeleteDoct";
 import EditPatient from "../../components/admin/elements/Modal/EditPatient";
+import Cookies from 'js-cookie';
 
 function Patient() {
   const onChange = (e) => console.log(`radio checked:${e.target.value}`);
@@ -54,8 +55,14 @@ function Patient() {
 
   // to fetch the data as per the search query
   const fetchUsers = (url) => {
+    const accessToken = Cookies.get("access");
     axios
-      .get(url)
+      .get(url, {
+                headers: {
+                  Authorization: `Bearer ${accessToken}`,
+                  Accept: 'application/json',
+                  'Content-Type': 'application/json',
+                }})
       .then((req) => {
         setDoctorData(req.data.results);
         setNextPage(req.data.next);
