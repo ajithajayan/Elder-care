@@ -134,7 +134,7 @@ const Navbar = () => {
           Home
         </NavLink>
 
-        <NavLink className="flex text-gray-800 hover:text-blue-500 cursor-pointer transition-colors duration-300">
+        <NavLink to="/doctor-list" className="flex text-gray-800 hover:text-blue-500 cursor-pointer transition-colors duration-300">
           Find Doctor
         </NavLink>
 

@@ -10,7 +10,8 @@ import { ggogle_id } from './utils/constants/Constants';
 import AdminWrapper from './Wrapper/AdminWrapper/AdminWrapper';
 import DoctorWrapper from './Wrapper/DoctorWrapper/DoctorWrapper';
 
-
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 
 
@@ -39,6 +40,7 @@ function App() {
     transition: Bounce
     />
       <Provider store={userStore}>
+        
       <GoogleOAuthProvider clientId={ggogle_id}>
 
       

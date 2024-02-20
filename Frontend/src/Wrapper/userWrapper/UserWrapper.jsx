@@ -14,6 +14,8 @@ import Authenticator from "../../pages/Authentication/Authenticator";
 import Page404 from "../../components/404/Page404";
 import UserProfile from "../../pages/userSide/UserProfile";
 import UserRoute from "../../components/Private/UserRoute";
+import DoctorSearch from "../../pages/userSide/DoctorSearch";
+import DocProfile from "../../pages/userSide/DocProfile";
 
 
 function UserWrapper() {
@@ -98,6 +100,8 @@ function UserWrapper() {
     children:[
 
       {path: "/profile", element: <UserProfile/>},
+      {path: "/doctor-list", element: <DoctorSearch/>},
+      {path: "/doctor-profile", element: <DocProfile/>},
 
     ],
   },
