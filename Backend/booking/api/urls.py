@@ -1,7 +1,9 @@
 from django.urls import path
-from .views import DoctorAvailabilityListCreateView, DoctorAvailabilityRetrieveUpdateDestroyView
+from .views import DoctorSlotUpdateView,DoctorSlotsAPIView
 
 urlpatterns = [
-    path('availability/', DoctorAvailabilityListCreateView.as_view(), name='doctor-availability-list-create'),
-    path('availability/<int:pk>/', DoctorAvailabilityRetrieveUpdateDestroyView.as_view(), name='doctor-availability-retrieve-update-destroy'),
+    path('doctors/<str:custom_id>/slots/', DoctorSlotsAPIView.as_view(), name='doctor-slots-api'),
+    
+    path('doctors/<str:custom_id>/update_slots/', DoctorSlotUpdateView.as_view(), name='update-doctor-slots'),
+
 ]

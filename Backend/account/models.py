@@ -154,7 +154,7 @@ class Doctor(models.Model):
     specializations = models.CharField(max_length=30, choices=SPECIALIZATION_CHOICES, default='General')
     consultaion_fees = models.DecimalField(max_digits=10, decimal_places=3, default=300)
     consultation_duration = models.DurationField(default=datetime.timedelta(hours=1))
-    consultation_slots = models.IntegerField(default=3)
+    consultation_slots = models.IntegerField(default=5)
     education = models.TextField(max_length=50,blank=True, null=True)   
     years_of_experience = models.IntegerField(default=0)
     about_me = models.CharField(max_length=255, blank=True, null=True)
@@ -171,7 +171,10 @@ class Doctor(models.Model):
                 self.custom_id = 'D5000'
         super().save(*args, **kwargs)
 
-
+    @property
+    def availability(self):
+        # This assumes DoctorAvailability has a ForeignKey to Doctor named 'doctor'
+        return self.doctoravailability_set.all()
 
 
 class Patient(models.Model):
