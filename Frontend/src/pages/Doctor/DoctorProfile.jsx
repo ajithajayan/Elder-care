@@ -9,6 +9,7 @@ import DocumentVerificationForm from "../../components/Doctor/Elements/DocumentV
 import Cookies from "js-cookie";
 import DoctorSlotBooking from "../../components/Doctor/DoctorSlotBooking";
 import Timer from "../../components/Timer/Timer";
+import { useStaticPicker } from "@mui/x-date-pickers/internals";
 
 function DoctorProfile() {
   const UserFields = [
@@ -61,6 +62,22 @@ function DoctorProfile() {
     "Radiologist",
   ];
 
+  const ProfileFields = [
+    "about_me",
+    "consultaion_fees",
+    "education",
+    "years_of_experience",
+    "Hospital",
+  ];
+
+  const ProfilefieldInputTypes = {
+
+    consultaion_fees: "number",
+    years_of_experience: "number",
+    about_me: "textarea",
+    Hospital: "text",
+  };
+
   const [profile, setProfile] = useState(null); // it's use for storing the image
 
   const [about, setAbout] = useState([]); // it's used to store the all profile information about the users
@@ -68,10 +85,14 @@ function DoctorProfile() {
   const [id, setId] = useState(null);
 
   const [docid, setdocid] = useState("");
+ 
 
   const [user, setUser] = useState({});
   const [specializations, setSpecializations] = useState("");
-  const [docDetail, setDocDetail] = useState({});
+
+  // to store the doctor personal details seperatly
+
+  const [docDetail, setDocDetail] = useState([]);
 
   // ---------------------  Portion for uploding the image   ---------------------
 
@@ -220,6 +241,33 @@ function DoctorProfile() {
       });
   };
 
+  // ******************************function to submit the personal profile information***********************************
+  const handleProfileSubmit = async (e) => {
+    e.preventDefault();
+
+    // Create a FormData object
+    const formData = new FormData(e.target);
+
+    try {
+      // Make the API request
+      const response = await axios.patch(
+        baseUrl + `auth/admin/doc/${docid}`,
+        formData
+      );
+      console.log("Data updated successfully:", response.data);
+      toast.success("Data updated successfully");
+      // Optionally, you can reset the form or handle other actions
+    } catch (error) {
+      console.error("Error updating data:", error);
+      // Handle the error as needed
+      if (error.response) {
+        toast.error(error.response.data.user.date_of_birth[0]);
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+    }
+  };
+
   return (
     <>
       <div className="grid grid-cols-1 px-4 pt-6 xl:grid-cols-3 xl:gap-4 dark:bg-gray-900">
@@ -352,8 +400,7 @@ function DoctorProfile() {
               Time slot Allotment
             </h3>
             <div className="mb-4">
-              <DoctorSlotBooking
-              docid={docid} />
+              <DoctorSlotBooking docid={docid} />
             </div>
           </div>
 
@@ -469,6 +516,58 @@ function DoctorProfile() {
                     Save all
                   </button>
                 </div>
+              </div>
+            </form>
+          </div>
+
+          {/* **************************************************Profile settting for user****************************************** */}
+          <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+            <h3 className="mb-4 text-xl font-semibold dark:text-white">
+              Professional information
+            </h3>
+            <form
+              onSubmit={handleProfileSubmit}
+              className="grid grid-cols-6 gap-6"
+            >
+              {ProfileFields.map((fieldName) => (
+                <div key={fieldName} className="col-span-6 sm:col-span-3">
+                  <label
+                    htmlFor={fieldName}
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    {fieldName.replace(/_/g, " ")}
+                  </label>
+                  {ProfilefieldInputTypes[fieldName] === "textarea" ? (
+                    <textarea
+                      name={fieldName}
+                      id={fieldName}
+                      defaultValue={docDetail[fieldName]}
+                      rows={4} // You can adjust the number of rows as needed
+                      maxLength={255} // Set the maximum length in characters
+                      className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                      placeholder={`Enter ${fieldName.replace(/_/g, " ")}`}
+                      required=""
+                    />
+                  ) : (
+                    <input
+                      type={ProfilefieldInputTypes[fieldName]}
+                      name={fieldName}
+                      id={fieldName}
+                      defaultValue={docDetail[fieldName]}
+                      className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                      placeholder={`Enter ${fieldName.replace(/_/g, " ")}`}
+                      required=""
+                    />
+                  )}
+                </div>
+              ))}
+              <div className="col-span-6 sm:col-full">
+                <button
+                  className="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                  type="submit"
+                >
+                  Save all
+                </button>
               </div>
             </form>
           </div>
