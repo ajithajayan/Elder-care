@@ -9,6 +9,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from account.models import Doctor
 from django.utils import timezone
+from django.utils.timezone import now
+
+# from dateutil.parser import parse
 
 
 
@@ -22,12 +25,9 @@ class DoctorSlotUpdateView(APIView):
         serializer = DoctorSlotUpdateSerializer(data=request.data)
         if serializer.is_valid():
             serializer.update_doctor_slots(doctor)
-            updated_doctor_serializer = DoctorAvailabilitySerializer(doctor)
-            return Response(updated_doctor_serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            return Response({"error": "Invalid data"}, status=status.HTTP_400_BAD_REQUEST)
-        
-
+            return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 class DoctorSlotsAPIView(APIView):
     def get(self, request, custom_id):
@@ -58,3 +58,38 @@ class DoctorSlotsAPIView(APIView):
         }
 
         return Response(slots, status=status.HTTP_200_OK)
+    
+
+
+# class DoctorSlotUpdateView(APIView):
+#     def post(self, request, custom_id):
+#         try:
+#             doctor = Doctor.objects.get(custom_id=custom_id)
+#         except Doctor.DoesNotExist:
+#             return Response({"error": "Doctor not found"}, status=status.HTTP_404_NOT_FOUND)
+
+#         serializer = DoctorSlotUpdateSerializer(data=request.data)
+#         if serializer.is_valid():
+#             date = serializer.validated_data['date']
+#             from_time = serializer.validated_data['from_time']
+#             to_time = serializer.validated_data['to_time']
+
+#             # Check if there are existing slots for the selected date
+#             existing_slots = doctor.available_slots.filter(day=date)
+            
+#             if not existing_slots.exists():
+#                 # If no existing slots, create default slots for the entire day
+#                 start_of_day = datetime.combine(date, time.min)
+#                 end_of_day = datetime.combine(date, time.max)
+#                 default_slot = {
+#                     "from": start_of_day.strftime('%H:%M:%S'),
+#                     "to": end_of_day.strftime('%H:%M:%S')
+#                 }
+#                 doctor.available_slots.create(day=date, **default_slot)
+
+#             # Update the doctor's slots as before
+#             serializer.update_doctor_slots(doctor)
+#             updated_doctor_serializer = DoctorAvailabilitySerializer(doctor)
+#             return Response(updated_doctor_serializer.data, status=status.HTTP_200_OK)
+#         else:
+#             return Response({"error": "Invalid data"}, status=status.HTTP_400_BAD_REQUEST)

@@ -352,7 +352,8 @@ function DoctorProfile() {
               Time slot Allotment
             </h3>
             <div className="mb-4">
-              <DoctorSlotBooking />
+              <DoctorSlotBooking
+              docid={docid} />
             </div>
           </div>
 
