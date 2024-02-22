@@ -6,7 +6,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 
-const Timer = ({ label, onTimeChange,defaultValue }) => {
+const Timer = ({ label, onTimeChange }) => {
   const handleTimeChange = (newTime) => {
     onTimeChange(newTime);
     console.log("gulabaaaaaaaaaa time taker",newTime)
@@ -15,7 +15,7 @@ const Timer = ({ label, onTimeChange,defaultValue }) => {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DemoContainer components={['TimePicker']}>
-        <TimePicker label={label} defaultValue={defaultValue} onChange={handleTimeChange} />
+        <TimePicker label={label}  onChange={handleTimeChange} />
       </DemoContainer>
     </LocalizationProvider>
   );

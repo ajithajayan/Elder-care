@@ -24,6 +24,7 @@ const DoctorSlotBooking = ({ docid }) => {
 
   }, [selectedDate, docid]);
 
+  
   // function to fetch the available slots
 
   const fetchAvailableSlots = () => {
@@ -42,6 +43,8 @@ const DoctorSlotBooking = ({ docid }) => {
     });
 
   };
+
+
   // this is used for to convert the time to 12 hour format 
 
   const convertTo12HourFormat = (timeString) => {
@@ -64,6 +67,8 @@ const DoctorSlotBooking = ({ docid }) => {
     return `${hoursIn24HourFormat}:${minutes} ${period}`;
   };
 
+  // ************************** Handling the slotselection ****************************
+
   const handleTimeSlotSelect = (timeSlot) => {
     setSelectedTimeSlot(timeSlot);
   };
@@ -71,6 +76,8 @@ const DoctorSlotBooking = ({ docid }) => {
   const handleDateChange = (newDate) => {
     setSelectedDate(newDate);
   };
+
+  // *************************** Handling the form and two time component time management*****************
 
   const handleFromTimeChange = (newTime) => {
     setFromTime(newTime);
@@ -80,57 +87,81 @@ const DoctorSlotBooking = ({ docid }) => {
     setToTime(newTime);
   };
 
-  const handleSaveSlots = () => {
-    if (fromTime && toTime) {
-      console.log("Before formatting:", fromTime, toTime);
+//  ********************************* Doctor slot updation function ***************************************
 
-      const fromTimeFormatted = moment(fromTime.$d).format("HH:mm:ss");
-      const toTimeFormatted = moment(toTime.$d).format("HH:mm:ss");
+const handleSaveSlots = () => {
+  if (fromTime && toTime) {
+    console.log("Before formatting:", fromTime, toTime);
 
-      console.log("After formatting:", fromTimeFormatted, toTimeFormatted);
+    const fromTimeFormatted = moment(fromTime.$d);
+    const toTimeFormatted = moment(toTime.$d);
 
-      const newSlot = {
-        from_time: fromTimeFormatted,
-        to_time: toTimeFormatted,
-      };
-      const updatedSlots = [newSlot];
+    console.log("After formatting:", fromTimeFormatted, toTimeFormatted);
 
-      axios
-        .post(baseUrl + `appointment/doctors/${docid}/update_slots/`, {
-          date: selectedDate.format("YYYY-MM-DD"),
-          slots: updatedSlots,
-        })
-        .then((response) => {
-          fetchAvailableSlots()
-        })
-        .catch((error) => {
-          console.error("Error updating time slots:", error);
-        });
+    // Calculate the duration in minutes
+    const durationInMinutes = toTimeFormatted.diff(fromTimeFormatted, 'minutes');
 
-      // setFromTime(null);
-      // setToTime(null);
-    } else {
-      toast.warning("Please select from and to time");
+    // Define min and max slot durations
+    const minSlotDuration = 20;
+    const maxSlotDuration = 40;
+
+    // Check if the duration is within the allowed range
+    if (durationInMinutes < minSlotDuration || durationInMinutes > maxSlotDuration) {
+      toast.warning(`Slot duration should be between ${minSlotDuration} and ${maxSlotDuration} minutes.`);
+      return;
     }
-  };
 
-  const handleDeleteSlot = (index) => {
-    const updatedSlots = [...timeSlots];
-    updatedSlots.splice(index, 1);
+    const newSlot = {
+      from_time: fromTimeFormatted.format("HH:mm:ss"),
+      to_time: toTimeFormatted.format("HH:mm:ss"),
+    };
+    const updatedSlots = [newSlot];
 
     axios
-      .post(baseUrl + `appointment/doctors/${docid}/updateSlots`, {
+      .post(baseUrl + `appointment/doctors/${docid}/update_slots/`, {
         date: selectedDate.format("YYYY-MM-DD"),
         slots: updatedSlots,
       })
       .then((response) => {
-        setTimeSlots(updatedSlots);
-        setSelectedTimeSlot(null); // Clear selected slot after deletion
+        fetchAvailableSlots();
+        toast.success("Slot created successfully");
       })
       .catch((error) => {
-        console.error("Error deleting time slot:", error);
+        console.error("Error updating time slots:", error);
+        toast.error("Duplicate slot found. Please choose a different time range.");
       });
-  };
+
+    // setFromTime(null);
+    // setToTime(null);
+  } else {
+    toast.warning("Please select from and to time");
+  }
+};
+
+// ******************************** Docotr slot Deletion function *************************
+
+
+  const handleDeleteSlot = (index) => {
+    const slotToDelete = timeSlots[index];
+    
+    axios
+        .delete(baseUrl + `appointment/doctors/${docid}/delete_slot/`, {
+            data: {
+                date: selectedDate.format("YYYY-MM-DD"),
+                slot: slotToDelete,
+            },
+        })
+        .then((response) => {
+            fetchAvailableSlots(); // Refresh the slots after deletion
+            toast.success("slot deleted sucessfully")
+        })
+        .catch((error) => {
+            console.error("Error deleting time slot:", error);
+        });
+};
+
+
+
 
   return (
     <div>
@@ -151,7 +182,6 @@ const DoctorSlotBooking = ({ docid }) => {
         <div className="flex pb-4">
           <Timer
             label="from time"
-            defaultValue={currentTime}
             onTimeChange={handleFromTimeChange}
           />
           <Timer label="to time" onTimeChange={handleToTimeChange} />

@@ -1,5 +1,6 @@
 # views.py
 import datetime
+from xml.dom import ValidationErr
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from booking.models import DoctorAvailability
@@ -22,12 +23,15 @@ class DoctorSlotUpdateView(APIView):
         except Doctor.DoesNotExist:
             return Response({"error": "Doctor not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = DoctorSlotUpdateSerializer(data=request.data)
-        if serializer.is_valid():
+        serializer = DoctorSlotUpdateSerializer(data=request.data, context={'doctor': doctor})
+        try:
+            serializer.is_valid(raise_exception=True)
             serializer.update_doctor_slots(doctor)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        except ValidationErr as e:
+            if 'duplicate_slot' in e.get_codes():
+                return Response({"error": str(e)}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class DoctorSlotsAPIView(APIView):
     def get(self, request, custom_id):
@@ -61,35 +65,22 @@ class DoctorSlotsAPIView(APIView):
     
 
 
-# class DoctorSlotUpdateView(APIView):
-#     def post(self, request, custom_id):
-#         try:
-#             doctor = Doctor.objects.get(custom_id=custom_id)
-#         except Doctor.DoesNotExist:
-#             return Response({"error": "Doctor not found"}, status=status.HTTP_404_NOT_FOUND)
+class DoctorSlotDeleteView(APIView):
+    def delete(self, request, custom_id):
+        try:
+            doctor = Doctor.objects.get(custom_id=custom_id)
+        except Doctor.DoesNotExist:
+            return Response({"error": "Doctor not found"}, status=status.HTTP_404_NOT_FOUND)
 
-#         serializer = DoctorSlotUpdateSerializer(data=request.data)
-#         if serializer.is_valid():
-#             date = serializer.validated_data['date']
-#             from_time = serializer.validated_data['from_time']
-#             to_time = serializer.validated_data['to_time']
+        date = request.data.get('date')
+        slot = request.data.get('slot')
 
-#             # Check if there are existing slots for the selected date
-#             existing_slots = doctor.available_slots.filter(day=date)
-            
-#             if not existing_slots.exists():
-#                 # If no existing slots, create default slots for the entire day
-#                 start_of_day = datetime.combine(date, time.min)
-#                 end_of_day = datetime.combine(date, time.max)
-#                 default_slot = {
-#                     "from": start_of_day.strftime('%H:%M:%S'),
-#                     "to": end_of_day.strftime('%H:%M:%S')
-#                 }
-#                 doctor.available_slots.create(day=date, **default_slot)
-
-#             # Update the doctor's slots as before
-#             serializer.update_doctor_slots(doctor)
-#             updated_doctor_serializer = DoctorAvailabilitySerializer(doctor)
-#             return Response(updated_doctor_serializer.data, status=status.HTTP_200_OK)
-#         else:
-#             return Response({"error": "Invalid data"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            # Assuming DoctorAvailability has a ForeignKey to Doctor named 'doctor'
+            doctor_availability = DoctorAvailability.objects.get(doctor=doctor, day=date, start_time=slot['from'], end_time=slot['to'])
+            doctor_availability.delete()
+            return Response({"message": "Slot deleted successfully"}, status=status.HTTP_200_OK)
+        except DoctorAvailability.DoesNotExist:
+            return Response({"error": "Slot not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": f"Error deleting slot: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

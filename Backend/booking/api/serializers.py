@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from booking.models import DoctorAvailability
 from datetime import datetime
-
+from django.core.exceptions import ValidationError
 
 
 
@@ -19,19 +19,33 @@ class DoctorSlotUpdateSerializer(serializers.Serializer):
     date = serializers.DateField()
     slots = serializers.ListField(child=serializers.DictField())
 
+    def validate(self, data):
+        date = data.get('date')
+        slots = data.get('slots')
+
+        for slot_data in slots:
+            from_time = datetime.strptime(slot_data.get('from_time'), '%H:%M:%S')
+            to_time = datetime.strptime(slot_data.get('to_time'), '%H:%M:%S')
+
+            # Check if the slot already exists for the specified date and time range
+            if DoctorAvailability.objects.filter(doctor=self.context.get('doctor'), day=date, start_time=from_time, end_time=to_time).exists():
+                raise ValidationError("Duplicate slot found. Please choose a different time range.", code='duplicate_slot')
+
+        return data
+
     def update_doctor_slots(self, doctor):
         try:
-            date = self.validated_data['date']
-            for slot_data in self.validated_data['slots']:
-                from_time = datetime.strptime(slot_data['from_time'], '%H:%M:%S')
-                to_time = datetime.strptime(slot_data['to_time'], '%H:%M:%S')
+            date = self.validated_data.get('date')
+            for slot_data in self.validated_data.get('slots'):
+                from_time = datetime.strptime(slot_data.get('from_time'), '%H:%M:%S')
+                to_time = datetime.strptime(slot_data.get('to_time'), '%H:%M:%S')
 
                 DoctorAvailability.objects.create(
-                doctor=doctor,
-                day=date,
-                start_time=from_time, 
-                end_time=to_time
-            )
+                    doctor=doctor,
+                    day=date,
+                    start_time=from_time,
+                    end_time=to_time
+                )
 
             return True
 
