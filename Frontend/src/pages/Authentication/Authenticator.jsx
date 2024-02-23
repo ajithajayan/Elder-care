@@ -9,6 +9,7 @@ import ResetPasswordPage from "../userSide/ResetPassword";
 import PrivateRoute from "../../components/Private/PrivateRoute";
 import DoctorRegister from "../Doctor/DoctorRegiser";
 import VerifyOtp from "../userSide/VerifyOtp";
+import DoctorLogin from "../Doctor/DoctorLogin";
 
 const Authenticator = () => {
   const [vantaEffect, setVantaEffect] = useState(0);
@@ -42,6 +43,7 @@ const Authenticator = () => {
         <Routes>
           <Route path="/register" element={ <PrivateRoute><Register /></PrivateRoute>} />
           <Route path="/login" element={<PrivateRoute><UserLogin /></PrivateRoute>} />
+          <Route path="doctor/login" element={<PrivateRoute><DoctorLogin /></PrivateRoute>} />
           <Route path="/doctor/register" element={<PrivateRoute><DoctorRegister /></PrivateRoute>} />
           <Route path="/otp" element={<PrivateRoute><VerifyOtp /></PrivateRoute>} />
         </Routes>

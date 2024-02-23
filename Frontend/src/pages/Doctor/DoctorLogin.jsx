@@ -1,18 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import axios from "axios";
-import { useDispatch } from "react-redux";
-import { jwtDecode } from "jwt-decode";
-import { set_Authentication } from "../../Redux/authentication/authenticationSlice";
-import { baseUrl } from "../../utils/constants/Constants";
-import { GoogleLogin } from "@react-oauth/google";
-import { toast } from "react-toastify";
-import Cookies from "js-cookie";
+import React, { useEffect, useState } from 'react'
+import { Link ,useLocation,useNavigate} from 'react-router-dom'
+import axios from 'axios'
+import { useDispatch } from 'react-redux';
+import {jwtDecode} from "jwt-decode";
+import { set_Authentication } from '../../Redux/authentication/authenticationSlice';
+import { baseUrl } from '../../utils/constants/Constants';
+import { GoogleLogin } from '@react-oauth/google';
+import { toast } from 'react-toastify';
+import Cookies from 'js-cookie';
 
-function UserLogin() {
+
+
+
+function DoctorLogin() {
   const { state } = useLocation();
-  const [message, setmessage] = useState(null);
-  const [formError, setFormError] = useState([]);
+  const [message, setmessage] = useState(null)
+  const [formError, setFormError] = useState([])
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -21,104 +24,117 @@ function UserLogin() {
   //   if(state){
   //     setmessage(state)
   //   }
-
-  //   navigate('', {});
-
+    
+  //   navigate('', {}); 
+    
   // }, [navigate])
 
-  const handleLoginSubmit = async (event) => {
+
+  const handleLoginSubmit = async(event)=> {
     event.preventDefault();
-    console.log("yep reach here\n");
-    setFormError([]);
+    console.log('yep reach here\n');
+    setFormError([])
     const formData = new FormData();
     formData.append("email", event.target.email.value);
     formData.append("password", event.target.password.value);
     console.log(Object.fromEntries(formData));
     console.log(formData);
     try {
-      const res = await axios.post(baseUrl + "auth/login", formData);
-      if (res.status === 200) {
+      const res = await axios.post(baseUrl+'auth/login', formData)
+      if(res.status === 200){
         // localStorage.setItem('access', res.data.access)
         // localStorage.setItem('refresh', res.data.refresh)
-        Cookies.set("access", res.data.access);
-        Cookies.set("refresh", res.data.refresh);
+        Cookies.set('access', res.data.access);
+        Cookies.set('refresh', res.data.refresh);
         console.log(res.data);
         dispatch(
           set_Authentication({
             name: jwtDecode(res.data.access).first_name,
             isAuthenticated: true,
-            isAdmin: res.data.isAdmin,
-            is_doctor: res.data.is_doctor,
+            isAdmin:res.data.isAdmin,
+            is_doctor:res.data.is_doctor,
+            
           })
         );
-        console.log(res.data.is_doctor, "this is the status");
+        console.log(res.data.is_doctor,"this is the status");
         console.log(res.data.is_doctor);
-        if (res.data.is_doctor) {
-          navigate("/doctor/dashboard");
-          return res;
-        } else {
-          navigate("/");
-          return res;
+        if (res.data.is_doctor){
+          navigate('/doctor/dashboard')
+          return res 
+        }else{
+          navigate('/')
+          return res  
         }
-      }
-    } catch (error) {
+      }  
+      
+    }
+    catch (error) {
       console.log(error);
-      toast.error(error.response.data.detail);
+      toast.error(error.response.data.detail)
       // if (error.response.status===401)
       // {
-
+       
       //   setFormError(error.response.data)
       // }
       // else
       // {
       //   console.log(error);
-
+  
       // }
     }
-  };
+  }
   const Google_login = async (user_detail) => {
     const formData = new FormData();
-    formData.append("email", user_detail.email);
-    formData.append("password", "12345678874");
+    formData.append("email", user_detail.email)
+    formData.append("password", "12345678874")
     console.log("formData");
-    console.log(Object.fromEntries(formData));
+    console.log(Object.fromEntries(formData))
 
     try {
-      const res = await axios.post(baseUrl + "auth/login", formData);
+      const res = await axios.post(baseUrl + 'auth/login', formData)
       console.log(res);
       if (res.status === 200) {
-        localStorage.setItem("access", res.data.access);
-        localStorage.setItem("refresh", res.data.refresh);
+        localStorage.setItem('access', res.data.access)
+        localStorage.setItem('refresh', res.data.refresh)
         dispatch(
           set_Authentication({
             name: jwtDecode(res.data.access).first_name,
             isAuthenticated: true,
             isAdmin: res.data.isAdmin,
-            is_doctor: res.data.is_doctor,
+            is_doctor:res.data.is_doctor,
+            
           })
         );
-        console.log(res.data.is_doctor, "this is the status");
-        if (res.data.is_doctor) {
-          navigate("/doctor/dashboard");
-          return res;
-        } else {
-          navigate("/");
-          return res;
+        console.log(res.data.is_doctor,"this is the status");
+        if (res.data.is_doctor){
+          navigate('/doctor/dashboard')
+          return res 
+        }else{
+          navigate('/')
+          return res  
         }
+
+
+
+        
+        
       }
 
       if (res.response.status === 401) {
-        navigate("/auth/signup");
+        navigate('/auth/signup')
       }
-    } catch (error) {
+
+    }
+    catch (error) {
       console.log(error);
     }
-  };
+  }
+  
 
   return (
     <div className="login-container">
       <div className="container">
-        <div className="heading">Patient Login</div>
+        <div className="heading">Doctor Login</div>
         <form className="form" method="POST" onSubmit={handleLoginSubmit}>
           <input
             required=""
@@ -204,15 +220,16 @@ function UserLogin() {
               />
             </svg>
           </span>
-          <Link to="/auth/doctor/login">
+          <Link to="/auth/login">
             <span className="relative w-full text-left transition-colors duration-200 ease-in-out group-hover:text-white dark:group-hover:text-gray-200">
-              Login as A Doctor
+              Login as A Patient
             </span>
           </Link>
         </div>
       </div>
-    </div>
-  );
+    </div>  
+
+  )
 }
 
-export default UserLogin;
+export default DoctorLogin
