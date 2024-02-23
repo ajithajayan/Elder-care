@@ -1,3 +1,4 @@
+from account.models import Doctor, User
 from rest_framework import serializers
 from booking.models import DoctorAvailability
 from datetime import datetime
@@ -54,28 +55,22 @@ class DoctorSlotUpdateSerializer(serializers.Serializer):
         
 
 
-# class DoctorSlotUpdateSerializer(serializers.Serializer):
-#     date = serializers.DateField()
-#     from_time = serializers.CharField()  # Assume it's a string in "HH:mm:ss" format
-#     to_time = serializers.CharField()
+class DOCUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        exclude = ('password', 'id' ,'is_staff','is_superuser','user_type')
 
-#     def update_doctor_slots(self, doctor):
-#         try:
-#             date = self.validated_data['date']
-#             from_time_str = self.validated_data['from_time']
-#             to_time_str = self.validated_data['to_time']
 
-#             # Parse the string time to datetime for saving
-#             from_time = datetime.strptime(from_time_str, '%H:%M:%S').time()
-#             to_time = datetime.strptime(to_time_str, '%H:%M:%S').time()
 
-#             new_slot = {
-#                 "from": from_time.strftime('%H:%M:%S'),
-#                 "to": to_time.strftime('%H:%M:%S')
-#             }
-
-#             # Assuming `available_slots` is a related manager in the Doctor model
-#             # If not, modify this part accordingly
-#             doctor.available_slots.create(day=date, **new_slot)
-#         except Exception as e:
-#             raise serializers.ValidationError(f"Error updating doctor slots: {str(e)}")
+class AdminDocUpdateSerializer(serializers.ModelSerializer):
+    user=DOCUserSerializer()
+    class Meta:
+        model = Doctor
+        fields='__all__' 
+        
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('user', {}) # this is used to pop out the user object and if it is not existing then we will assign a {} to it as default
+        user_serializer = DOCUserSerializer(instance.user, data=user_data, partial=True)
+        if user_serializer.is_valid():
+            user_serializer.save()
+        return super().update(instance, validated_data)

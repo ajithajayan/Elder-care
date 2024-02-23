@@ -19,9 +19,11 @@ urlpatterns = [
     path('verify-otp', views.OTPVerificationView.as_view(), name='verify-otp'),
     path('resend-otp/', views.ResendOTPView.as_view(), name='resend-otp'),
 
-    
+
 
     path("user/details/", views.UserDetails.as_view(), name="user-details"),
+
+    # **************************Main portion to list all the doctors considering base on the main user table ****************
     path("doctors/details/", views.UserDetailsUpdate.as_view(), name="doctors-details"),
     path("user/update/<str:pk>", views.UserDetailsUpdate.as_view(), name="user-update"),
     path("user/list/<str:pk>", views.UserDetailsUpdate().as_view(), name="user-list"),
@@ -30,12 +32,13 @@ urlpatterns = [
     path("patient/details/", views.PatientUseDetailsUpdate.as_view(), name="patient-details"),
 
 
-
+    # ***************this portion used for get the user details by main user id*************************
     path("doc/list/<str:pk>", views.DocDetailsUpdate().as_view(), name="doc-list"),
     path("doc/update/<str:pk>", views.DocDetailsUpdate().as_view(), name="doc-update"),
-
+    # *******************************************************************************************
     path("patient/list/<str:pk>", views.ClientDetailsUpdate().as_view(), name="patient-list"),
 
+    #  this portion is used for the doc and patient updation base on their custom_id
 
     path("admin/doc/<str:pk>", views.AdminDocUpdate().as_view(), name="adminDoc-update"),
     path("admin/doc/delete/<str:pk>", views.AdminDocDelete().as_view(), name="adminDoc-delete"),

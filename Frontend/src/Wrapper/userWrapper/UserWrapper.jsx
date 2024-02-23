@@ -101,7 +101,7 @@ function UserWrapper() {
 
       {path: "/profile", element: <UserProfile/>},
       {path: "/doctor-list", element: <DoctorSearch/>},
-      {path: "/doctor-profile", element: <DocProfile/>},
+      {path: "/doctor-profile/:id", element: <DocProfile/>},
 
     ],
   },

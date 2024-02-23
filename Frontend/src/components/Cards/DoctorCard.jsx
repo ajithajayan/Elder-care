@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const DoctorCard = ({ img, name, speciality, rating }) => {
+const DoctorCard = ({ img, name, speciality, rating,id }) => {
   // Calculate the number of filled stars and the remaining fractional part
   const filledStars = Math.floor(rating);
   const remainder = rating - filledStars;
@@ -75,8 +75,8 @@ const DoctorCard = ({ img, name, speciality, rating }) => {
         </p>
         
         <div className="flex flex-col md:flex-row mb-2">
-          <Link to="/doctor-profile"><button className="btn ml-0 mt-2 md:ml-2 md:mt-0">View Profile</button></Link>
-          <Link to="/doctor-profile"><button className="btn ml-0 mt-2 md:ml-2 md:mt-0">Book Appointment</button></Link>
+          <Link to={`/doctor-profile/${id}`}><button className="btn ml-0 mt-2 md:ml-2 md:mt-0">View Profile</button></Link>
+          <Link to={`/doctor-profile/${id}`}><button className="btn ml-0 mt-2 md:ml-2 md:mt-0">Book Appointment</button></Link>
         </div>
         
       </div>

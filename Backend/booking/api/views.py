@@ -4,13 +4,15 @@ from xml.dom import ValidationErr
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from booking.models import DoctorAvailability
-from .serializers import DoctorAvailabilitySerializer, DoctorSlotUpdateSerializer
+from .serializers import AdminDocUpdateSerializer, DoctorAvailabilitySerializer, DoctorSlotUpdateSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from account.models import Doctor
 from django.utils import timezone
 from django.utils.timezone import now
+from rest_framework import status, generics
+from rest_framework.parsers import MultiPartParser, FormParser
 
 # from dateutil.parser import parse
 
@@ -84,3 +86,13 @@ class DoctorSlotDeleteView(APIView):
             return Response({"error": "Slot not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": f"Error deleting slot: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+
+#****************************************** doctor detail page listing **************************************
+
+class DocDetailList(generics.RetrieveAPIView):
+    queryset = Doctor.objects.all()
+    parser_classes = (MultiPartParser, FormParser)
+    serializer_class = AdminDocUpdateSerializer
+    lookup_field = 'pk'

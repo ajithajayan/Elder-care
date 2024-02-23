@@ -1,19 +1,49 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { BeakerIcon } from "@heroicons/react/24/solid";
 import { AcademicCapIcon } from "@heroicons/react/24/solid";
 import { BriefcaseIcon } from "@heroicons/react/24/solid";
 import { ClockIcon } from "@heroicons/react/24/solid";
 import { CurrencyDollarIcon } from "@heroicons/react/24/solid";
 import DoctorAvailability from "../../components/calender/DoctorAvailability";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import { baseUrl } from "../../utils/constants/Constants";
+import docpic from "../../assets/images/doctor/docpic.jpg";
+import docavatar from '../../assets/images/doctor/docavatar.webp'
 
 function DocProfile() {
-  // Assuming this is your component state or props
+  const { id } = useParams();
+
+  const [doct, setdoct] = useState("");
+  const fetchDoctor = () => {
+    axios
+      .get(baseUrl + `appointment/detail/doctors/${id}`)
+      .then((res) => {
+        setdoct(res.data);
+        console.log(res.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  useEffect(() => {
+    fetchDoctor();
+  }, []);
+
+  // Doctor field values .....
   const doctorDetails = {
-    specialization: "Cardiologist",
-    education: "MD in Cardiology",
-    experience: "9 years +",
-    timing: "10:00 AM - 6:00 PM",
-    bookingFees: "$300",
+    specialization: doct.specializations ? doct.specializations : "General",
+    education: doct.education ? doct.education : "",
+    experience: doct.years_of_experience ? doct.years_of_experience : "1 year",
+    timing: doct.consultation_time
+      ? doct.consultation_time
+      : "10:00 AM - 6:00 PM",
+    bookingFees: doct.consultaion_fees
+      ? `₹ ${parseInt(doct.consultaion_fees).toLocaleString("en-IN", {
+          maximumFractionDigits: 0,
+        })}`
+      : "₹ 300",
   };
 
   // Define an array of fields
@@ -44,6 +74,7 @@ function DocProfile() {
       icon: <CurrencyDollarIcon className="h-6 w-6 text-blue-500" />,
     },
   ];
+
   return (
     <div className="bg-gray-100">
       <div className="container mx-auto py-8">
@@ -52,11 +83,19 @@ function DocProfile() {
             <div className="bg-white shadow rounded-lg p-6">
               <div className="flex flex-col items-center">
                 <img
-                  src="https://randomuser.me/api/portraits/men/94.jpg"
+                  src={doct.user ? doct.user.profile_picture?doct.user.profile_picture:docavatar : docavatar}
                   className="w-32 h-32 bg-gray-300 rounded-full mb-4 shrink-0"
+                  alt=""
                 />
-                <h1 className="text-xl font-bold">John Doe</h1>
-                <p className="text-gray-700">Software Developer</p>
+                <h1 className="text-xl font-bold">
+                  Dr{" "}
+                  {doct.user
+                    ? doct.user.first_name + " " + doct.user.last_name
+                    : ""}
+                </h1>
+                <p className="text-gray-700">
+                  {doct.specializations ? doct.specializations : "General"}
+                </p>
                 <div className="mt-6 flex flex-wrap gap-4 justify-center">
                   <a
                     href="#"
@@ -68,7 +107,7 @@ function DocProfile() {
               </div>
               <hr className="my-6 border-t border-gray-300" />
               <div className="flex flex-col">
-                <DoctorAvailability/>
+                <DoctorAvailability />
               </div>
             </div>
           </div>
@@ -76,15 +115,19 @@ function DocProfile() {
             <div className="bg-white shadow rounded-lg p-6">
               <h2 className="text-xl font-bold mb-4">About Me</h2>
               <p className="text-gray-700">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-                finibus est vitae tortor ullamcorper, ut vestibulum velit
-                convallis. Aenean posuere risus non velit egestas suscipit. Nunc
-                finibus vel ante id euismod. Vestibulum ante ipsum primis in
-                faucibus orci luctus et ultrices posuere cubilia Curae; Aliquam
-                erat volutpat. Nulla vulputate pharetra tellus, in luctus risus
-                rhoncus id.
+                {doct?.about !== null && doct?.about !== undefined? (
+                  doct?.about
+                ) : (
+                  <>
+                    Dr. {doct?.user?.first_name} {doct?.user?.last_name} earned
+                    his degree in {doct?.education} from {doct?.college_name}.
+                    Currently, he is a {doct?.specializations || "General"} at{" "}
+                    {doct?.Hospital || ""}.
+                  </>
+                )}
               </p>
-              <h3 className="font-semibold text-center mt-3 -mb-2">
+
+              <h3 className="font-semibold text-center pt-16 ">
                 Find me on
               </h3>
               <div className="flex justify-center items-center gap-6 my-6">
@@ -174,7 +217,7 @@ function DocProfile() {
                   </svg>
                 </a>
               </div>
-              {/* // Inside your component render method or functional component */}
+              {/* Inside your component render method or functional component */}
               <div className="flex flex-wrap my-16">
                 {fields.map((field, index) => (
                   <div
@@ -197,7 +240,6 @@ function DocProfile() {
                   </div>
                 ))}
               </div>
-              ;
             </div>
           </div>
         </div>
