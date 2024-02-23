@@ -4,16 +4,17 @@ from xml.dom import ValidationErr
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from booking.models import DoctorAvailability
-from .serializers import AdminDocUpdateSerializer, DoctorAvailabilitySerializer, DoctorSlotUpdateSerializer
+from .serializers import AdminDocUpdateSerializer, DoctorAvailabilitySerializer, DoctorSlotUpdateSerializer, UserDetailsUpdateSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from account.models import Doctor
+from account.models import Doctor, User
 from django.utils import timezone
 from django.utils.timezone import now
 from rest_framework import status, generics
 from rest_framework.parsers import MultiPartParser, FormParser
-
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.filters import SearchFilter
 # from dateutil.parser import parse
 
 
@@ -96,3 +97,30 @@ class DocDetailList(generics.RetrieveAPIView):
     parser_classes = (MultiPartParser, FormParser)
     serializer_class = AdminDocUpdateSerializer
     lookup_field = 'pk'
+
+
+
+
+class DoctorsUserSideList(generics.ListAPIView):
+    queryset = User.objects.filter(user_type='doctor', approval_status='APPROVED', is_active=True)
+    permission_classes = [IsAuthenticated]
+    parser_classes = (MultiPartParser, FormParser)
+    serializer_class = UserDetailsUpdateSerializer
+    pagination_class = PageNumberPagination
+    filter_backends = [SearchFilter]
+    search_fields = ['first_name', 'last_name', 'email', 'phone_number']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        # Filter based on gender
+        gender = self.request.query_params.get('gender', None)
+        if gender:
+            queryset = queryset.filter(gender=gender)
+
+        # Filter based on specialization
+        specialization = self.request.query_params.get('specialization', None)
+        if specialization:
+            queryset = queryset.filter(doctor_user__specializations__icontains=specialization)
+
+        return queryset

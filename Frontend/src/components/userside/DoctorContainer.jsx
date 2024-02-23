@@ -42,7 +42,7 @@ const DoctorContainer = ({ selectedFilters }) => {
         : "";
 
     // Construct the API URL with search query and filters
-    const apiUrl = `${baseUrl}auth/doctors/details/?search=${searchQuery}${genderFilterParam}${specializationFilterParam}`;
+    const apiUrl = `${baseUrl}appointment/doctors/listing/?search=${searchQuery}${genderFilterParam}${specializationFilterParam}`;
 
     // Get the access token from Cookies or wherever it is stored
     const accessToken = Cookies.get("access"); // Make sure to import Cookies

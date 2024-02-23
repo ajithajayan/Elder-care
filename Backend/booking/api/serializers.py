@@ -74,3 +74,23 @@ class AdminDocUpdateSerializer(serializers.ModelSerializer):
         if user_serializer.is_valid():
             user_serializer.save()
         return super().update(instance, validated_data)
+    
+
+
+
+
+# serializer used list out all the docotrs based on the filter
+
+
+class DoctorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Doctor
+        fields = '__all__'
+
+
+
+class UserDetailsUpdateSerializer(serializers.ModelSerializer):
+    doctor_user=DoctorSerializer(read_only=True)
+    class Meta:
+        model = User
+        exclude = ('password','is_id_verified','is_email_verified','is_staff','is_superuser','user_type')   

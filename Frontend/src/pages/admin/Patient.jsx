@@ -356,7 +356,7 @@ function Patient() {
                             </svg>
                             Edit user
                           </button>
-                          <button
+                          {/* <button
                             type="button"
                             onClick={() => doctorDelete(item.id)}
                             className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-600 rounded-lg hover:bg-red-800 focus:ring-4 focus:ring-red-300 dark:focus:ring-red-900"
@@ -374,7 +374,7 @@ function Patient() {
                               />
                             </svg>
                             Delete user
-                          </button>
+                          </button> */}
                         </td>
                       </tr>
                     );
