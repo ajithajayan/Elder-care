@@ -4,19 +4,22 @@ from xml.dom import ValidationErr
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from booking.models import DoctorAvailability
-from .serializers import AdminDocUpdateSerializer, DoctorAvailabilitySerializer, DoctorSlotUpdateSerializer, UserDetailsUpdateSerializer
+from .serializers import AdminDocUpdateSerializer, DoctorAvailabilitySerializer, DoctorSlotUpdateSerializer, RazorpayOrderSerializer, TranscationModelSerializer, UserDetailsUpdateSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from account.models import Doctor, User
+from account.models import Doctor, Patient, User
 from django.utils import timezone
 from django.utils.timezone import now
 from rest_framework import status, generics
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.filters import SearchFilter
-# from dateutil.parser import parse
+from rest_framework.decorators import api_view
+from django.shortcuts import get_object_or_404
+from booking.api.razorpay.main import RazorpayClient
 
+# ************************************************************************************************************************************
 
 
 class DoctorSlotUpdateView(APIView):
@@ -124,3 +127,97 @@ class DoctorsUserSideList(generics.ListAPIView):
             queryset = queryset.filter(doctor_user__specializations__icontains=specialization)
 
         return queryset
+    
+
+
+
+
+# payment integration for razor pay
+
+
+
+
+
+
+rz_client = RazorpayClient()
+
+@api_view(['POST'])
+def check_availability(request):
+    doctor_id = request.data.get('doctor_id')
+    selected_from_time = request.data.get('selected_from_time')
+    selected_to_time = request.data.get('selected_to_time')
+    selected_day = request.data.get('selected_day')
+
+    doctor_availability = get_object_or_404(DoctorAvailability, doctor_id=doctor_id, day=selected_day, start_time__lte=selected_from_time, end_time__gte=selected_to_time)
+
+    available = not doctor_availability.is_booked
+
+    return Response({'available': available}, status=status.HTTP_200_OK)
+
+
+class RazorpayOrderAPIView(APIView):
+    """This API will create an order"""
+    
+    def post(self, request):
+        razorpay_order_serializer = RazorpayOrderSerializer(
+            data=request.data
+        )
+        if razorpay_order_serializer.is_valid():
+            order_response = rz_client.create_order(
+                amount=razorpay_order_serializer.validated_data.get("amount"),
+                currency=razorpay_order_serializer.validated_data.get("currency")
+            )
+            response = {
+                "status_code": status.HTTP_201_CREATED,
+                "message": "order created",
+                "data": order_response
+            }
+            return Response(response, status=status.HTTP_201_CREATED)
+        else:
+            response = {
+                "status_code": status.HTTP_400_BAD_REQUEST,
+                "message": "bad request",
+                "error": razorpay_order_serializer.errors
+            }
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class TransactionAPIView(APIView):
+    """This API will complete order and save the 
+    transaction"""
+    
+    def post(self, request):
+        transaction_serializer = TranscationModelSerializer(data=request.data)
+        if transaction_serializer.is_valid():
+            rz_client.verify_payment_signature(
+                razorpay_payment_id = transaction_serializer.validated_data.get("payment_id"),
+                razorpay_order_id = transaction_serializer.validated_data.get("order_id"),
+                razorpay_signature = transaction_serializer.validated_data.get("signature")
+            )
+            try:
+                doctor_id=transaction_serializer.validated_data.get("doctor_id")
+                selected_from_time=transaction_serializer.validated_data.get("booked_from_time")
+                selected_to_time=transaction_serializer.validated_data.get("booked_to_time")
+
+                selected_day=transaction_serializer.validated_data.get("booked_date")
+                
+                doctor_availability = get_object_or_404(DoctorAvailability, doctor_id=doctor_id, day=selected_day, start_time__lte=selected_from_time, end_time__gte=selected_to_time)
+                doctor_availability.is_booked=True
+            except Exception as e:
+                print(e)
+                return Response({"error": "Doctor availability not found"}, status=status.HTTP_404_NOT_FOUND)
+
+                
+            transaction_serializer.save()
+            response = {
+                "status_code": status.HTTP_201_CREATED,
+                "message": "transaction created"
+            }
+            return Response(response, status=status.HTTP_201_CREATED)
+        else:
+            response = {
+                "status_code": status.HTTP_400_BAD_REQUEST,
+                "message": "bad request",
+                "error": transaction_serializer.errors
+            }
+            return Response(response, status=status.HTTP_400_BAD_REQUEST) 

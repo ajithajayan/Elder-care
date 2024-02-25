@@ -90,6 +90,10 @@ function DoctorProfile() {
   const [user, setUser] = useState({});
   const [specializations, setSpecializations] = useState("");
 
+  // to display the booking component
+
+  const [showBooking, setShowBooking] = useState(false);
+
   // to store the doctor personal details seperatly
 
   const [docDetail, setDocDetail] = useState([]);
@@ -393,8 +397,8 @@ function DoctorProfile() {
             </div>
           </div>
 
-          {/* *************************************************This portion for Language********************************************************/}
-
+          {/* *************************************************This portion for Time slot********************************************************/}
+          
           <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
             <h3 className="mb-4 text-xl font-semibold dark:text-white">
               Time slot Allotment

@@ -6,12 +6,12 @@ export const userBasicDetailsSlice = createSlice(
     name: 'user_basic_details',
     initialState: {
       name: null,
-      profile_pic:null
+      user_id:null
     },
     reducers: {
       set_user_basic_details: (state, action) => {
         state.name = action.payload.name;
-        state.profile_pic = action.payload.profile_pic;
+        state.user_id = action.payload.user_id;
       }
     }
 

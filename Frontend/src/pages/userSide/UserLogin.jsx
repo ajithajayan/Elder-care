@@ -8,6 +8,7 @@ import { baseUrl } from "../../utils/constants/Constants";
 import { GoogleLogin } from "@react-oauth/google";
 import { toast } from "react-toastify";
 import Cookies from "js-cookie";
+import { set_user_basic_details } from "../../Redux/userBasicDetails/userBasicDetailsSlice";
 
 function UserLogin() {
   const { state } = useLocation();
@@ -42,14 +43,16 @@ function UserLogin() {
         // localStorage.setItem('refresh', res.data.refresh)
         Cookies.set("access", res.data.access);
         Cookies.set("refresh", res.data.refresh);
-        console.log(res.data);
+        console.log("the access token ",res.data.access);
         dispatch(
           set_Authentication({
             name: jwtDecode(res.data.access).first_name,
             isAuthenticated: true,
             isAdmin: res.data.isAdmin,
             is_doctor: res.data.is_doctor,
+            user_id: jwtDecode(res.data.access).user_id,
           })
+          
         );
         console.log(res.data.is_doctor, "this is the status");
         console.log(res.data.is_doctor);

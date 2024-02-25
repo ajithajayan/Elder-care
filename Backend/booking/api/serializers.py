@@ -1,6 +1,6 @@
 from account.models import Doctor, User
 from rest_framework import serializers
-from booking.models import DoctorAvailability
+from booking.models import DoctorAvailability, Transaction
 from datetime import datetime
 from django.core.exceptions import ValidationError
 
@@ -94,3 +94,18 @@ class UserDetailsUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         exclude = ('password','is_id_verified','is_email_verified','is_staff','is_superuser','user_type')   
+
+
+
+
+# Docotr bookin serializer
+        
+class RazorpayOrderSerializer(serializers.Serializer):
+    amount = serializers.IntegerField()
+    currency = serializers.CharField()
+
+
+class TranscationModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = [ 'payment_id', 'order_id', 'signature', 'amount', 'doctor_id', 'patient_id', 'booked_date', 'booked_from_time', 'booked_to_time']

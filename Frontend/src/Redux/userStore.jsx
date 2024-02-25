@@ -7,6 +7,6 @@ import userBasicDetailsSliceReducer from './userBasicDetails/userBasicDetailsSli
 export default configureStore({
     reducer:{
         authentication_user:authenticationSliceReducer,
-        // user_basic_details:userBasicDetailsSliceReducer
+        user_basic_details:userBasicDetailsSliceReducer
     }
 })

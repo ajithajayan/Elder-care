@@ -152,7 +152,7 @@ class Doctor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE,related_name='doctor_user')
     full_name = models.CharField(max_length=255)
     specializations = models.CharField(max_length=30, choices=SPECIALIZATION_CHOICES, default='General')
-    consultaion_fees = models.DecimalField(max_digits=10, decimal_places=3, default=300)
+    consultaion_fees = models.DecimalField(max_digits=10, decimal_places=0, default=300)
     consultation_duration = models.DurationField(default=datetime.timedelta(hours=1))
     consultation_slots = models.IntegerField(default=5)
     education = models.TextField(max_length=50,blank=True, null=True)

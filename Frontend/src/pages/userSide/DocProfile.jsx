@@ -13,8 +13,14 @@ import docavatar from '../../assets/images/doctor/docavatar.webp'
 
 function DocProfile() {
   const { id } = useParams();
-
+  
   const [doct, setdoct] = useState("");
+
+  // to display the booking component
+
+  const [showBooking, setShowBooking] = useState(false);
+
+
   const fetchDoctor = () => {
     axios
       .get(baseUrl + `appointment/detail/doctors/${id}`)
@@ -98,7 +104,8 @@ function DocProfile() {
                 </p>
                 <div className="mt-6 flex flex-wrap gap-4 justify-center">
                   <a
-                    href="#"
+             
+                    onClick={()=>{setShowBooking(true)}}
                     className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
                   >
                     Book appointment
@@ -106,9 +113,9 @@ function DocProfile() {
                 </div>
               </div>
               <hr className="my-6 border-t border-gray-300" />
-              <div className="flex flex-col">
-                <DoctorAvailability />
-              </div>
+             {showBooking&& <div className="flex flex-col">
+                <DoctorAvailability fees={doct.consultaion_fees} doctorId={doct.custom_id}/>
+              </div>}
             </div>
           </div>
           <div className="col-span-4 sm:col-span-9">
