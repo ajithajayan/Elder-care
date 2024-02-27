@@ -44,6 +44,8 @@ urlpatterns = [
     path("admin/doc/delete/<str:pk>", views.AdminDocDelete().as_view(), name="adminDoc-delete"),
     path("admin/client/<str:pk>", views.AdminClientUpdate().as_view(), name="adminClient-Update"),
 
+    # for getting the patient wallet amount
+    path("wallet/amount/<str:patient_id>", views.WalletAmountView.as_view(), name="wallet-amount"),
 
     # for verification file for docotrs
 

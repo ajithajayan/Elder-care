@@ -4,8 +4,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from account.models import  Doctor, OTPModel, Patient, User, Verification
-from .serializers import  AdminClientUpdateSerializer, AdminDocUpdateSerializer, PatientSerializer, PatientUserSerializer, UserDetailsUpdateSerializer, UserRegisterSerializer, UserSerializer, VerificationSerializer, adminDocVerificationSerializer
+from account.models import  Doctor, OTPModel, Patient, User, Verification, Wallet
+from .serializers import  AdminClientUpdateSerializer, AdminDocUpdateSerializer, PatientSerializer, PatientUserSerializer, UserDetailsUpdateSerializer, UserRegisterSerializer, UserSerializer, VerificationSerializer, WalletUpdateSerializer, adminDocVerificationSerializer
 from django.contrib.auth import authenticate
 import random
 from django.core.mail import send_mail
@@ -321,3 +321,12 @@ class AdminDoctorApprovalListView(generics.ListAPIView):
     pagination_class = PageNumberPagination
     filter_backends = [SearchFilter]
     search_fields = ['first_name', 'last_name', 'email', 'phone_number','approval_status']    
+
+
+
+# for to display the wallet amout of the user
+    
+class WalletAmountView(generics.RetrieveUpdateAPIView):
+    queryset = Wallet.objects.all()
+    serializer_class = WalletUpdateSerializer
+    lookup_field = 'patient_id'

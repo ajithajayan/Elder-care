@@ -1,5 +1,5 @@
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer,TokenRefreshSerializer
-from account.models import Doctor, Patient, User, Verification
+from account.models import Doctor, Patient, User, Verification, Wallet
 
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
@@ -134,3 +134,12 @@ class adminDocVerificationSerializer(serializers.ModelSerializer):
         if user_serializer.is_valid():
             user_serializer.save()
         return super().update(instance, validated_data)
+    
+
+
+
+class WalletUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Wallet
+        exclude = ['patient'] 
+        

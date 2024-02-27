@@ -3,12 +3,12 @@ import datetime
 from xml.dom import ValidationErr
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from booking.models import DoctorAvailability
-from .serializers import AdminDocUpdateSerializer, DoctorAvailabilitySerializer, DoctorSlotUpdateSerializer, RazorpayOrderSerializer, TranscationModelSerializer, UserDetailsUpdateSerializer
+from booking.models import DoctorAvailability, Transaction
+from .serializers import AdminDocUpdateSerializer, DoctorAvailabilitySerializer, DoctorSlotUpdateSerializer, RazorpayOrderSerializer, TranscationModelList, TranscationModelSerializer, UserDetailsUpdateSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from account.models import Doctor, Patient, User
+from account.models import Doctor, Patient, User, Wallet
 from django.utils import timezone
 from django.utils.timezone import now
 from rest_framework import status, generics
@@ -18,7 +18,9 @@ from rest_framework.filters import SearchFilter
 from rest_framework.decorators import api_view
 from django.shortcuts import get_object_or_404
 from booking.api.razorpay.main import RazorpayClient
-
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated,IsAdminUser
+from django.http import JsonResponse
 # ************************************************************************************************************************************
 
 
@@ -63,7 +65,7 @@ class DoctorSlotsAPIView(APIView):
         # Retrieve and serialize the available slots for the specified date
         slots = {
             'available_slots': [
-                {'from': slot.start_time, 'to': slot.end_time} for slot in doctor_with_availability.doctoravailability_set.filter(day=date)
+                {'from': slot.start_time, 'to': slot.end_time} for slot in doctor_with_availability.doctoravailability_set.filter(day=date,is_booked=False)
             ]
         }
 
@@ -203,6 +205,7 @@ class TransactionAPIView(APIView):
                 
                 doctor_availability = get_object_or_404(DoctorAvailability, doctor_id=doctor_id, day=selected_day, start_time__lte=selected_from_time, end_time__gte=selected_to_time)
                 doctor_availability.is_booked=True
+                doctor_availability.save()
             except Exception as e:
                 print(e)
                 return Response({"error": "Doctor availability not found"}, status=status.HTTP_404_NOT_FOUND)
@@ -221,3 +224,83 @@ class TransactionAPIView(APIView):
                 "error": transaction_serializer.errors
             }
             return Response(response, status=status.HTTP_400_BAD_REQUEST) 
+        
+
+@api_view(['POST'])
+def cancel_booking(request):
+    transaction_id = request.data.get('transaction_id')
+    print("here i got the transaction id", transaction_id)
+
+    try:
+        transaction = Transaction.objects.get(transaction_id=transaction_id)
+
+        patient_id = transaction.patient_id
+        try:
+            patient = Patient.objects.get(custom_id=patient_id)
+            try:
+                wallet = Wallet.objects.get(patient=patient)
+                try:
+                    doctor = Doctor.objects.get(custom_id=transaction.doctor_id)
+                    try:
+                        doctor_availability = DoctorAvailability.objects.get(
+                            doctor=doctor,
+                            day=transaction.booked_date,
+                            start_time=transaction.booked_from_time,
+                            end_time=transaction.booked_to_time
+                        )
+
+                        wallet.balance += (transaction.amount - 50)
+
+                        doctor_availability.is_booked = False
+                        doctor_availability.save()
+                        wallet.save()
+                        transaction.status = 'REFUNDED'
+                        transaction.save()
+                        
+                        return JsonResponse({"message": "Booking cancelled successfully"}, status=status.HTTP_200_OK)
+
+                    except DoctorAvailability.DoesNotExist:
+                        return JsonResponse({"error": "Doctor availability not found"}, status=status.HTTP_404_NOT_FOUND)
+
+                except Doctor.DoesNotExist:
+                    return JsonResponse({"error": "Doctor not found"}, status=status.HTTP_404_NOT_FOUND)
+
+            except Wallet.DoesNotExist:
+                return JsonResponse({"error": "Wallet not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        except Patient.DoesNotExist:
+            return JsonResponse({"error": "Patient not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    except Transaction.DoesNotExist:
+        return JsonResponse({"error": "Transaction not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+class TrasactionListAPIView(generics.ListAPIView):
+    queryset = Transaction.objects.all()
+    serializer_class = TranscationModelList
+    pagination_class = PageNumberPagination    
+    filter_backends = [SearchFilter]
+    permission_classes=[IsAdminUser]
+    search_fields = ['transaction_id', 'doctor_id','patient_id', 'booked_date']
+
+
+class TrasactionRetriveAPIView(generics.RetrieveAPIView):
+    queryset = Transaction.objects.all()
+    serializer_class = TranscationModelList
+    lookup_field = 'pk'
+
+
+@api_view(['GET'])
+def PatientBookingDetailsAPIView(request, patient_id):
+    try:
+        transactions = Transaction.objects.filter(patient_id=patient_id)
+        serializer = TranscationModelList(transactions, many=True)
+        response = {
+                "status_code": status.HTTP_200_OK,
+                "data": serializer.data
+            }
+        return Response(response, status=status.HTTP_200_OK)
+    except Transaction.DoesNotExist:
+        return Response({"error": "Transaction not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        

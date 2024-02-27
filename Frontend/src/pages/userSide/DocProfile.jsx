@@ -10,11 +10,13 @@ import axios from "axios";
 import { baseUrl } from "../../utils/constants/Constants";
 import docpic from "../../assets/images/doctor/docpic.jpg";
 import docavatar from '../../assets/images/doctor/docavatar.webp'
+import { useSelector } from "react-redux";
 
 function DocProfile() {
   const { id } = useParams();
   
   const [doct, setdoct] = useState("");
+  
 
   // to display the booking component
 

@@ -22,6 +22,7 @@ import DashboardLayout from '../../pages/admin/DashboardLayout';
 import Dashboard from '../../pages/admin/Dashboard';
 import AdminLogRoute from '../../components/Private/AdminLogRoute';
 import VarificationDoc from '../../pages/admin/VarificationDoc';
+import Order from '../../pages/admin/Order';
 
 function AdminWrapper() {
   // const dispatch = useDispatch();
@@ -89,6 +90,7 @@ function AdminWrapper() {
         {path: "/doctor", element: <Doctor/>},
         {path: "/patient", element: <Patient/>},
         {path: "/DocVerification", element: <VarificationDoc/>},
+        {path: "/order", element: <Order/>},
 
         // // {path: "/profile", element: <Profile/>},
         // {path: "user/create", element: <AdminCreateUser />},  

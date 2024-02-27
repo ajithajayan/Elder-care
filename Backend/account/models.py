@@ -6,6 +6,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 
+
 # Create your models here.
 
 
@@ -208,6 +209,13 @@ class Patient(models.Model):
 
 
 
+class Wallet(models.Model):
+    patient = models.OneToOneField(Patient, on_delete=models.CASCADE,related_name='wallet_user', primary_key=True)
+    balance = models.IntegerField(default=0)
+
+    def __str__(self):
+        return str(self.patient)   
+
 
 # Signal receiver to create profile instances
 @receiver(post_save, sender=User)
@@ -219,7 +227,8 @@ def create_profile(sender, instance, created, **kwargs):
             Verification.objects.create(user=instance)
 
         elif instance.user_type == 'client':
-            Patient.objects.create(user=instance, full_name=instance.first_name+" "+instance.last_name)  # Customize as per your requirements
+            patient=Patient.objects.create(user=instance, full_name=instance.first_name+" "+instance.last_name)  # Customize as per your requirements
+            Wallet.objects.create(patient=patient)
 
 
 # Connect the signal receiver function

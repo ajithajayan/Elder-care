@@ -109,3 +109,9 @@ class TranscationModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
         fields = [ 'payment_id', 'order_id', 'signature', 'amount', 'doctor_id', 'patient_id', 'booked_date', 'booked_from_time', 'booked_to_time']
+
+
+class TranscationModelList(serializers.ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = '__all__'

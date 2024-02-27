@@ -5,7 +5,8 @@ import { baseUrl } from "../../utils/constants/Constants";
 import ImageUploading from "react-images-uploading";
 import userImage from "../../assets/images/user.png";
 import { toast } from "react-toastify";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
+import BookindDetails from "../../components/userside/Element/BookindDetails";
 
 function UserProfile() {
   const UserFields = [
@@ -60,6 +61,23 @@ function UserProfile() {
   const [user, setUser] = useState({});
   const [specializations, setSpecializations] = useState("");
   const [docDetail, setDocDetail] = useState({});
+  const [wallet, setWallet] = useState(0);
+
+  // for booking details
+
+  const [booking, setBooking] = useState(null);
+
+  const fetchBookingDetails = (id) => {
+    axios
+      .get(baseUrl + `appointment/booking/details/patient/${id}`)
+      .then((res) => {
+        setBooking(res.data.data);
+        console.log("the details of the doctor is here", res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   // ---------------------  Portion for uploding the image   ---------------------
 
@@ -102,12 +120,20 @@ function UserProfile() {
       });
   };
 
-  // ...................................................................................
+  // ........................... fetch Wallet data........................................................
 
+  const fetctWallet = (custom_id) => {
+    axios.get(baseUrl + `auth/wallet/amount/${custom_id}`).then((res) => {
+      setWallet(res.data.balance);
+      console.log(res.data.balance);
+    });
+  };
+
+  // ........................... fetch user data........................................................
   const fetchData = async () => {
     try {
       const refreshToken = Cookies.get("refresh");
-      console.log(refreshToken,"evide kittunnilla");
+      console.log(refreshToken, "evide kittunnilla");
 
       let decoded = jwtDecode(refreshToken);
       console.log(decoded, "hfhhhhhhhhhhhhhhhhhhhhhhhh");
@@ -120,14 +146,17 @@ function UserProfile() {
         setProfile(doct.data.profile_picture);
         setAbout(doct.data);
         setdocid(doct.data.patient_user.custom_id);
+        fetctWallet(doct.data.patient_user.custom_id);
+        fetchBookingDetails(doct.data.patient_user.custom_id);
         axios
-          .get(baseUrl + `auth/admin/client/${doct.data.patient_user.custom_id}`)
+          .get(
+            baseUrl + `auth/admin/client/${doct.data.patient_user.custom_id}`
+          )
           .then((res) => {
             setUser({ ...res.data.user }); // Spread the user object to avoid mutation
             setSpecializations(res.data.specializations || "");
             setDocDetail(res.data);
             console.log(res.data, "reached to the editing component");
-            
           })
           .catch((err) => {
             console.log(err);
@@ -145,7 +174,7 @@ function UserProfile() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [wallet]);
 
   // used to update the details of the users
   const handleInputChange = (field, value) => {
@@ -337,56 +366,52 @@ function UserProfile() {
 
           {/* *************************************************This portion for Language********************************************************/}
 
+          <div className="p-4 mb-4 justify-center items-center bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+            {/* <h3 className="mb-4 text-xl font-semibold dark:text-white">
+              Your wallet
+            </h3> */}
+
+            <div className="mb-4 flex justify-center items-center">
+              <div className="relative overflow-hidden w-60 h-80 rounded-3xl cursor-pointer text-2xl font-bold bg-blue-400">
+                <div className="z-10 absolute w-full h-full peer" />
+                <div className="absolute peer-hover:-top-20 peer-hover:-left-16 peer-hover:w-[140%] peer-hover:h-[140%] -top-32 -left-16 w-32 h-44 rounded-full bg-blue-300 transition-all duration-500" />
+                <div className="absolute flex text-xl text-center items-end justify-end peer-hover:right-0 peer-hover:rounded-b-none peer-hover:bottom-0 peer-hover:items-center peer-hover:justify-center peer-hover:w-full peer-hover:h-full -bottom-32 -right-16 w-36 h-44 rounded-full bg-blue-300 transition-all duration-500">
+                  Your wallet amount
+                  <br />₹{wallet}
+                </div>
+                <div className="w-full h-full items-center justify-center flex uppercase">
+                  Wallet
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/******************************* Tihs portion for the  Bookin details listing ********************************  */}
+
           <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-            <h3 className="mb-4 text-xl font-semibold dark:text-white">
-              Language &amp; Time
-            </h3>
-            <div className="mb-4">
-              <label
-                htmlFor="settings-language"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Select language
-              </label>
-              <select
-                id="settings-language"
-                name="countries"
-                className="bg-gray-50 border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-              >
-                <option>English (US)</option>
-                <option>Italiano</option>
-                <option>Français (France)</option>
-                <option>正體字</option>
-                <option>Español (España)</option>
-                <option>Deutsch</option>
-                <option>Português (Brasil)</option>
-              </select>
-            </div>
-            <div className="mb-6">
-              <label
-                htmlFor="settings-timezone"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Time Zone
-              </label>
-              <select
-                id="settings-timezone"
-                name="countries"
-                className="bg-gray-50 border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-              >
-                <option>GMT+0 Greenwich Mean Time (GMT)</option>
-                <option>GMT+1 Central European Time (CET)</option>
-                <option>GMT+2 Eastern European Time (EET)</option>
-                <option>GMT+3 Moscow Time (MSK)</option>
-                <option>GMT+5 Pakistan Standard Time (PKT)</option>
-                <option>GMT+8 China Standard Time (CST)</option>
-                <option>GMT+10 Eastern Australia Standard Time (AEST)</option>
-              </select>
-            </div>
-            <div>
-              <button className="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-                Save all
-              </button>
+            <div className="flow-root">
+              <h3 className="text-xl font-semibold dark:text-white">
+                Your Booking Details
+              </h3>
+              {booking && booking.length > 0 ? (
+                <ul className="mb-6 divide-y divide-gray-200 dark:divide-gray-700">
+                  {booking.map((booking, index) => {
+                    return (
+                      <li key={index} className="py-4">
+                        <BookindDetails
+                          transaction_id={booking.transaction_id}
+                          setWallet={setWallet}
+                        />
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <p className="pt-10 pl-5 font-bold text-2xl text-indigo-500">
+                  {" "}
+                  No booking history{" "}
+                </p>
+              )}
             </div>
           </div>
         </div>

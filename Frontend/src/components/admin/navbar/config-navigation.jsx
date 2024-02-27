@@ -41,7 +41,7 @@ const navConfig = [
   },
   {
     title: 'Order List',
-    path: '/admin/Orderlist',
+    path: '/admincontrol/order',
     icon: icon('ic_blog'),
   },
   {

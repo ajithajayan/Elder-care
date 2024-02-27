@@ -14,14 +14,25 @@ import { toast } from "react-toastify";
 const DoctorAvailability = ({ doctorId, fees }) => {
   const [Razorpay] = useRazorpay();
   const userId = useSelector((state) => state.authentication_user.user_id);
+  const [patientID, setPatientID] = useState(null)
   const navigate= useNavigate()
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const fetchPatient=(id)=>{
+
+    axios.get(`${baseUrl}auth/patient/list/${id}`).then((res)=>{
+      setPatientID(res.data.patient_user.custom_id)
+    }).catch((err)=>{
+      console.log(err)
+    })
+  }
+
   useEffect(() => {
     fetchAvailableTimeSlots(selectedDate.format("YYYY-MM-DD"));
+    fetchPatient(userId)
     
   }, [selectedDate]);
 
@@ -78,7 +89,7 @@ const DoctorAvailability = ({ doctorId, fees }) => {
         signature: signature,
         amount:fees ,
         doctor_id:  doctorId ,
-        patient_id: userId,
+        patient_id: patientID,
         booked_date: selectedDate.format("YYYY-MM-DD"),
         booked_from_time: selectedTimeSlot.from,
         booked_to_time: selectedTimeSlot.to,
