@@ -1,4 +1,4 @@
-from account.models import Doctor, User
+from account.models import Doctor, Patient, User
 from rest_framework import serializers
 from booking.models import DoctorAvailability, Transaction
 from datetime import datetime
@@ -66,6 +66,20 @@ class AdminDocUpdateSerializer(serializers.ModelSerializer):
     user=DOCUserSerializer()
     class Meta:
         model = Doctor
+        fields='__all__' 
+        
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('user', {}) # this is used to pop out the user object and if it is not existing then we will assign a {} to it as default
+        user_serializer = DOCUserSerializer(instance.user, data=user_data, partial=True)
+        if user_serializer.is_valid():
+            user_serializer.save()
+        return super().update(instance, validated_data)
+
+
+class AdminPatientUpdateSerializer(serializers.ModelSerializer):
+    user=DOCUserSerializer()
+    class Meta:
+        model = Patient
         fields='__all__' 
         
     def update(self, instance, validated_data):

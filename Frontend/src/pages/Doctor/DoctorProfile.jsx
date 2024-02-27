@@ -10,6 +10,7 @@ import Cookies from "js-cookie";
 import DoctorSlotBooking from "../../components/Doctor/DoctorSlotBooking";
 import Timer from "../../components/Timer/Timer";
 import { useStaticPicker } from "@mui/x-date-pickers/internals";
+import BookindDetailsDoctor from "../../components/Doctor/Elements/BookingDetailsDoctor";
 
 function DoctorProfile() {
   const UserFields = [
@@ -98,6 +99,23 @@ function DoctorProfile() {
 
   const [docDetail, setDocDetail] = useState([]);
 
+  
+  // for booking details
+
+  const [booking, setBooking] = useState(null);
+
+  const fetchBookingDetails = (id) => {
+    axios
+      .get(baseUrl + `appointment/booking/details/doctor/${id}`)
+      .then((res) => {
+        setBooking(res.data.data);
+        console.log("the details of the doctor is here", res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   // ---------------------  Portion for uploding the image   ---------------------
 
   const fileInputRef = useRef(null);
@@ -156,6 +174,7 @@ function DoctorProfile() {
         setProfile(doct.data.profile_picture);
         setAbout(doct.data);
         setdocid(doct.data.doctor_user.custom_id);
+        fetchBookingDetails(doct.data.doctor_user.custom_id)
         axios
           .get(baseUrl + `auth/admin/doc/${doct.data.doctor_user.custom_id}`)
           .then((res) => {
@@ -410,6 +429,35 @@ function DoctorProfile() {
 
           {/* ***********************************************verification documents***************************************************************** */}
           {id && <DocumentVerificationForm id={id} />}
+
+          {/******************************* Tihs portion for the  Bookin details listing ********************************  */}
+
+          <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+            <div className="flow-root">
+              <h3 className="text-xl font-semibold dark:text-white">
+                Your Booking Details
+              </h3>
+              {booking && booking.length > 0 ? (
+                <ul className="mb-6 divide-y divide-gray-200 dark:divide-gray-700">
+                  {booking.map((booking, index) => {
+                    return (
+                      <li key={index} className="py-4">
+                        <BookindDetailsDoctor
+                          transaction_id={booking.transaction_id}
+                        />
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <p className="pt-10 pl-5 font-bold text-2xl text-indigo-500">
+                  {" "}
+                  No booking history{" "}
+                </p>
+              )}
+            </div>
+          </div>
+
         </div>
 
         {/* **************************************************General information********************************************************/}

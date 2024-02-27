@@ -4,7 +4,7 @@ from xml.dom import ValidationErr
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from booking.models import DoctorAvailability, Transaction
-from .serializers import AdminDocUpdateSerializer, DoctorAvailabilitySerializer, DoctorSlotUpdateSerializer, RazorpayOrderSerializer, TranscationModelList, TranscationModelSerializer, UserDetailsUpdateSerializer
+from .serializers import AdminDocUpdateSerializer, AdminPatientUpdateSerializer, DoctorAvailabilitySerializer, DoctorSlotUpdateSerializer, RazorpayOrderSerializer, TranscationModelList, TranscationModelSerializer, UserDetailsUpdateSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -101,6 +101,12 @@ class DocDetailList(generics.RetrieveAPIView):
     queryset = Doctor.objects.all()
     parser_classes = (MultiPartParser, FormParser)
     serializer_class = AdminDocUpdateSerializer
+    lookup_field = 'pk'
+
+class PatientDetailList(generics.RetrieveAPIView):
+    queryset = Patient.objects.all()
+    parser_classes = (MultiPartParser, FormParser)
+    serializer_class = AdminPatientUpdateSerializer
     lookup_field = 'pk'
 
 
@@ -275,6 +281,56 @@ def cancel_booking(request):
         return JsonResponse({"error": "Transaction not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
+
+@api_view(['POST'])
+def cancel_booking_doctor(request):
+    transaction_id = request.data.get('transaction_id')
+    print("here i got the transaction id", transaction_id)
+
+    try:
+        transaction = Transaction.objects.get(transaction_id=transaction_id)
+
+        patient_id = transaction.patient_id
+        try:
+            patient = Patient.objects.get(custom_id=patient_id)
+            try:
+                wallet = Wallet.objects.get(patient=patient)
+                try:
+                    doctor = Doctor.objects.get(custom_id=transaction.doctor_id)
+                    try:
+                        doctor_availability = DoctorAvailability.objects.get(
+                            doctor=doctor,
+                            day=transaction.booked_date,
+                            start_time=transaction.booked_from_time,
+                            end_time=transaction.booked_to_time
+                        )
+
+                        wallet.balance += (transaction.amount)
+
+                        doctor_availability.is_booked = False
+                        doctor_availability.save()
+                        wallet.save()
+                        transaction.status = 'REFUNDED'
+                        transaction.save()
+                        
+                        return JsonResponse({"message": "Booking cancelled successfully"}, status=status.HTTP_200_OK)
+
+                    except DoctorAvailability.DoesNotExist:
+                        return JsonResponse({"error": "Doctor availability not found"}, status=status.HTTP_404_NOT_FOUND)
+
+                except Doctor.DoesNotExist:
+                    return JsonResponse({"error": "Doctor not found"}, status=status.HTTP_404_NOT_FOUND)
+
+            except Wallet.DoesNotExist:
+                return JsonResponse({"error": "Wallet not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        except Patient.DoesNotExist:
+            return JsonResponse({"error": "Patient not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    except Transaction.DoesNotExist:
+        return JsonResponse({"error": "Transaction not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
 class TrasactionListAPIView(generics.ListAPIView):
     queryset = Transaction.objects.all()
     serializer_class = TranscationModelList
@@ -303,4 +359,17 @@ def PatientBookingDetailsAPIView(request, patient_id):
     except Transaction.DoesNotExist:
         return Response({"error": "Transaction not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        
+
+
+@api_view(['GET'])
+def DoctorBookingDetailsAPIView(request, doctor_id):
+    try:
+        transactions = Transaction.objects.filter(doctor_id=doctor_id)
+        serializer = TranscationModelList(transactions, many=True)
+        response = {
+                "status_code": status.HTTP_200_OK,
+                "data": serializer.data
+            }
+        return Response(response, status=status.HTTP_200_OK)
+    except Transaction.DoesNotExist:
+        return Response({"error": "Transaction not found"}, status=status.HTTP_404_NOT_FOUND)
