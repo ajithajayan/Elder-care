@@ -30,6 +30,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include("account.api.urls")),
     path('appointment/', include("booking.api.urls")),
+    path('chat/', include("chat.api.urls")),
     
 
 ]

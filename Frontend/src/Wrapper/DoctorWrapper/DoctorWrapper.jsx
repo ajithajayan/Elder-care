@@ -15,6 +15,7 @@ import { baseUrl } from "../../utils/constants/Constants";
 import Page404 from "../../components/404/Page404";
 import DoctorProfile from "../../pages/Doctor/DoctorProfile";
 import ImageUpload from "../../pages/Doctor/ImageUpload";
+import DoctorChatComponent from "../../components/Messages/DoctMessage";
 
 
 
@@ -90,6 +91,8 @@ function DoctorWrapper() {
       {path: "/dashboard", element: <DoctorHome/>},
       {path: "/image", element: <ImageUpload/>},
       {path: "/profile", element: <DoctorProfile/>},
+      {path: "/chat", element: <DoctorChatComponent/>},
+
     ],
   },
   {

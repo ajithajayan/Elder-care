@@ -4,7 +4,7 @@ from xml.dom import ValidationErr
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from booking.models import DoctorAvailability, Transaction
-from .serializers import AdminDocUpdateSerializer, AdminPatientUpdateSerializer, DoctorAvailabilitySerializer, DoctorSlotUpdateSerializer, RazorpayOrderSerializer, TranscationModelList, TranscationModelSerializer, UserDetailsUpdateSerializer
+from .serializers import AdminDocUpdateSerializer, AdminPatientUpdateSerializer, DoctorAvailabilitySerializer, DoctorSlotUpdateSerializer, RazorpayOrderSerializer, TransactionPatientSerializer, TranscationModelList, TranscationModelSerializer, UserDetailsUpdateSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -392,3 +392,44 @@ def DoctorBookingDetailsAPIView(request, doctor_id):
         return Response(response, status=status.HTTP_200_OK)
     except Transaction.DoesNotExist:
         return Response({"error": "Transaction not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+
+
+from django.http import Http404
+
+class DoctorTransactionsAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        doctor_id = request.query_params.get('doctor_id', None)
+
+        if not doctor_id:
+            return Response({'error': 'Doctor ID is required in query parameters'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            doctor = Doctor.objects.get(custom_id=doctor_id)
+        except (Doctor.DoesNotExist, ValueError):
+            raise Http404("Doctor not found or invalid ID")
+
+        transactions = Transaction.objects.filter(doctor_id=doctor_id)
+
+        data = []
+        for transaction in transactions:
+            patient = Patient.objects.get(custom_id=transaction.patient_id)
+            transaction_data = {
+                "transaction_id": transaction.transaction_id,
+                "payment_id": transaction.payment_id,
+                "order_id": transaction.order_id,
+                "signature": transaction.signature,
+                "amount": transaction.amount,
+                "doctor_id": transaction.doctor_id,
+                "patient_id": transaction.patient_id,
+                "patient_name": patient.user.first_name,
+                "patient_profile_picture": str(patient.user.profile_picture.url) if patient.user.profile_picture else None,
+                "booked_date": transaction.booked_date,
+                "booked_from_time": transaction.booked_from_time,
+                "booked_to_time": transaction.booked_to_time,
+                "status": transaction.status,
+                "created_at": transaction.created_at,
+            }
+            data.append(transaction_data)
+
+        return Response(data, status=status.HTTP_200_OK)

@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { baseUrl } from "../../../utils/constants/Constants";
 import docavatar from "../../../assets/images/doctor/docavatar.webp";
 import { useEffect } from "react";
+import { toast } from "react-toastify";
 
 function BookindDetailsDoctor({ transaction_id }) {
   const [doct, setdoct] = useState("");

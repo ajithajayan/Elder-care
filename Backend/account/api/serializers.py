@@ -142,4 +142,31 @@ class WalletUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Wallet
         exclude = ['patient'] 
+
+
+
+
+
+class PatientCustomIDSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Patient
+        fields = ['custom_id']    
+
+
+class DoctorCustomIDSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Doctor
+        fields = ['custom_id']       
         
+        
+class UserPatientCustomIDSerializer(serializers.ModelSerializer):
+    patient_user=PatientCustomIDSerializer(read_only=True)
+    class Meta:
+        model = User
+        fields = ['id','first_name','patient_user']
+
+class UserDoctorCustomIDSerializer(serializers.ModelSerializer):
+    doctor_user=DoctorCustomIDSerializer(read_only=True)
+    class Meta:
+        model = User
+        fields = ['id','first_name','doctor_user']        

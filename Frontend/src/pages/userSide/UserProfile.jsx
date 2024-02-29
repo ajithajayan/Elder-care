@@ -148,6 +148,7 @@ function UserProfile() {
         setdocid(doct.data.patient_user.custom_id);
         fetctWallet(doct.data.patient_user.custom_id);
         fetchBookingDetails(doct.data.patient_user.custom_id);
+        
         axios
           .get(
             baseUrl + `auth/admin/client/${doct.data.patient_user.custom_id}`

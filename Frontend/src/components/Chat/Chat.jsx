@@ -37,7 +37,7 @@ function Chat() {
   const connectToWebSocket = (appointmentId) => {
     if (!appointmentId) return;
 
-    const newClient = new W3CWebSocket(`wss://your-backend-url/ws/chat/${appointmentId}/`);
+    const newClient = new W3CWebSocket(`wss://127.0.0.1:8000/ws/chat/${appointmentId}/`);
     setClient(newClient);
 
     newClient.onopen = () => {

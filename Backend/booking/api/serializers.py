@@ -129,3 +129,21 @@ class TranscationModelList(serializers.ModelSerializer):
     class Meta:
         model = Transaction
         fields = '__all__'
+
+
+
+# for to get the trasaction based on patient details
+        
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['first_name', 'profile_picture']
+
+class TransactionPatientSerializer(serializers.ModelSerializer):
+    # Use the UserSerializer for the patient field
+    patient = UserSerializer(source='patient.user', read_only=True)
+
+    class Meta:
+        model = Transaction
+        fields = '__all__'       

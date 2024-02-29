@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from account.models import  Doctor, OTPModel, Patient, User, Verification, Wallet
-from .serializers import  AdminClientUpdateSerializer, AdminDocUpdateSerializer, PatientSerializer, PatientUserSerializer, UserDetailsUpdateSerializer, UserRegisterSerializer, UserSerializer, VerificationSerializer, WalletUpdateSerializer, adminDocVerificationSerializer
+from .serializers import  AdminClientUpdateSerializer, AdminDocUpdateSerializer, PatientSerializer, PatientUserSerializer, UserDetailsUpdateSerializer, UserDoctorCustomIDSerializer, UserPatientCustomIDSerializer, UserRegisterSerializer, UserSerializer, VerificationSerializer, WalletUpdateSerializer, adminDocVerificationSerializer
 from django.contrib.auth import authenticate
 import random
 from django.core.mail import send_mail
@@ -330,3 +330,18 @@ class WalletAmountView(generics.RetrieveUpdateAPIView):
     queryset = Wallet.objects.all()
     serializer_class = WalletUpdateSerializer
     lookup_field = 'patient_id'
+
+
+
+# for getting the cusom id of patient using their user id
+    
+class PatientCustomIdView(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserPatientCustomIDSerializer
+    lookup_field = 'pk'    
+
+
+class DoctorCustomIdView(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserDoctorCustomIDSerializer
+    lookup_field = 'pk'    
