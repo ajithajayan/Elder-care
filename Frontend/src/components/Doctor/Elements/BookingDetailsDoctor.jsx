@@ -4,7 +4,7 @@ import { baseUrl } from "../../../utils/constants/Constants";
 import docavatar from "../../../assets/images/doctor/docavatar.webp";
 import { useEffect } from "react";
 
-function BookindDetailsDoctor({ transaction_id, setWallet }) {
+function BookindDetailsDoctor({ transaction_id }) {
   const [doct, setdoct] = useState("");
   const [trasaction, setTrasaction] = useState(null);
   const [status, setStatus] = useState(null);
@@ -55,8 +55,8 @@ function BookindDetailsDoctor({ transaction_id, setWallet }) {
       .then((res) => {
         console.log(res);
         setStatus("REFUNDED");
-        setWallet(50);
         setCancel(false);
+        toast.success("Booking cancelled successfully.Amound refunded to your Patient wallet")
       })
       .catch((error) => {
         console.log(error);
@@ -114,7 +114,7 @@ function BookindDetailsDoctor({ transaction_id, setWallet }) {
             </button>
           ) : status === "REFUNDED" ? (
             <button className="bg-blue-500 hover:bg-blue-400 text-white font-bold hover:text-red-500 font-bold  py-2 px-4 border-b-4 border-blue-700 hover:border-red-300 rounded">
-              REFUNDED
+              CANCELLED
             </button>
           ) : null}
         </div>

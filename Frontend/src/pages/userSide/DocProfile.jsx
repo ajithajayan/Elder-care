@@ -11,12 +11,21 @@ import { baseUrl } from "../../utils/constants/Constants";
 import docpic from "../../assets/images/doctor/docpic.jpg";
 import docavatar from '../../assets/images/doctor/docavatar.webp'
 import { useSelector } from "react-redux";
+import { jwtDecode } from "jwt-decode";
+import Cookies from "js-cookie";
 
 function DocProfile() {
   const { id } = useParams();
   
   const [doct, setdoct] = useState("");
+
+  const[patient_id,setPatientID]=useState(null)
   
+  const fetchPatientID=()=>{
+    const token=Cookies.get("access")
+    const decoded = jwtDecode(token);
+    setPatientID(decoded.user_id)
+  }
 
   // to display the booking component
 
@@ -29,6 +38,7 @@ function DocProfile() {
       .then((res) => {
         setdoct(res.data);
         console.log(res.data);
+        fetchPatientID()
       })
       .catch((error) => {
         console.log(error);
@@ -116,7 +126,7 @@ function DocProfile() {
               </div>
               <hr className="my-6 border-t border-gray-300" />
              {showBooking&& <div className="flex flex-col">
-                <DoctorAvailability fees={doct.consultaion_fees} doctorId={doct.custom_id}/>
+                <DoctorAvailability fees={doct.consultaion_fees} doctorId={doct.custom_id} patient_id={patient_id}/>
               </div>}
             </div>
           </div>

@@ -9,6 +9,7 @@ import logo from '../../assets/my logo.png';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import { baseUrl } from '../../utils/constants/Constants';
+import Notification from '../Notification/Notification';
 
 
 
@@ -145,12 +146,17 @@ const Navbar = () => {
         <NavLink className="flex text-gray-800 hover:text-blue-500 cursor-pointer transition-colors duration-300">
           About Us
         </NavLink>
+        
+
+        
+        
       </div>
 
       {/* Icon Menu Section */}
       <div className="flex items-center space-x-5 lg:space-x-8">
         {!isAuthenticated ? (
           <>
+
             {/* Register */}
             <NavLink to="auth/register" className="flex text-gray-600 hover:text-blue-500 cursor-pointer transition-colors duration-300">
               {registerIcon}
@@ -162,9 +168,12 @@ const Navbar = () => {
               {loginIcon}
               Login
             </NavLink>
+
+            
           </>
         ) : (
           <>
+          <Notification/>
             {/* Logout */}
             <NavLink
               onClick={handleLogout}
@@ -196,7 +205,7 @@ const Navbar = () => {
       {/* Mobile Menu Dropdown */}
       {isMobileMenuOpen && (
         <div className="lg:hidden w-full mt-4">
-          <div className="flex flex-col space-y-4">
+          <div className="flex flex-col space-y-5">
             <NavLink to="" className="text-gray-600 hover:text-blue-500 cursor-pointer transition-colors duration-300">
               Home
             </NavLink>
@@ -212,6 +221,8 @@ const Navbar = () => {
             <NavLink className="text-gray-600 hover:text-blue-500 cursor-pointer transition-colors duration-300">
               About Us
             </NavLink>
+
+            <Notification/>
           </div>
         </div>
       )}

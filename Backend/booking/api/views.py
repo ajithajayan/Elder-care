@@ -21,6 +21,13 @@ from booking.api.razorpay.main import RazorpayClient
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated,IsAdminUser
 from django.http import JsonResponse
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from django.http import JsonResponse
+
+channel_layer = get_channel_layer()
 # ************************************************************************************************************************************
 
 
@@ -235,7 +242,7 @@ class TransactionAPIView(APIView):
 @api_view(['POST'])
 def cancel_booking(request):
     transaction_id = request.data.get('transaction_id')
-    print("here i got the transaction id", transaction_id)
+    print("here I got the transaction id", transaction_id)
 
     try:
         transaction = Transaction.objects.get(transaction_id=transaction_id)
@@ -262,8 +269,20 @@ def cancel_booking(request):
                         wallet.save()
                         transaction.status = 'REFUNDED'
                         transaction.save()
-                        
-                        return JsonResponse({"message": "Booking cancelled successfully"}, status=status.HTTP_200_OK)
+
+                        # Send notification to the doctor
+                        # channel_layer = get_channel_layer()
+                        doctor_channel_name = f'doctor_{doctor.id}'
+                        notification_message = f"The patient {patient.first_name} {patient.last_name} has canceled the booking for {transaction.booked_date} from {transaction.booked_from_time} to {transaction.booked_to_time}."
+                        async_to_sync(channel_layer.group_send)(
+                            doctor_channel_name,
+                            {
+                                'type': 'send_notification',
+                                'message': notification_message,
+                            }
+                        )
+
+                        return JsonResponse({"message": "Booking canceled successfully"}, status=status.HTTP_200_OK)
 
                     except DoctorAvailability.DoesNotExist:
                         return JsonResponse({"error": "Doctor availability not found"}, status=status.HTTP_404_NOT_FOUND)

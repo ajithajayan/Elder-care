@@ -56,7 +56,8 @@
     "tailwindcss-bootstrap": "^0.1.2",
     "three": "^0.121.1",
     "vanta": "^0.5.24",
-    "web-vitals": "^1.1.2"
+    "web-vitals": "^1.1.2",
+    "websocket": "^1.0.34"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",

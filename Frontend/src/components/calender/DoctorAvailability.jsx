@@ -11,9 +11,9 @@ import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
 
-const DoctorAvailability = ({ doctorId, fees }) => {
+const DoctorAvailability = ({ doctorId, fees,patient_id }) => {
   const [Razorpay] = useRazorpay();
-  const userId = useSelector((state) => state.authentication_user.user_id);
+  // const userId = useSelector((state) => state.authentication_user.user_id);
   const [patientID, setPatientID] = useState(null)
   const navigate= useNavigate()
   const [selectedDate, setSelectedDate] = useState(dayjs());
@@ -32,7 +32,7 @@ const DoctorAvailability = ({ doctorId, fees }) => {
 
   useEffect(() => {
     fetchAvailableTimeSlots(selectedDate.format("YYYY-MM-DD"));
-    fetchPatient(userId)
+    fetchPatient(patient_id)
     
   }, [selectedDate]);
 

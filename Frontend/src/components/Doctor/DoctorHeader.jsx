@@ -7,6 +7,7 @@ import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import logo from '../../assets/my logo.png';
 import Cookies from 'js-cookie';
+import Notification from '../Notification/Notification';
 
 
 
@@ -164,6 +165,7 @@ const DocotrHeader = () => {
         ) : (
           <>
             {/* Logout */}
+            <Notification/>
             <NavLink
               onClick={handleLogout}
               className="flex text-gray-600 cursor-pointer transition-colors duration-300 font-semibold text-red-500"

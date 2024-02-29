@@ -17,6 +17,7 @@ import UserRoute from "../../components/Private/UserRoute";
 import DoctorSearch from "../../pages/userSide/DoctorSearch";
 import DocProfile from "../../pages/userSide/DocProfile";
 import PaymentSucess from "../../pages/userSide/PaymentSucess";
+import UserChat from "../../pages/userSide/UserChat";
 
 
 function UserWrapper() {
@@ -104,6 +105,7 @@ function UserWrapper() {
       {path: "/doctor-list", element: <DoctorSearch/>},
       {path: "/doctor-profile/:id", element: <DocProfile/>},
       {path: "/sucess-page", element: <PaymentSucess/>},
+      {path: "/user-chat", element: <UserChat/>},
 
 
     ],

@@ -16,10 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
+from django.urls import re_path
 from django.conf import settings
 from django.conf.urls.static import static
 
 from account.channels import AvailabilityConsumer
+from booking.consumers import DoctorConsumer
+from chat.consumers import ChatConsumer
+from account import consumers
 
 
 urlpatterns = [
@@ -40,4 +44,7 @@ if settings.DEBUG:
 
 websocket_urlpatterns = [
     path("practice/<str:practiceID>/availability", AvailabilityConsumer.as_asgi()),
+    path('ws/notification/', DoctorConsumer.as_asgi()),
+    path('ws/chat/',consumers.ChatConsumer.as_asgi()),
+    path('ws/chat/<int:appointment_id>/', ChatConsumer.as_asgi()),
 ]
