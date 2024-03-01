@@ -423,7 +423,50 @@ class DoctorTransactionsAPIView(APIView):
                 "doctor_id": transaction.doctor_id,
                 "patient_id": transaction.patient_id,
                 "patient_name": patient.user.first_name,
-                "patient_profile_picture": str(patient.user.profile_picture.url) if patient.user.profile_picture else None,
+                "patient_profile_picture": request.build_absolute_uri('/')[:-1]+patient.user.profile_picture.url if patient.user.profile_picture else None,
+                "booked_date": transaction.booked_date,
+                "booked_from_time": transaction.booked_from_time,
+                "booked_to_time": transaction.booked_to_time,
+                "status": transaction.status,
+                "created_at": transaction.created_at,
+            }
+
+            print("profile",request.build_absolute_uri('/')[:-1]+patient.user.profile_picture.url)
+            data.append(transaction_data)
+
+        return Response(data, status=status.HTTP_200_OK)
+
+
+
+
+
+class PatientTransactionsAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        patient_id = request.query_params.get('patient_id', None)
+
+        if not patient_id:
+            return Response({'error': 'patien_id ID is required in query parameters'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            patient = Patient.objects.get(custom_id=patient_id)
+        except (Doctor.DoesNotExist, ValueError):
+            raise Http404("Doctor not found or invalid ID")
+
+        transactions = Transaction.objects.filter(patient_id=patient_id)
+
+        data = []
+        for transaction in transactions:
+            doctor = Doctor.objects.get(custom_id=transaction.doctor_id)
+            transaction_data = {
+                "transaction_id": transaction.transaction_id,
+                "payment_id": transaction.payment_id,
+                "order_id": transaction.order_id,
+                "signature": transaction.signature,
+                "amount": transaction.amount,
+                "doctor_id": transaction.doctor_id,
+                "patient_id": transaction.patient_id,
+                "doctor_name": doctor.user.first_name,
+                "doctor_profile_picture": request.build_absolute_uri('/')[:-1]+doctor.user.profile_picture.url if doctor.user.profile_picture else "",
                 "booked_date": transaction.booked_date,
                 "booked_from_time": transaction.booked_from_time,
                 "booked_to_time": transaction.booked_to_time,

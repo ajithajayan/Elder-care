@@ -47,6 +47,7 @@ INSTALLED_APPS = [
 
     'corsheaders',
     'rest_framework',
+    "django_celery_results",
     'rest_framework_simplejwt.token_blacklist',
     'rest_framework_simplejwt',
     'account',
@@ -233,3 +234,12 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 RAZORPAY_KEY_ID = os.environ.get("RAZORPAY_KEY_ID")
 RAZORPAY_KEY_SECRET = os.environ.get("RAZORPAY_KEY_SECRET")
+
+
+# Celery
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_TIMEZONE = 'Asia/Kolkata'

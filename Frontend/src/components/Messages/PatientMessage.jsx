@@ -9,8 +9,7 @@ import { jwtDecode } from 'jwt-decode';
 import docavatar from '../../assets/images/doctor/docavatar.webp'
 
 
-
-const DoctorChatComponent = () => {
+const PatientChatComponent = () => {
     const [message, setMessage] = useState('');
     const [chatMessages, setChatMessages] = useState([]);
     const [bookings, setBookings] = useState([]);
@@ -28,7 +27,7 @@ const DoctorChatComponent = () => {
 
     const fetchBookings = async (id) => {
       try {
-        const response = await axios.get(`${baseUrl}appointment/api/doctor-transactions/?doctor_id=${id}`);
+        const response = await axios.get(`${baseUrl}appointment/api/patient-transactions/?patient_id=${id}`);
         setBookings(response.data);
         console.log(response.data)
       } catch (error) {
@@ -38,11 +37,11 @@ const DoctorChatComponent = () => {
 
     const fetchDoctorID = (id) => {
       axios
-        .get(baseUrl + `auth/custom-id/doctor/${id}`)
+        .get(baseUrl + `auth/custom-id/patient/${id}`)
         .then((res) => {
           setdoct(res.data);
-          console.log(res.data.doctor_user.custom_id);
-          fetchBookings(res.data.doctor_user.custom_id)
+          console.log(res.data.patient_user.custom_id);
+          fetchBookings(res.data.patient_user.custom_id)
         })
         .catch((error) => {
           console.log(error);
@@ -169,10 +168,10 @@ const DoctorChatComponent = () => {
           {bookings.map((booking) => (
             <li key={booking.transaction_id} onClick={() => handleAppointmentClick(booking)}>
                 <div className="doctor-list-item d-flex align-items-start">
-                  <img src={`${booking.patient_profile_picture?booking.patient_profile_picture:docavatar}`} alt="User" className="rounded-circle mr-1"  />
+                  <img src={booking.doctor_profile_picture?booking.doctor_profile_picture:docavatar} alt="Doctor" className="rounded-circle mr-1"  />
                   <div className="flex-grow-1 ml-3">
                     <div className="small">
-                      <small style={{ fontSize: '16px', fontWeight: 'bold' }}>{booking.patient_name}</small>
+                      <small style={{ fontSize: '16px', fontWeight: 'bold' }}>{booking.doctor_name}</small>
                     </div>
                   </div>
                 </div>
@@ -185,17 +184,17 @@ const DoctorChatComponent = () => {
             <div>
               <div className="selected-doctor-info d-flex align-items-center">
                 <img
-                  src={selectedAppointment.patient_profile_picture}
-                  alt={selectedAppointment.patient_name}
+                  src={docavatar}
+                  alt={selectedAppointment.doctor_name}
                   className="rounded-circle mr-1"
                   width={40}
                   height={40}
                 />
                 <div className="flex-grow-1">
-                  <strong>{selectedAppointment.patient_name}</strong>
+                  <strong>{selectedAppointment.doctor_name}</strong>
                 
                 </div>
-              </div>
+              </div>  
               <div className="chat-messages mt-4" style={{ display: 'flex', flexDirection: 'column' }}>
                 {chatMessages.map((msg, index) => (
                   <div key={index} className="message-container">
@@ -209,7 +208,7 @@ const DoctorChatComponent = () => {
                 </div>
                 ))}
               </div>
-              <div className="message-input">
+              <div className="message-input border-cyan-950 ">
                 <input
                   type="text"
                   value={message}
@@ -229,4 +228,4 @@ const DoctorChatComponent = () => {
   )
 }
 
-export default DoctorChatComponent
+export default PatientChatComponent

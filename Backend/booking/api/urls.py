@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import  DoctorBookingDetailsAPIView, DoctorSlotUpdateView,DoctorSlotsAPIView,DoctorSlotDeleteView,DocDetailList, DoctorTransactionsAPIView,DoctorsUserSideList, PatientBookingDetailsAPIView, PatientDetailList,RazorpayOrderAPIView, TrasactionListAPIView, TrasactionRetriveAPIView, cancel_booking, cancel_booking_doctor,check_availability,TransactionAPIView    
+from .views import  DoctorBookingDetailsAPIView, DoctorSlotUpdateView,DoctorSlotsAPIView,DoctorSlotDeleteView,DocDetailList, DoctorTransactionsAPIView,DoctorsUserSideList, PatientBookingDetailsAPIView, PatientDetailList, PatientTransactionsAPIView,RazorpayOrderAPIView, TrasactionListAPIView, TrasactionRetriveAPIView, cancel_booking, cancel_booking_doctor,check_availability,TransactionAPIView    
 
 urlpatterns = [
     path('doctors/<str:custom_id>/slots/', DoctorSlotsAPIView.as_view(), name='doctor-slots-api'),
@@ -49,9 +49,13 @@ urlpatterns = [
     path('booking/details/doctor/<str:doctor_id>', DoctorBookingDetailsAPIView, name='booking-details'),
 
 
-    # for getting the boking details with user profile and name
+    # for getting the boking details with patient profile and name
 
     path('api/doctor-transactions/', DoctorTransactionsAPIView.as_view(), name='doctor-transactions'),
+    
+    # for getting the boking details with doctor profile and name
+
+    path('api/patient-transactions/', PatientTransactionsAPIView.as_view(), name='patient-transactions'),
 
 
 ]
