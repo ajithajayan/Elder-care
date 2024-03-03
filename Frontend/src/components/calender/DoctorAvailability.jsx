@@ -21,18 +21,18 @@ const DoctorAvailability = ({ doctorId, fees,patient_id }) => {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const fetchPatient=(id)=>{
-
-    axios.get(`${baseUrl}auth/patient/list/${id}`).then((res)=>{
-      setPatientID(res.data.patient_user.custom_id)
-    }).catch((err)=>{
-      console.log(err)
-    })
-  }
+  
 
   useEffect(() => {
     fetchAvailableTimeSlots(selectedDate.format("YYYY-MM-DD"));
-    fetchPatient(patient_id)
+    axios.get(`${baseUrl}auth/custom-id/patient/${patient_id}`).then((res)=>{
+      setPatientID(res.data.patient_user.custom_id)
+      console.log("the patient cusotom id got here ",res.data)
+
+      
+    }).catch((err)=>{
+      console.log(err)
+    })
     
   }, [selectedDate]);
 
@@ -82,6 +82,7 @@ const DoctorAvailability = ({ doctorId, fees,patient_id }) => {
 
   // complete order
   const complete_order = (paymentID, orderID, signature) => {
+    console.log("patient id got here befor  passing",patientID)
     axios
       .post(`${baseUrl}appointment/complete-order/`, {
         payment_id: paymentID,

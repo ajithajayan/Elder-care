@@ -235,14 +235,7 @@ function Patient() {
                       (Active / Deactive)
                     </th>
 
-                    <th
-                      scope="col"
-                      className="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400"
-                    >
-                      Aprroval status
-                      <br />
-                      (Approved / Pending / Rejected)
-                    </th>
+                    
 
                     <th
                       scope="col"
@@ -329,9 +322,7 @@ function Patient() {
                           </div>
                         </td>
 
-                        <td className="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                          {item.approval_status}
-                        </td>
+                                
 
                         <td className="p-4 space-x-2 whitespace-nowrap">
                           <button

@@ -3,8 +3,9 @@ import datetime
 from xml.dom import ValidationErr
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
+from notification.models import Notification
 from booking.models import DoctorAvailability, Transaction
-from .serializers import AdminDocUpdateSerializer, AdminPatientUpdateSerializer, DoctorAvailabilitySerializer, DoctorSlotUpdateSerializer, RazorpayOrderSerializer, TransactionPatientSerializer, TranscationModelList, TranscationModelSerializer, UserDetailsUpdateSerializer
+from .serializers import AdminDocUpdateSerializer, AdminPatientUpdateSerializer, DoctorAvailabilitySerializer, DoctorSlotBulkUpdateSerializer, DoctorSlotUpdateSerializer, RazorpayOrderSerializer, TransactionPatientSerializer, TranscationModelList, TranscationModelSerializer, UserDetailsUpdateSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -26,6 +27,7 @@ from asgiref.sync import async_to_sync
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.http import JsonResponse
+from rest_framework.exceptions import ValidationError
 
 channel_layer = get_channel_layer()
 # ************************************************************************************************************************************
@@ -47,6 +49,28 @@ class DoctorSlotUpdateView(APIView):
             if 'duplicate_slot' in e.get_codes():
                 return Response({"error": str(e)}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+# for creating the slot of a long time period
+
+
+class DoctorSlotBulkUpdateView(APIView):
+    def post(self, request, custom_id):
+        try:
+            doctor = Doctor.objects.get(custom_id=custom_id)
+        except Doctor.DoesNotExist:
+            return Response({"error": "Doctor not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = DoctorSlotBulkUpdateSerializer(data=request.data, context={'doctor': doctor})
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.update_doctor_slots(doctor)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except ValidationError as e:
+            if 'overlap_error' in e.get_codes():
+                return Response({"error": str(e)}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class DoctorSlotsAPIView(APIView):
     def get(self, request, custom_id):
@@ -72,11 +96,12 @@ class DoctorSlotsAPIView(APIView):
         # Retrieve and serialize the available slots for the specified date
         slots = {
             'available_slots': [
-                {'from': slot.start_time, 'to': slot.end_time} for slot in doctor_with_availability.doctoravailability_set.filter(day=date,is_booked=False)
+                {'from': slot.start_time, 'to': slot.end_time, 'is_booked': slot.is_booked} for slot in doctor_with_availability.doctoravailability_set.filter(day=date)
             ]
         }
 
         return Response(slots, status=status.HTTP_200_OK)
+
     
 
 
@@ -211,6 +236,9 @@ class TransactionAPIView(APIView):
             )
             try:
                 doctor_id=transaction_serializer.validated_data.get("doctor_id")
+                patient_id=transaction_serializer.validated_data.get("patient_id")
+                doctor=Doctor.objects.get(custom_id=doctor_id)
+                patient=Patient.objects.get(custom_id=patient_id)
                 selected_from_time=transaction_serializer.validated_data.get("booked_from_time")
                 selected_to_time=transaction_serializer.validated_data.get("booked_to_time")
 
@@ -219,6 +247,10 @@ class TransactionAPIView(APIView):
                 doctor_availability = get_object_or_404(DoctorAvailability, doctor_id=doctor_id, day=selected_day, start_time__lte=selected_from_time, end_time__gte=selected_to_time)
                 doctor_availability.is_booked=True
                 doctor_availability.save()
+            #     Notification.objects.create(
+            # Patient=patient, Doctor=doctor, message=f'{patient.user.first_name} has booked an appointment.',
+            # receiver_type=Notification.RECEIVER_TYPE[1][0],notification_type=Notification.NOTIFICATION_TYPES[0][0]
+            # )
             except Exception as e:
                 print(e)
                 return Response({"error": "Doctor availability not found"}, status=status.HTTP_404_NOT_FOUND)
@@ -270,17 +302,17 @@ def cancel_booking(request):
                         transaction.status = 'REFUNDED'
                         transaction.save()
 
-                        # Send notification to the doctor
-                        # channel_layer = get_channel_layer()
-                        doctor_channel_name = f'doctor_{doctor.id}'
-                        notification_message = f"The patient {patient.first_name} {patient.last_name} has canceled the booking for {transaction.booked_date} from {transaction.booked_from_time} to {transaction.booked_to_time}."
-                        async_to_sync(channel_layer.group_send)(
-                            doctor_channel_name,
-                            {
-                                'type': 'send_notification',
-                                'message': notification_message,
-                            }
-                        )
+                        # # Send notification to the doctor
+                        # # channel_layer = get_channel_layer()
+                        # doctor_channel_name = f'doctor_{doctor.custom_id}'
+                        # notification_message = f"The patient {patient.user.first_name} {patient.user.last_name} has canceled the booking for {transaction.booked_date} from {transaction.booked_from_time} to {transaction.booked_to_time}."
+                        # async_to_sync(channel_layer.group_send)(
+                        #     doctor_channel_name,
+                        #     {
+                        #         'type': 'send_notification',
+                        #         'message': notification_message,
+                        #     }
+                        # )
 
                         return JsonResponse({"message": "Booking canceled successfully"}, status=status.HTTP_200_OK)
 
@@ -326,8 +358,8 @@ def cancel_booking_doctor(request):
 
                         wallet.balance += (transaction.amount)
 
-                        doctor_availability.is_booked = False
-                        doctor_availability.save()
+                       
+                        doctor_availability.delete()
                         wallet.save()
                         transaction.status = 'REFUNDED'
                         transaction.save()

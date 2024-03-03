@@ -11,6 +11,7 @@ import DoctorSlotBooking from "../../components/Doctor/DoctorSlotBooking";
 import Timer from "../../components/Timer/Timer";
 import { useStaticPicker } from "@mui/x-date-pickers/internals";
 import BookindDetailsDoctor from "../../components/Doctor/Elements/BookingDetailsDoctor";
+import DoctorWeeklySlotBooking from "../../components/Doctor/DoctorWeeklySlotBooking";
 
 function DoctorProfile() {
   const UserFields = [

@@ -128,7 +128,7 @@ const Register = () => {
     <div className="regis">
       <form className="form" onSubmit={handleSubmit}>
         <p className="title">Patient Register</p>
-        <p className="message">Signup now and get full access to our app.</p>
+        <p className="message text-red-500 font-bold"></p>
         <div className="flex">
           <label>
             <input

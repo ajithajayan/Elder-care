@@ -25,6 +25,8 @@ function DocProfile() {
     const token=Cookies.get("access")
     const decoded = jwtDecode(token);
     setPatientID(decoded.user_id)
+
+    console.log("the decoded patientId",decoded.user_id)
   }
 
   // to display the booking component
@@ -38,7 +40,6 @@ function DocProfile() {
       .then((res) => {
         setdoct(res.data);
         console.log(res.data);
-        fetchPatientID()
       })
       .catch((error) => {
         console.log(error);
@@ -47,6 +48,7 @@ function DocProfile() {
 
   useEffect(() => {
     fetchDoctor();
+    fetchPatientID()
   }, []);
 
   // Doctor field values .....

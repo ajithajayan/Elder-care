@@ -1,16 +1,13 @@
-import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { NavLink, Navigate, useNavigate } from 'react-router-dom';
-import { logout, reset } from '../../features/authSlice';
-import { Fragment } from 'react'
-import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import logo from '../../assets/my logo.png';
-import Cookies from 'js-cookie';
-import Notification from '../Notification/Notification';
-
-
-
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { NavLink, Navigate, useNavigate } from "react-router-dom";
+import { logout, reset } from "../../features/authSlice";
+import { Fragment } from "react";
+import { Disclosure, Menu, Transition } from "@headlessui/react";
+import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import logo from "../../assets/my logo.png";
+import Cookies from "js-cookie";
+import Notification from "../Notification/Notification";
 
 const registerIcon = (
   <svg
@@ -25,7 +22,6 @@ const registerIcon = (
     <path d="M19 13H21V16H24V18H21V21H19V18H16V16H19V13M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2M12 4A6 6 0 0 1 18 10H16A4 4 0 0 0 12 6A4 4 0 0 0 8 10H6A6 6 0 0 1 12 4M12 8A2 2 0 1 1 10 10A2 2 0 0 1 12 8Z" />
   </svg>
 );
-
 
 const loginIcon = (
   <svg
@@ -51,10 +47,9 @@ const logoutIcon = (
     height="24"
     viewBox="0 0 24 24"
   >
-    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM17 13H7v-2h10v2z"/>
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM17 13H7v-2h10v2z" />
   </svg>
 );
-
 
 const accountIcon = (
   <svg
@@ -70,152 +65,177 @@ const accountIcon = (
   </svg>
 );
 
-
 const DocotrHeader = () => {
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { name, isAuthenticated } = useSelector((state) => state.authentication_user);
+  const { name, isAuthenticated } = useSelector(
+    (state) => state.authentication_user
+  );
 
-  const handleLogout =  () => {
-
+  const handleLogout = () => {
     // try {
-  
+
     //   const accessToken = Cookies.get('refresh');
-  
+
     //   await axios.post(baseUrl+'auth/logout', {}, {
     //     headers: {
-    //       Authorization: `Bearer ${accessToken}`  
+    //       Authorization: `Bearer ${accessToken}`
     //     }
     //   })
     //   Cookies.remove(['access', 'refresh']);
-  
+
     // } catch (error) {
     //   console.log(error);
     // }
-    
-    Cookies.remove('access');
-    Cookies.remove('refresh');
+
+    Cookies.remove("access");
+    Cookies.remove("refresh");
     dispatch(
       set_Authentication({
         name: null,
         isAuthenticated: false,
-        isAdmin:false
+        isAdmin: false,
       })
     );
-    navigate('/auth/login')
-
-  
+    navigate("/auth/login");
   };
 
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <>
-    <nav className="flex flex-wrap justify-between items-center py-4 bg-white/80 backdrop-blur-md shadow-md w-full relative z-10 px-10">
-      {/* Logo Container */}
-      <div className="flex items-center">
-        {/* Logo */}
-        <a className=" cursor-pointer">
-          <h3 className="text-2xl font-medium text-blue-500">
-            <img
-              className="h-8 w-16 object-cover"
-              src={logo}
-              alt="Store Logo"
-            />
-          </h3>
-        </a>
-      </div>
-
-      {/* Links Section - Hidden on Small Screens */}
-      <div className={`items-center hidden space-x-8 lg:flex ${isMobileMenuOpen ? 'hidden' : ''}`}>
-        <NavLink to="/doctor/dashboard" className="flex text-gray-800 hover:text-blue-500 cursor-pointer transition-colors duration-300">
-          Home
-        </NavLink>
-
-        <NavLink to="/doctor/profile"  className="flex text-gray-800 hover:text-blue-500 cursor-pointer transition-colors duration-300">
-          My profile
-        </NavLink>
-
-        <NavLink className="flex text-gray-800 hover:text-blue-500 cursor-pointer transition-colors duration-300">
-          Packages
-        </NavLink>
-
-        <NavLink className="flex text-gray-800 hover:text-blue-500 cursor-pointer transition-colors duration-300">
-          About Us
-        </NavLink>
-      </div>
-
-      {/* Icon Menu Section */}
-      <div className="flex items-center space-x-5 lg:space-x-8">
-        {!isAuthenticated ? (
-          <>
-            {/* Register */}
-            <NavLink to="auth/register" className="flex text-gray-600 hover:text-blue-500 cursor-pointer transition-colors duration-300">
-              {registerIcon}
-              Register
-            </NavLink>
-
-            {/* Login */}
-            <NavLink to="auth/login" className="flex text-gray-600 cursor-pointer transition-colors duration-300 font-semibold text-gray-600">
-              {loginIcon}
-              Login
-            </NavLink>
-          </>
-        ) : (
-          <>
-            {/* Logout */}
-            <Notification/>
-            <NavLink
-              onClick={handleLogout}
-              className="flex text-gray-600 cursor-pointer transition-colors duration-300 font-semibold text-red-500"
-            >
-              {logoutIcon}
-              Logout
-            </NavLink>
-
-            {/* Account */}
-            <NavLink className="flex text-gray-600 cursor-pointer transition-colors duration-300 font-semibold text-blue-600">
-              {accountIcon}
-              {name}
-            </NavLink>
-          </>
-        )}
-      </div>
-
-      {/* Hamburger Icon for Small Screens */}
-      <div className="lg:hidden mt-4">
-        <button
-          className="text-gray-600 hover:text-blue-500 focus:outline-none focus:text-blue-500 transition-colors duration-300"
-          onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          ☰
-        </button>
-      </div>
-
-      {/* Mobile Menu Dropdown */}
-      {isMobileMenuOpen && (
-        <div className="lg:hidden w-full mt-4">
-          <div className="flex flex-col space-y-4">
-            <NavLink to="" className="text-gray-600 hover:text-blue-500 cursor-pointer transition-colors duration-300">
-              Home
-            </NavLink>
-
-            <NavLink className="text-gray-600 hover:text-blue-500 cursor-pointer transition-colors duration-300">
-              Destinations
-            </NavLink>
-
-            <NavLink className="text-gray-600 hover:text-blue-500 cursor-pointer transition-colors duration-300">
-              Packages
-            </NavLink>
-
-            <NavLink className="text-gray-600 hover:text-blue-500 cursor-pointer transition-colors duration-300">
-              About Us
-            </NavLink>
-          </div>
+      <nav className="flex flex-wrap justify-between items-center py-4 bg-white/80 backdrop-blur-md shadow-md w-full relative z-10 px-10">
+        {/* Logo Container */}
+        <div className="flex items-center">
+          {/* Logo */}
+          <a className=" cursor-pointer">
+            <h3 className="text-2xl font-medium text-blue-500">
+              <img
+                className="h-8 w-16 object-cover"
+                src={logo}
+                alt="Store Logo"
+              />
+            </h3>
+          </a>
         </div>
-      )}
-    </nav>
+
+        {/* Links Section - Hidden on Small Screens */}
+        <div
+          className={`items-center hidden space-x-8 lg:flex ${
+            isMobileMenuOpen ? "hidden" : ""
+          }`}
+        >
+          <NavLink
+            to="/doctor/dashboard"
+            className="flex text-gray-800 hover:text-blue-500 cursor-pointer transition-colors duration-300"
+          >
+            Home
+          </NavLink>
+
+          <NavLink
+            to="/doctor/profile"
+            className="flex text-gray-800 hover:text-blue-500 cursor-pointer transition-colors duration-300"
+          >
+            My profile
+          </NavLink>
+
+          <NavLink
+            to="/doctor/chat"
+            className="flex text-gray-800 hover:text-blue-500 cursor-pointer transition-colors duration-300"
+          >
+            Messages
+          </NavLink>
+
+          <NavLink className="flex text-gray-800 hover:text-blue-500 cursor-pointer transition-colors duration-300">
+            About Us
+          </NavLink>
+        </div>
+
+        {/* Icon Menu Section */}
+        <div className="flex items-center space-x-5 lg:space-x-8">
+          {!isAuthenticated ? (
+            <>
+              {/* Register */}
+              <NavLink
+                to="auth/register"
+                className="flex text-gray-600 hover:text-blue-500 cursor-pointer transition-colors duration-300"
+              >
+                {registerIcon}
+                Register
+              </NavLink>
+
+              {/* Login */}
+              <NavLink
+                to="auth/login"
+                className="flex text-gray-600 cursor-pointer transition-colors duration-300 font-semibold text-gray-600"
+              >
+                {loginIcon}
+                Login
+              </NavLink>
+            </>
+          ) : (
+            <>
+              {/* Logout */}
+              <Notification />
+              <NavLink
+                onClick={handleLogout}
+                className="flex text-gray-600 cursor-pointer transition-colors duration-300 font-semibold text-red-500"
+              >
+                {logoutIcon}
+                Logout
+              </NavLink>
+
+              {/* Account */}
+              <NavLink className="flex text-gray-600 cursor-pointer transition-colors duration-300 font-semibold text-blue-600">
+                {accountIcon}
+                {name}
+              </NavLink>
+            </>
+          )}
+        </div>
+
+        {/* Hamburger Icon for Small Screens */}
+        <div className="lg:hidden mt-4">
+          <button
+            className="text-gray-600 hover:text-blue-500 focus:outline-none focus:text-blue-500 transition-colors duration-300"
+            onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            ☰
+          </button>
+        </div>
+
+        {/* Mobile Menu Dropdown */}
+        {isMobileMenuOpen && (
+          <div className="lg:hidden w-full mt-4">
+            <div className="flex flex-col space-y-4">
+              <NavLink
+                to="/doctor/dashboard"
+                className="flex text-gray-800 hover:text-blue-500 cursor-pointer transition-colors duration-300"
+              >
+                Home
+              </NavLink>
+
+              <NavLink
+                to="/doctor/profile"
+                className="flex text-gray-800 hover:text-blue-500 cursor-pointer transition-colors duration-300"
+              >
+                My profile
+              </NavLink>
+
+              <NavLink
+                to="/doctor/chat"
+                className="flex text-gray-800 hover:text-blue-500 cursor-pointer transition-colors duration-300"
+              >
+                Messages
+              </NavLink>
+
+              <NavLink className="flex text-gray-800 hover:text-blue-500 cursor-pointer transition-colors duration-300">
+                About Us
+              </NavLink>
+            </div>
+          </div>
+        )}
+      </nav>
     </>
   );
 };

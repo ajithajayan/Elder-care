@@ -169,11 +169,11 @@ const DoctorRegister = () => {
           <span>Email</span>
         </label>
         <label>
-          <input
+        <input
             required
             placeholder=""
             type="tel"
-            pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+            pattern="\d{10}"
             className="input"
             name="phone_number"
             value={phone_number}

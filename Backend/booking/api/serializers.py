@@ -1,7 +1,7 @@
 from account.models import Doctor, Patient, User
 from rest_framework import serializers
 from booking.models import DoctorAvailability, Transaction
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.core.exceptions import ValidationError
 
 
@@ -12,8 +12,6 @@ class DoctorAvailabilitySerializer(serializers.ModelSerializer):
     class Meta:
         model = DoctorAvailability
         fields = '__all__'
-
-
 
 
 class DoctorSlotUpdateSerializer(serializers.Serializer):
@@ -29,8 +27,8 @@ class DoctorSlotUpdateSerializer(serializers.Serializer):
             to_time = datetime.strptime(slot_data.get('to_time'), '%H:%M:%S')
 
             # Check if the slot already exists for the specified date and time range
-            if DoctorAvailability.objects.filter(doctor=self.context.get('doctor'), day=date, start_time=from_time, end_time=to_time).exists():
-                raise ValidationError("Duplicate slot found. Please choose a different time range.", code='duplicate_slot')
+            if DoctorAvailability.objects.filter(doctor=self.context.get('doctor'), day=date, start_time__lt=to_time, end_time__gt=from_time).exists():
+                raise ValidationError("Overlapping slots are not allowed.", code='overlap_error')
 
         return data
 
@@ -52,7 +50,64 @@ class DoctorSlotUpdateSerializer(serializers.Serializer):
 
         except Exception as e:
             raise serializers.ValidationError(f"Error updating doctor slots: {str(e)}")
+
+
+
+# for updating the slot of a long time period
         
+
+class DoctorSlotBulkUpdateSerializer(serializers.Serializer):
+    from_date = serializers.DateField()
+    to_date = serializers.DateField()
+    slots = serializers.ListField(child=serializers.DictField())
+
+    def validate(self, data):
+        from_date = data.get('from_date')
+        to_date = data.get('to_date')
+        slots = data.get('slots')
+
+        if len(slots) != 1:
+            raise ValidationError("Only one time slot is allowed for the entire date range.", code='invalid_slots')
+
+        slot_data = slots[0]
+        from_time = datetime.strptime(slot_data.get('from_time'), '%H:%M:%S')
+        to_time = datetime.strptime(slot_data.get('to_time'), '%H:%M:%S')
+
+        if from_time >= to_time:
+            raise ValidationError("Invalid time range. 'from_time' should be before 'to_time'.", code='invalid_time_range')
+
+        return data
+
+    def update_doctor_slots(self, doctor):
+        try:
+            from_date = self.validated_data['from_date']
+            to_date = self.validated_data['to_date']
+            slots = self.validated_data['slots']
+            slot_data = slots[0]  # Only one slot is allowed
+
+            current_date = from_date
+            while current_date <= to_date:
+                date_str = current_date.strftime('%Y-%m-%d')
+                from_time = datetime.strptime(slot_data['from_time'], '%H:%M:%S')
+                to_time = datetime.strptime(slot_data['to_time'], '%H:%M:%S')
+
+                # Check if the slot already exists for the specified date and time range
+                if DoctorAvailability.objects.filter(doctor=doctor, day=current_date, start_time__lt=to_time, end_time__gt=from_time).exists():
+                    raise ValidationError(f"Overlapping slots are not allowed for {date_str}.", code='overlap_error')
+
+                DoctorAvailability.objects.create(
+                    doctor=doctor,
+                    day=current_date,
+                    start_time=from_time,
+                    end_time=to_time
+                )
+
+                current_date += timedelta(days=1)
+
+            return True
+
+        except Exception as e:
+            raise serializers.ValidationError(f"Error updating doctor slots: {str(e)}")
 
 
 class DOCUserSerializer(serializers.ModelSerializer):

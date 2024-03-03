@@ -9,6 +9,7 @@ import { baseUrl } from "../../utils/constants/Constants";
 import { DateCalendar } from "@mui/x-date-pickers";
 import { TrashIcon } from "@heroicons/react/24/solid";
 import moment from "moment";
+import DoctorWeeklySlotBooking from "./DoctorWeeklySlotBooking";
 
 const DoctorSlotBooking = ({ docid }) => {
   const [selectedDate, setSelectedDate] = useState(dayjs());
@@ -17,35 +18,34 @@ const DoctorSlotBooking = ({ docid }) => {
   const [toTime, setToTime] = useState(null);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const currentTime = dayjs(new Date());
+  const [isBulkBooking, setBulk] = useState(false);
+  const [isNormalBooking, setNormal] = useState(true);
+  const [isRefresh,setRefresh]=useState(false);
 
   useEffect(() => {
     // Fetch existing time slots for the selected date and update state
-    fetchAvailableSlots()
+    fetchAvailableSlots();
+  }, [selectedDate, docid,isRefresh]);
 
-  }, [selectedDate, docid]);
-
-  
   // function to fetch the available slots
 
   const fetchAvailableSlots = () => {
     axios
-    .get(
-      baseUrl +
-        `appointment/doctors/${docid}/slots?date=${selectedDate.format(
-          "YYYY-MM-DD"
-        )}`
-    )
-    .then((response) => {
-      setTimeSlots(response.data.available_slots || []);
-    })
-    .catch((error) => {
-      console.error("Error fetching existing time slots:", error);
-    });
-
+      .get(
+        baseUrl +
+          `appointment/doctors/${docid}/slots?date=${selectedDate.format(
+            "YYYY-MM-DD"
+          )}`
+      )
+      .then((response) => {
+        setTimeSlots(response.data.available_slots || []);
+      })
+      .catch((error) => {
+        console.error("Error fetching existing time slots:", error);
+      });
   };
 
-
-  // this is used for to convert the time to 12 hour format 
+  // this is used for to convert the time to 12 hour format
 
   const convertTo12HourFormat = (timeString) => {
     if (!timeString) {
@@ -87,81 +87,94 @@ const DoctorSlotBooking = ({ docid }) => {
     setToTime(newTime);
   };
 
-//  ********************************* Doctor slot updation function ***************************************
+  //  ********************************* Doctor slot updation function ***************************************
 
-const handleSaveSlots = () => {
-  if (fromTime && toTime) {
-    console.log("Before formatting:", fromTime, toTime);
+  const handleSaveSlots = () => {
+    if (fromTime && toTime) {
+      // Convert the selected time range to moment objects
+      const fromTimeFormatted = moment(fromTime.$d);
+      const toTimeFormatted = moment(toTime.$d);
 
-    const fromTimeFormatted = moment(fromTime.$d);
-    const toTimeFormatted = moment(toTime.$d);
+      // Set the allowed time range
+      const allowedStartTime = moment("05:00:00", "HH:mm:ss");
+      const allowedEndTime = moment("22:00:00", "HH:mm:ss");
 
-    console.log("After formatting:", fromTimeFormatted, toTimeFormatted);
+      // Check if the selected time range is within the allowed range
+      if (
+        fromTimeFormatted.isBefore(allowedStartTime) ||
+        toTimeFormatted.isAfter(allowedEndTime)
+      ) {
+        toast.warning("Slot allocation time should be between 5 am and 10 pm.");
+        return;
+      }
 
-    // Calculate the duration in minutes
-    const durationInMinutes = toTimeFormatted.diff(fromTimeFormatted, 'minutes');
+      // Calculate the duration in minutes
+      const durationInMinutes = toTimeFormatted.diff(
+        fromTimeFormatted,
+        "minutes"
+      );
 
-    // Define min and max slot durations
-    const minSlotDuration = 20;
-    const maxSlotDuration = 40;
+      // Define min and max slot durations
+      const minSlotDuration = 20;
+      const maxSlotDuration = 40;
 
-    // Check if the duration is within the allowed range
-    if (durationInMinutes < minSlotDuration || durationInMinutes > maxSlotDuration) {
-      toast.warning(`Slot duration should be between ${minSlotDuration} and ${maxSlotDuration} minutes.`);
-      return;
+      // Check if the duration is within the allowed range
+      if (
+        durationInMinutes < minSlotDuration ||
+        durationInMinutes > maxSlotDuration
+      ) {
+        toast.warning(
+          `Slot duration should be between ${minSlotDuration} and ${maxSlotDuration} minutes.`
+        );
+        return;
+      }
+
+      const newSlot = {
+        from_time: fromTimeFormatted.format("HH:mm:ss"),
+        to_time: toTimeFormatted.format("HH:mm:ss"),
+      };
+      const updatedSlots = [newSlot];
+
+      axios
+        .post(baseUrl + `appointment/doctors/${docid}/update_slots/`, {
+          date: selectedDate.format("YYYY-MM-DD"),
+          slots: updatedSlots,
+        })
+        .then((response) => {
+          fetchAvailableSlots();
+          toast.success("Slot created successfully");
+        })
+        .catch((error) => {
+          console.error("Error updating time slots:", error);
+          toast.error(
+            "Duplicate and Overlapping slots are not allowed. Please choose a different time range."
+          );
+        });
+    } else {
+      toast.warning("Please select from and to time");
     }
+  };
 
-    const newSlot = {
-      from_time: fromTimeFormatted.format("HH:mm:ss"),
-      to_time: toTimeFormatted.format("HH:mm:ss"),
-    };
-    const updatedSlots = [newSlot];
-
-    axios
-      .post(baseUrl + `appointment/doctors/${docid}/update_slots/`, {
-        date: selectedDate.format("YYYY-MM-DD"),
-        slots: updatedSlots,
-      })
-      .then((response) => {
-        fetchAvailableSlots();
-        toast.success("Slot created successfully");
-      })
-      .catch((error) => {
-        console.error("Error updating time slots:", error);
-        toast.error("Duplicate slot found. Please choose a different time range.");
-      });
-
-    // setFromTime(null);
-    // setToTime(null);
-  } else {
-    toast.warning("Please select from and to time");
-  }
-};
-
-// ******************************** Docotr slot Deletion function *************************
-
+  // ******************************** Docotr slot Deletion function *************************
 
   const handleDeleteSlot = (index) => {
     const slotToDelete = timeSlots[index];
-    
+
     axios
-        .delete(baseUrl + `appointment/doctors/${docid}/delete_slot/`, {
-            data: {
-                date: selectedDate.format("YYYY-MM-DD"),
-                slot: slotToDelete,
-            },
-        })
-        .then((response) => {
-            fetchAvailableSlots(); // Refresh the slots after deletion
-            toast.success("slot deleted sucessfully")
-        })
-        .catch((error) => {
-            console.error("Error deleting time slot:", error);
-        });
-};
-
-
-
+      .delete(baseUrl + `appointment/doctors/${docid}/delete_slot/`, {
+        data: {
+          date: selectedDate.format("YYYY-MM-DD"),
+          slot: slotToDelete,
+        },
+      })
+      .then((response) => {
+        fetchAvailableSlots(); // Refresh the slots after deletion
+        toast.success("slot deleted sucessfully");
+      })
+      .catch((error) => {
+        console.error("Error deleting time slot:", error);
+      });
+  };
 
   return (
     <div>
@@ -173,25 +186,36 @@ const handleSaveSlots = () => {
         />
       </LocalizationProvider>
       <div className="mb-6">
-        <label
-          htmlFor="settings-timezone"
-          className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-        >
-          Create time slot
-        </label>
-        <div className="flex pb-4">
-          <Timer
-            label="from time"
-            onTimeChange={handleFromTimeChange}
-          />
-          <Timer label="to time" onTimeChange={handleToTimeChange} />
-        </div>
-        <button
-          onClick={handleSaveSlots}
-          className=" text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-        >
-          Save Slots
-        </button>
+        {isNormalBooking && (
+          <>
+            <label
+              htmlFor="settings-timezone"
+              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Create time slot
+            </label>
+            <div className="flex pb-4">
+              <Timer label="from time" onTimeChange={handleFromTimeChange} />
+              <Timer label="to time" onTimeChange={handleToTimeChange} />
+            </div>
+            <button
+              onClick={handleSaveSlots}
+              className=" text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+            >
+              Save Slots
+            </button>
+            <button
+              onClick={() => {
+                setBulk(true);
+                setNormal(false);
+              }}
+              className="  text-white bg-gray-400 ml-10 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+            >
+              Create slot for a bulk date
+            </button>
+          </>
+        )}
+        {isBulkBooking && <DoctorWeeklySlotBooking docid={docid} setRefresh={setRefresh}/>}
       </div>
       <h2 className="font-bold p-2 mb-2 border-2 border-black">
         Created Time Slots for - {selectedDate.format("YYYY-MM-DD")}
@@ -217,10 +241,11 @@ const handleSaveSlots = () => {
                 {`${convertTo12HourFormat(
                   timeSlot.from
                 )} - ${convertTo12HourFormat(timeSlot.to)}`}
+                {!timeSlot.is_booked &&
                 <TrashIcon
                   className="h-5 w-5 text-red-500 cursor-pointer "
                   onClick={() => handleDeleteSlot(index)}
-                />
+                />}
               </li>
             ))}
           </ul>

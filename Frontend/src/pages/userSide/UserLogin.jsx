@@ -90,8 +90,8 @@ function UserLogin() {
       const res = await axios.post(baseUrl + "auth/login", formData);
       console.log(res);
       if (res.status === 200) {
-        localStorage.setItem("access", res.data.access);
-        localStorage.setItem("refresh", res.data.refresh);
+        Cookies.set("access", res.data.access);
+        Cookies.set("refresh", res.data.refresh);
         dispatch(
           set_Authentication({
             name: jwtDecode(res.data.access).first_name,

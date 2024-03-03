@@ -143,6 +143,10 @@ const Navbar = () => {
           My Profile
         </NavLink>
 
+        <NavLink to="/user-chat" className="flex text-gray-800 hover:text-blue-500 cursor-pointer transition-colors duration-300">
+          Messages
+        </NavLink>
+
         <NavLink className="flex text-gray-800 hover:text-blue-500 cursor-pointer transition-colors duration-300">
           About Us
         </NavLink>

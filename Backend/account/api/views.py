@@ -23,6 +23,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime
 from django.utils import timezone
 from django.db.models import Q
+from .task import sent_otp
 
 
 
@@ -63,13 +64,15 @@ class RegisterView(APIView):
 
     def send_otp_email(self, email):
         random_num = random.randint(1000, 9999)
-        send_mail(
-            "OTP AUTHENTICATING Elder Care",
-            f"{random_num} -OTP",
-            "ajithajayan222aa@gmail.com",
-            [email],
-            fail_silently=False,
-        )
+        result = sent_otp.delay(f"{random_num} -OTP", email)
+        print(result, '\n\n\n this is the resulet')
+        # send_mail(
+        #     "OTP AUTHENTICATING Elder Care",
+        #     f"{random_num} -OTP",
+        #     "ajithajayan222aa@gmail.com",
+        #     [email],
+        #     fail_silently=False,
+        # )
 
         # Save the generated OTP and timestamp in the database
         otp_model_instance = OTPModel.objects.create(
@@ -124,7 +127,8 @@ class UserLogin(APIView):
 
     def post(self, request):
         print(request.data)
-
+        result = sent_otp.delay("-OTP", 'em23ail@gmail.com')
+        print(result, '\n\n\n this is the resulet')
         try:
             email = request.data['email']
             password = request.data['password']

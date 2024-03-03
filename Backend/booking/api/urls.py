@@ -1,10 +1,13 @@
 from django.urls import path
-from .views import  DoctorBookingDetailsAPIView, DoctorSlotUpdateView,DoctorSlotsAPIView,DoctorSlotDeleteView,DocDetailList, DoctorTransactionsAPIView,DoctorsUserSideList, PatientBookingDetailsAPIView, PatientDetailList, PatientTransactionsAPIView,RazorpayOrderAPIView, TrasactionListAPIView, TrasactionRetriveAPIView, cancel_booking, cancel_booking_doctor,check_availability,TransactionAPIView    
+from .views import  DoctorBookingDetailsAPIView, DoctorSlotBulkUpdateView, DoctorSlotUpdateView,DoctorSlotsAPIView,DoctorSlotDeleteView,DocDetailList, DoctorTransactionsAPIView,DoctorsUserSideList, PatientBookingDetailsAPIView, PatientDetailList, PatientTransactionsAPIView,RazorpayOrderAPIView, TrasactionListAPIView, TrasactionRetriveAPIView, cancel_booking, cancel_booking_doctor,check_availability,TransactionAPIView    
 
 urlpatterns = [
     path('doctors/<str:custom_id>/slots/', DoctorSlotsAPIView.as_view(), name='doctor-slots-api'),
     
     path('doctors/<str:custom_id>/update_slots/', DoctorSlotUpdateView.as_view(), name='update-doctor-slots'),
+
+    # slot updation for a bulk data
+    path('doctors/<str:custom_id>/update_slots/bulk/', DoctorSlotBulkUpdateView.as_view(), name='update-doctor-slots-bulk'),
 
     path('doctors/<str:custom_id>/delete_slot/', DoctorSlotDeleteView.as_view(), name='delete-slot'),
 
