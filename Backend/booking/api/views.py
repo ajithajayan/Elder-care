@@ -330,6 +330,13 @@ def cancel_booking(request):
                         wallet.save()
                         transaction.status = 'REFUNDED'
                         transaction.save()
+                        Notification.objects.create(
+                                Patient=patient,
+                                Doctor=doctor,
+                                message=f'{patient.user.first_name} has cancelled the appointment on {transaction.booked_date} @ {transaction.booked_from_time}.',
+                                receiver_type=Notification.RECEIVER_TYPE[1][0],  # Assuming doctor is the receiver
+                                notification_type=Notification.NOTIFICATION_TYPES[3][0]  # 'cancelled'
+                        )
 
                         # # Send notification to the doctor
                         # # channel_layer = get_channel_layer()
