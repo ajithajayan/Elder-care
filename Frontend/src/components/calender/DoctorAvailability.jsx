@@ -41,7 +41,7 @@ const DoctorAvailability = ({ doctorId, fees,patient_id }) => {
       setLoading(true);
 
       const response = await axios.get(
-        `${baseUrl}appointment/doctors/${doctorId}/slots?date=${date}`
+        `${baseUrl}appointment/patient/check/doctor/${doctorId}/slots?date=${date}`
       );
 
       setAvailableTimeSlots(response.data.available_slots || []);

@@ -94,11 +94,11 @@ const DoctorSlotBooking = ({ docid }) => {
       // Convert the selected time range to moment objects
       const fromTimeFormatted = moment(fromTime.$d);
       const toTimeFormatted = moment(toTime.$d);
-
+  
       // Set the allowed time range
       const allowedStartTime = moment("05:00:00", "HH:mm:ss");
       const allowedEndTime = moment("22:00:00", "HH:mm:ss");
-
+  
       // Check if the selected time range is within the allowed range
       if (
         fromTimeFormatted.isBefore(allowedStartTime) ||
@@ -107,17 +107,17 @@ const DoctorSlotBooking = ({ docid }) => {
         toast.warning("Slot allocation time should be between 5 am and 10 pm.");
         return;
       }
-
+  
       // Calculate the duration in minutes
       const durationInMinutes = toTimeFormatted.diff(
         fromTimeFormatted,
         "minutes"
       );
-
+  
       // Define min and max slot durations
       const minSlotDuration = 20;
       const maxSlotDuration = 40;
-
+  
       // Check if the duration is within the allowed range
       if (
         durationInMinutes < minSlotDuration ||
@@ -128,13 +128,28 @@ const DoctorSlotBooking = ({ docid }) => {
         );
         return;
       }
-
+  
+      // Get the current date and time
+      const currentDate = moment();
+      const currentDateTime = currentDate.format("YYYY-MM-DD HH:mm:ss");
+  
+      // Combine selected date and time
+      const selectedDateTime = moment(
+        `${selectedDate.format("YYYY-MM-DD")} ${fromTimeFormatted.format("HH:mm:ss")}`
+      );
+  
+      // Check if the selected date is the current date and selected time is after 30 minutes from the current time
+      if (selectedDateTime.isSame(currentDate, 'day') && selectedDateTime.isBefore(currentDate.add(30, 'minutes'))) {
+        toast.warning("Selected time should be at least 30 minutes from the current time.");
+        return;
+      }
+  
       const newSlot = {
         from_time: fromTimeFormatted.format("HH:mm:ss"),
         to_time: toTimeFormatted.format("HH:mm:ss"),
       };
       const updatedSlots = [newSlot];
-
+  
       axios
         .post(baseUrl + `appointment/doctors/${docid}/update_slots/`, {
           date: selectedDate.format("YYYY-MM-DD"),
@@ -154,7 +169,8 @@ const DoctorSlotBooking = ({ docid }) => {
       toast.warning("Please select from and to time");
     }
   };
-
+  
+  
   // ******************************** Docotr slot Deletion function *************************
 
   const handleDeleteSlot = (index) => {

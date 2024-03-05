@@ -1,8 +1,11 @@
 from django.urls import path
-from .views import  DoctorBookingDetailsAPIView, DoctorSlotBulkUpdateView, DoctorSlotUpdateView,DoctorSlotsAPIView,DoctorSlotDeleteView,DocDetailList, DoctorTransactionsAPIView,DoctorsUserSideList, PatientBookingDetailsAPIView, PatientDetailList, PatientTransactionsAPIView,RazorpayOrderAPIView, TrasactionListAPIView, TrasactionRetriveAPIView, cancel_booking, cancel_booking_doctor,check_availability,TransactionAPIView    
+from .views import  DoctorBookingDetailsAPIView, DoctorSlotBulkUpdateView, DoctorSlotUpdateView,DoctorSlotsAPIView,DoctorSlotDeleteView,DocDetailList, DoctorTransactionsAPIView,DoctorsUserSideList, PatientBookingDetailsAPIView, PatientDetailList, PatientSlotsCheckingAPIView, PatientTransactionsAPIView,RazorpayOrderAPIView, TrasactionListAPIView, TrasactionRetriveAPIView, cancel_booking, cancel_booking_doctor,check_availability,TransactionAPIView    
 
 urlpatterns = [
     path('doctors/<str:custom_id>/slots/', DoctorSlotsAPIView.as_view(), name='doctor-slots-api'),
+
+    # for to check the docotr details from the patient side
+    path('patient/check/doctor/<str:custom_id>/slots/', PatientSlotsCheckingAPIView.as_view(), name='doctor-slots-api'),
     
     path('doctors/<str:custom_id>/update_slots/', DoctorSlotUpdateView.as_view(), name='update-doctor-slots'),
 
@@ -47,7 +50,7 @@ urlpatterns = [
 
     path('booking/details/patient/<str:patient_id>', PatientBookingDetailsAPIView, name='booking-details'),
 
-    # for getting the booking details for the perticular Docotor for docotr side listing
+    # for getting the booking details for the perticular Doctor for docotr side listing
 
     path('booking/details/doctor/<str:doctor_id>', DoctorBookingDetailsAPIView, name='booking-details'),
 

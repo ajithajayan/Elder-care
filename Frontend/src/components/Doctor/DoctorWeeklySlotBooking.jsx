@@ -38,6 +38,8 @@ const DoctorWeeklySlotBooking = ({ docid,setRefresh }) => {
   };
 
   const handleSaveSlots = () => {
+    const currentDate = moment(); // Get the current date
+  
     if (fromTime && toTime) {
       const fromTimeFormatted = moment(fromTime.$d);
       const toTimeFormatted = moment(toTime.$d);
@@ -51,15 +53,21 @@ const DoctorWeeklySlotBooking = ({ docid,setRefresh }) => {
         return;
       }
   
+      // Validate that selectedFromDate is not before the current date
+      if (selectedFromDate.isBefore(currentDate, 'day')) {
+        toast.warning('Please select a date on or after the current date.');
+        return;
+      }
+  
       // Validate the time range, you can customize this based on your requirements
-      const allowedStartTime = moment("05:00:00", "HH:mm:ss");
-      const allowedEndTime = moment("22:00:00", "HH:mm:ss");
+      const allowedStartTime = moment('05:00:00', 'HH:mm:ss');
+      const allowedEndTime = moment('22:00:00', 'HH:mm:ss');
   
       if (
         fromTimeFormatted.isBefore(allowedStartTime) ||
         toTimeFormatted.isAfter(allowedEndTime)
       ) {
-        toast.warning("Slot allocation time should be between 5 am and 10 pm.");
+        toast.warning('Slot allocation time should be between 5 am and 10 pm.');
         return;
       }
   
@@ -105,7 +113,6 @@ const DoctorWeeklySlotBooking = ({ docid,setRefresh }) => {
             'Duplicate and Overlapping slots are not allowed. Please choose a different time range.'
           );
         });
-  
     } else {
       toast.warning('Please select from and to time');
     }
@@ -125,11 +132,13 @@ const DoctorWeeklySlotBooking = ({ docid,setRefresh }) => {
           label="From Date"
           onDateChange={handleDateChange}
           dateType="from"
+          minDate={dayjs().toDate()} 
         />
         <DatePickerComponent
           label="To Date"
           onDateChange={handleDateChange}
           dateType="to"
+          minDate={dayjs().toDate()} 
         />
       </div>
 

@@ -50,6 +50,7 @@ const isAuthDoctor = async () => {
       isAuthenticated: false,
       isAdmin: false,
       is_doctor: false,
+      user_id:null
     };
   }
 
@@ -63,6 +64,7 @@ const isAuthDoctor = async () => {
       isAuthenticated: true,
       isAdmin: false,
       is_doctor: checkDoc,
+      user_id:decoded.user_id,
     };
   } else {
     const updateSuccess = await updateDocToken();
@@ -75,6 +77,7 @@ const isAuthDoctor = async () => {
         isAuthenticated: true,
         isAdmin: false,
         is_doctor: checkAdmin,
+        user_id:decoded.user_id,
       };
     } else {
       return {
@@ -82,6 +85,7 @@ const isAuthDoctor = async () => {
         isAuthenticated: false,
         isAdmin: false,
         is_doctor: false,
+        user_id:null,
       };
     }
   }

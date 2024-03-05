@@ -102,7 +102,36 @@ class DoctorSlotsAPIView(APIView):
 
         return Response(slots, status=status.HTTP_200_OK)
 
-    
+
+class PatientSlotsCheckingAPIView(APIView):
+    def get(self, request, custom_id):
+        try:
+            doctor = Doctor.objects.get(custom_id=custom_id)
+        except Doctor.DoesNotExist:
+            return Response({'error': 'Doctor not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Specify the date for which you want to retrieve slots
+        date_param = request.query_params.get('date')
+        
+        if not date_param:
+            return Response({'error': 'Date parameter is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            date = datetime.datetime.strptime(date_param, '%Y-%m-%d').date()
+        except ValueError:
+            return Response({'error': 'Invalid date format'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Use prefetch_related to optimize the query and fetch availability in a single query
+        doctor_with_availability = Doctor.objects.prefetch_related('doctoravailability_set').get(custom_id=custom_id)
+
+        # Retrieve and serialize the available slots for the specified date
+        slots = {
+            'available_slots': [
+                {'from': slot.start_time, 'to': slot.end_time, 'is_booked': slot.is_booked} for slot in doctor_with_availability.doctoravailability_set.filter(day=date,is_booked=False)
+            ]
+        }
+
+        return Response(slots, status=status.HTTP_200_OK)   
 
 
 class DoctorSlotDeleteView(APIView):
@@ -247,10 +276,10 @@ class TransactionAPIView(APIView):
                 doctor_availability = get_object_or_404(DoctorAvailability, doctor_id=doctor_id, day=selected_day, start_time__lte=selected_from_time, end_time__gte=selected_to_time)
                 doctor_availability.is_booked=True
                 doctor_availability.save()
-            #     Notification.objects.create(
-            # Patient=patient, Doctor=doctor, message=f'{patient.user.first_name} has booked an appointment.',
-            # receiver_type=Notification.RECEIVER_TYPE[1][0],notification_type=Notification.NOTIFICATION_TYPES[0][0]
-            # )
+                Notification.objects.create(
+            Patient=patient, Doctor=doctor, message=f'{patient.user.first_name} has booked an appointment on {selected_day} @ {selected_from_time}.',
+            receiver_type=Notification.RECEIVER_TYPE[1][0],notification_type=Notification.NOTIFICATION_TYPES[0][0]
+            )
             except Exception as e:
                 print(e)
                 return Response({"error": "Doctor availability not found"}, status=status.HTTP_404_NOT_FOUND)
@@ -441,10 +470,16 @@ class DoctorTransactionsAPIView(APIView):
         except (Doctor.DoesNotExist, ValueError):
             raise Http404("Doctor not found or invalid ID")
 
-        transactions = Transaction.objects.filter(doctor_id=doctor_id)
+        transactions = Transaction.objects.filter(doctor_id=doctor_id, status='COMPLETED')
 
+        processed_patient_ids = set()
         data = []
+
         for transaction in transactions:
+            # Check if the patient ID has been processed before
+            if transaction.patient_id in processed_patient_ids:
+                continue
+
             patient = Patient.objects.get(custom_id=transaction.patient_id)
             transaction_data = {
                 "transaction_id": transaction.transaction_id,
@@ -455,7 +490,9 @@ class DoctorTransactionsAPIView(APIView):
                 "doctor_id": transaction.doctor_id,
                 "patient_id": transaction.patient_id,
                 "patient_name": patient.user.first_name,
-                "patient_profile_picture": request.build_absolute_uri('/')[:-1]+patient.user.profile_picture.url if patient.user.profile_picture else None,
+                "patient_profile_picture": (
+                    request.build_absolute_uri('/')[:-1] + patient.user.profile_picture.url
+                ) if patient.user.profile_picture else None,
                 "booked_date": transaction.booked_date,
                 "booked_from_time": transaction.booked_from_time,
                 "booked_to_time": transaction.booked_to_time,
@@ -463,10 +500,11 @@ class DoctorTransactionsAPIView(APIView):
                 "created_at": transaction.created_at,
             }
 
-            print("profile",request.build_absolute_uri('/')[:-1]+patient.user.profile_picture.url)
+            processed_patient_ids.add(transaction.patient_id)
             data.append(transaction_data)
 
         return Response(data, status=status.HTTP_200_OK)
+
 
 
 
@@ -477,17 +515,23 @@ class PatientTransactionsAPIView(APIView):
         patient_id = request.query_params.get('patient_id', None)
 
         if not patient_id:
-            return Response({'error': 'patien_id ID is required in query parameters'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Patient ID is required in query parameters'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             patient = Patient.objects.get(custom_id=patient_id)
-        except (Doctor.DoesNotExist, ValueError):
-            raise Http404("Doctor not found or invalid ID")
+        except (Patient.DoesNotExist, ValueError):
+            raise Http404("Patient not found or invalid ID")
 
-        transactions = Transaction.objects.filter(patient_id=patient_id)
+        transactions = Transaction.objects.filter(patient_id=patient_id, status='COMPLETED')
 
+        processed_doctor_ids = set()
         data = []
+
         for transaction in transactions:
+            # Check if the doctor ID has been processed before
+            if transaction.doctor_id in processed_doctor_ids:
+                continue
+
             doctor = Doctor.objects.get(custom_id=transaction.doctor_id)
             transaction_data = {
                 "transaction_id": transaction.transaction_id,
@@ -498,13 +542,18 @@ class PatientTransactionsAPIView(APIView):
                 "doctor_id": transaction.doctor_id,
                 "patient_id": transaction.patient_id,
                 "doctor_name": doctor.user.first_name,
-                "doctor_profile_picture": request.build_absolute_uri('/')[:-1]+doctor.user.profile_picture.url if doctor.user.profile_picture else "",
+                "doctor_profile_picture": (
+                    request.build_absolute_uri('/')[:-1] + doctor.user.profile_picture.url
+                ) if doctor.user.profile_picture else "",
                 "booked_date": transaction.booked_date,
                 "booked_from_time": transaction.booked_from_time,
                 "booked_to_time": transaction.booked_to_time,
                 "status": transaction.status,
                 "created_at": transaction.created_at,
             }
+
+            processed_doctor_ids.add(transaction.doctor_id)
             data.append(transaction_data)
 
         return Response(data, status=status.HTTP_200_OK)
+

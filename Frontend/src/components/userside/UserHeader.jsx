@@ -177,7 +177,7 @@ const Navbar = () => {
           </>
         ) : (
           <>
-          <Notification/>
+          {/* <Notification/> */}
             {/* Logout */}
             <NavLink
               onClick={handleLogout}
@@ -226,7 +226,7 @@ const Navbar = () => {
               About Us
             </NavLink>
 
-            <Notification/>
+            {/* <Notification/> */}
           </div>
         </div>
       )}

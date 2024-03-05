@@ -23,7 +23,7 @@ from django.conf.urls.static import static
 
 from booking.consumers import DoctorConsumer
 from chat.consumers import ChatConsumer
-from notification import consumers
+from notification.consumers import NotificationConsumer
 
 
 urlpatterns = [
@@ -31,6 +31,7 @@ urlpatterns = [
     path('auth/', include("account.api.urls")),
     path('appointment/', include("booking.api.urls")),
     path('chat/', include("chat.api.urls")),
+    path('notification/', include("notification.api.urls")),
     
 
 ]
@@ -45,5 +46,5 @@ if settings.DEBUG:
 
 websocket_urlpatterns = [
     path('ws/chat/<int:appointment_id>/', ChatConsumer.as_asgi()),
-     path('ws/salon-notification/<int:custom_id>/', consumers.NotificationConsumer.as_asgi()),
+     path('ws/doctor-notification/<str:custom_id>/', NotificationConsumer.as_asgi()),
 ]

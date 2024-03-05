@@ -24,7 +24,8 @@ from datetime import datetime
 from django.utils import timezone
 from django.db.models import Q
 from .task import sent_otp
-
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
 
 
@@ -348,4 +349,50 @@ class PatientCustomIdView(generics.RetrieveAPIView):
 class DoctorCustomIdView(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserDoctorCustomIDSerializer
-    lookup_field = 'pk'    
+    lookup_field = 'pk' 
+
+
+
+#   google authentication 
+
+
+class UserGoogleAuth(APIView):
+
+    def post(self, request):
+
+        accountExist = True
+        try:
+            google_request = requests.Request()
+            id_info = id_token.verify_oauth2_token(
+                request.data['client_id'], google_request,  config('GOOGLE_AUTH_API'))
+            email = id_info['email']
+            print(' maankajfakdj\n\nthen next')
+
+
+
+        except KeyError:
+            raise ParseError('Check credential')
+
+        if not User.objects.filter(email=email).exists():
+            accountExist = False
+            username = id_info['given_name'] + id_info['jti'][-4:]
+            user = User.objects.create(email=email, first_name=username,
+                                          is_active=True, is_email_verified=True)
+            user.save()
+
+
+        refresh = RefreshToken.for_user(user)
+        refresh["is_vendor"] = False
+        refresh["name"] = str(user.first_name)
+        refresh["is_admin"] = False
+
+        content = {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+            'isAdmin': False,
+            "isVendor": False,
+            'accountExist': accountExist,
+        }
+        print(content)
+
+        return Response(content, status=status.HTTP_200_OK)
