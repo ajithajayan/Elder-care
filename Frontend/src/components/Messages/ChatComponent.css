@@ -136,6 +136,7 @@
   .message-right {
     background-color: #4caf50; /* Green color for sender's messages */
     color: white;
+    padding-left: 20px;
   }
   
   .message-left {
@@ -173,17 +174,18 @@
   }
   
   .sent-message {
-    background-color: #4caf50;
-    color: white;
+  
+
     align-self: flex-end;
     border-radius: 5px;
-    padding: 8px;
+    align-items: end;
+    padding-left: 20px;
     margin-bottom: 5px; /* Adjust spacing between messages if needed */
     margin-left: 5px; /* Adjust spacing between messages if needed */
 }
   
 .received-message {
-    background-color: #f1f0f0;
+  
     color: black;
     align-self: flex-start;
     border-radius: 5px;
