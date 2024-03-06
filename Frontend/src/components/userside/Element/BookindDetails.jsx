@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import React, { useState } from "react";
 import { baseUrl } from "../../../utils/constants/Constants";
@@ -10,6 +11,7 @@ function BookindDetails({ transaction_id, setWallet }) {
   const [trasaction, setTrasaction] = useState(null);
   const [status, setStatus] = useState(null);
   const [isCancelModalVisible, setCancel] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
@@ -58,7 +60,9 @@ function BookindDetails({ transaction_id, setWallet }) {
         setStatus("REFUNDED");
         setWallet(50);
         setCancel(false);
-        toast.success("Booking cancelled successfully.Amound refunded to your wallet")
+        toast.success(
+          "Booking cancelled successfully.Amound refunded to your wallet"
+        );
       })
       .catch((error) => {
         console.log(error);
@@ -71,6 +75,14 @@ function BookindDetails({ transaction_id, setWallet }) {
 
   const handleCloseCancel = () => {
     setCancel(false);
+  };
+
+  const handleJoinMeeting = (id) => {
+    // Construct the relative URL for room/transaction_id
+    const relativeURL = `/room/${id}`;
+
+    // Use navigate with the relative URL
+    navigate(relativeURL);
   };
 
   return (
@@ -106,19 +118,33 @@ function BookindDetails({ transaction_id, setWallet }) {
             </p>
           </div>
         </div>
-        <div className="inline-flex items-center w-auto xl:w-full 2xl:w-auto">
+        <div className="flex items-center justify-between w-auto xl:w-full 2xl:w-auto space-x-4">
           {status === "COMPLETED" ? (
+            <>
             <button
               onClick={() => handleOpenCancel()}
-              className="bg-blue-500 hover:bg-blue-400 text-white font-bold hover:text-red-500 font-bold  py-2 px-4 border-b-4 border-blue-700 hover:border-red-300 rounded"
+              className="bg-gray-400 hover:bg-blue-400 text-white font-bold hover:text-red-500 font-bold  py-2 px-4 border-b-4 border-blue-700 hover:border-red-300 rounded"
             >
-              Cancel Booking
+              Cancel
             </button>
+
+            <button
+            onClick={() => handleJoinMeeting(transaction_id)}
+            className="bg-blue-500 hover:bg-blue-400 text-white font-bold hover:text-red-500 font-bold  py-2 px-4 border-b-4 border-blue-700 hover:border-red-300 rounded"
+          >
+            Join Call
+          </button>
+
+            
+            </>
+            
           ) : status === "REFUNDED" ? (
             <button className="bg-blue-500 hover:bg-blue-400 text-white font-bold hover:text-red-500 font-bold  py-2 px-4 border-b-4 border-blue-700 hover:border-red-300 rounded">
-              REFUNDED
+              Refunded
             </button>
           ) : null}
+
+          
         </div>
       </div>
       {/* ******************************************************Booking Cancel Modal************************************************************* */}
@@ -147,9 +173,10 @@ function BookindDetails({ transaction_id, setWallet }) {
                     </svg>
                     <h3 className="mt-5 mb-6 text-lg text-gray-500 dark:text-gray-400">
                       Are you sure you want to Cancel this item?
-                      
                     </h3>
-                    <p1 className=" text-red-500">₹50 will deduct from your refund amount</p1>
+                    <p1 className=" text-red-500">
+                      ₹50 will deduct from your refund amount
+                    </p1>
                     <button
                       className="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-base inline-flex items-center px-3 py-2.5 text-center mr-2 dark:focus:ring-red-800"
                       onClick={() => handleCancel()}

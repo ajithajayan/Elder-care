@@ -17,14 +17,14 @@ const updateUserToken = async () => {
       Cookies.set('refresh', res.data.refresh);
       
       let decoded = jwtDecode(res.data.access);
-      return {'name': decoded.first_name, isAuthenticated: true};
+      return {'name': decoded.first_name, isAuthenticated: true,user_id:decoded.user_id};
 
     } else {
-      return {'name': null, isAuthenticated: false};
+      return {'name': null, isAuthenticated: false,user_id:null};
     }
 
   } catch (error) {
-    return {'name': null, isAuthenticated: false};
+    return {'name': null, isAuthenticated: false,user_id:null};
   }
 
 }
@@ -41,7 +41,7 @@ const isAuthUser = async () => {
   let decoded = jwtDecode(accessToken);
 
   if (decoded.exp > currentTime) {
-    return {'name':decoded.first_name,isAuthenticated:true};
+    return {'name':decoded.first_name,isAuthenticated:true,user_id:null};
   
   } else {
 

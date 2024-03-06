@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import React, { useState } from "react";
 import { baseUrl } from "../../../utils/constants/Constants";
@@ -10,6 +11,8 @@ function BookindDetailsDoctor({ transaction_id }) {
   const [trasaction, setTrasaction] = useState(null);
   const [status, setStatus] = useState(null);
   const [isCancelModalVisible, setCancel] = useState(false);
+  const [isMeetingAvailable, setIsMeetingAvailable] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
@@ -40,6 +43,18 @@ function BookindDetailsDoctor({ transaction_id }) {
       });
   }, [status]);
 
+  useEffect(() => {
+    // Check if the current date and time are equal to or later than the transaction date and time
+    const currentDateTime = new Date();
+    const transactionDateTime = new Date(
+      `${trasaction?.booked_date} ${trasaction?.booked_from_time}`
+    );
+    const meetingAvailable = currentDateTime >= transactionDateTime;
+
+    // Update the state variable to indicate whether the meeting is available
+    setIsMeetingAvailable(meetingAvailable);
+  }, [trasaction]);
+
   const handleCancel = () => {
     axios
       .post(
@@ -57,7 +72,9 @@ function BookindDetailsDoctor({ transaction_id }) {
         console.log(res);
         setStatus("REFUNDED");
         setCancel(false);
-        toast.success("Booking cancelled successfully.Amound refunded to your Patient wallet")
+        toast.success(
+          "Booking cancelled successfully.Amound refunded to your Patient wallet"
+        );
       })
       .catch((error) => {
         console.log(error);
@@ -70,6 +87,11 @@ function BookindDetailsDoctor({ transaction_id }) {
 
   const handleCloseCancel = () => {
     setCancel(false);
+  };
+
+  const handleJoinMeeting = (id) => {
+    // Add logic to redirect to the room/transaction_id page
+    navigate(`/doctor/room/${id}`);
   };
 
   return (
@@ -105,17 +127,26 @@ function BookindDetailsDoctor({ transaction_id }) {
             </p>
           </div>
         </div>
-        <div className="inline-flex items-center w-auto xl:w-full 2xl:w-auto">
+        <div className="flex items-center justify-between w-auto xl:w-full 2xl:w-auto space-x-4">
           {status === "COMPLETED" ? (
-            <button
-              onClick={() => handleOpenCancel()}
-              className="bg-blue-500 hover:bg-blue-400 text-white font-bold hover:text-red-500 font-bold  py-2 px-4 border-b-4 border-blue-700 hover:border-red-300 rounded"
-            >
-              Cancel Booking
-            </button>
+            <>
+              <button
+                onClick={() => handleOpenCancel()}
+                className="bg-gray-400 hover:bg-blue-400 text-white font-bold hover:text-red-500 font-bold  py-2 px-4 border-b-4 border-blue-700 hover:border-red-300 rounded"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={() => handleJoinMeeting(transaction_id)}
+                className="bg-blue-500 hover:bg-blue-400 text-white font-bold hover:text-red-500 font-bold  py-2 px-4 border-b-4 border-blue-700 hover:border-red-300 rounded"
+              >
+                Join Call
+              </button>
+            </>
           ) : status === "REFUNDED" ? (
             <button className="bg-blue-500 hover:bg-blue-400 text-white font-bold hover:text-red-500 font-bold  py-2 px-4 border-b-4 border-blue-700 hover:border-red-300 rounded">
-              CANCELLED
+              Refunded
             </button>
           ) : null}
         </div>

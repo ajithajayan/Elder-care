@@ -20,6 +20,7 @@ import PaymentSucess from "../../pages/userSide/PaymentSucess";
 import UserChat from "../../pages/userSide/UserChat";
 import ChatComponent from "../../components/Messages/Message";
 import PatientChatComponent from "../../components/Messages/PatientMessage";
+import VideoCallRoom from "../../pages/userSide/VideoCallRoom";
 
 
 function UserWrapper() {
@@ -34,7 +35,8 @@ function UserWrapper() {
     dispatch(
       set_Authentication({
         name: isAuthenticated.name,
-        isAuthenticated: isAuthenticated.isAuthenticated
+        isAuthenticated: isAuthenticated.isAuthenticated,
+        user_id:isAuthenticated.user_id,
       })
     );
   };
@@ -68,7 +70,7 @@ function UserWrapper() {
 
 
   useEffect(() => {
-    if(!authentication_user.name)
+    if(!authentication_user.user_id)
     {
      
       checkAuth();
@@ -108,6 +110,7 @@ function UserWrapper() {
       {path: "/doctor-profile/:id", element: <DocProfile/>},
       {path: "/sucess-page", element: <PaymentSucess/>},
       {path: "/user-chat", element: <PatientChatComponent/>},
+      {path: "/room/:roomID", element: <VideoCallRoom/>},
 
 
     ],

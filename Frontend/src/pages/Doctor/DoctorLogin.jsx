@@ -62,7 +62,7 @@ function DoctorLogin() {
           navigate('/doctor/dashboard')
           return res 
         }else{
-          navigate('/')
+          navigate('/auth/doctor/login')
           return res  
         }
       }  

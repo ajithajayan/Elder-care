@@ -16,6 +16,7 @@ import Page404 from "../../components/404/Page404";
 import DoctorProfile from "../../pages/Doctor/DoctorProfile";
 import ImageUpload from "../../pages/Doctor/ImageUpload";
 import DoctorChatComponent from "../../components/Messages/DoctMessage";
+import DoctorVideoCallRoom from "../../pages/Doctor/DoctorVideoCallRoom";
 
 function DoctorWrapper() {
   const dispatch = useDispatch();
@@ -62,6 +63,7 @@ function DoctorWrapper() {
         { path: "/image", element: <ImageUpload /> },
         { path: "/profile", element: <DoctorProfile /> },
         { path: "/chat", element: <DoctorChatComponent /> },
+        {path: "/room/:roomID", element: <DoctorVideoCallRoom/>},
       ],
     },
     {
