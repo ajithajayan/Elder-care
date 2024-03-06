@@ -361,12 +361,13 @@ class UserGoogleAuth(APIView):
     def post(self, request):
 
         accountExist = True
+        GOOGLE_AUTH_API='310720032185-uu1d58btdiim2i6jsq77sblnl99umjo1.apps.googleusercontent.com'
         try:
             google_request = requests.Request()
             id_info = id_token.verify_oauth2_token(
-                request.data['client_id'], google_request,  config('GOOGLE_AUTH_API'))
+                request.data['client_id'], google_request,  GOOGLE_AUTH_API)
             email = id_info['email']
-            print(' maankajfakdj\n\nthen next')
+            print('here is your email from google',email,id_info)
 
 
 
@@ -375,22 +376,87 @@ class UserGoogleAuth(APIView):
 
         if not User.objects.filter(email=email).exists():
             accountExist = False
-            username = id_info['given_name'] + id_info['jti'][-4:]
-            user = User.objects.create(email=email, first_name=username,
+            username = id_info['name']
+            first_name = id_info['given_name']
+            last_name = id_info['family_name']
+            profile_picture = id_info['picture']
+
+            user = User.objects.create(email=email, first_name=first_name,last_name=last_name,profile_picture=profile_picture,username=username,
                                           is_active=True, is_email_verified=True)
             user.save()
+        
+        user = User.objects.get(email=email)
+        if user.is_active == False:
+            return Response({'detail': 'You are blocked by admin ! Please contact admin'}, status=status.HTTP_403_FORBIDDEN)
+        elif user.is_doctor():
+            return Response({'detail': 'the account is alredy registerd as doctor'}, status=status.HTTP_403_FORBIDDEN)
 
-
-        refresh = RefreshToken.for_user(user)
-        refresh["is_vendor"] = False
-        refresh["name"] = str(user.first_name)
-        refresh["is_admin"] = False
+        else:
+            refresh = RefreshToken.for_user(user)
+            refresh["is_doctor"] = False
+            refresh["first_name"] = str(user.first_name)
+            refresh["is_admin"] = False
 
         content = {
             'refresh': str(refresh),
             'access': str(refresh.access_token),
             'isAdmin': False,
-            "isVendor": False,
+            "isDoctor": False,
+            'accountExist': accountExist,
+        }
+        print(content)
+
+        return Response(content, status=status.HTTP_200_OK)
+
+
+
+
+class DoctorGoogleAuth(APIView):
+
+    def post(self, request):
+
+        accountExist = True
+        GOOGLE_AUTH_API='310720032185-uu1d58btdiim2i6jsq77sblnl99umjo1.apps.googleusercontent.com'
+        try:
+            google_request = requests.Request()
+            id_info = id_token.verify_oauth2_token(
+                request.data['client_id'], google_request,  GOOGLE_AUTH_API)
+            email = id_info['email']
+            print('here is your email from google',email,id_info)
+
+
+
+        except KeyError:
+            raise ParseError('Check credential')
+
+        if not User.objects.filter(email=email).exists():
+            accountExist = False
+            username = id_info['name']
+            first_name = id_info['given_name']
+            last_name = id_info['family_name']
+            profile_picture = id_info['picture']
+
+            user = User.objects.create(email=email, first_name=first_name,last_name=last_name,profile_picture=profile_picture,username=username,
+                                          is_active=True, is_email_verified=True,user_type='doctor')
+            user.save()
+        
+        user = User.objects.get(email=email)
+        if user.is_active == False:
+            return Response({'detail': 'You are blocked by admin ! Please contact admin'}, status=status.HTTP_403_FORBIDDEN)
+        elif not user.is_doctor():
+            return Response({'detail': 'the account is alredy registerd as Patient'}, status=status.HTTP_403_FORBIDDEN)
+
+        else:
+            refresh = RefreshToken.for_user(user)
+            refresh["is_doctor"] = True
+            refresh["first_name"] = str(user.first_name)
+            refresh["is_admin"] = False
+
+        content = {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+            'isAdmin': False,
+            "isDoctor": True,
             'accountExist': accountExist,
         }
         print(content)

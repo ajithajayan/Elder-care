@@ -83,53 +83,42 @@ function DoctorLogin() {
       // }
     }
   }
-  const Google_login = async (user_detail) => {
-    const formData = new FormData();
-    formData.append("email", user_detail.email)
-    formData.append("password", "12345678874")
-    console.log("formData");
-    console.log(Object.fromEntries(formData))
-
-    try {
-      const res = await axios.post(baseUrl + 'auth/login', formData)
-      console.log(res);
-      if (res.status === 200) {
-        Cookies.set('access', res.data.access);
-        Cookies.set('refresh', res.data.refresh);
-        dispatch(
-          set_Authentication({
-            name: jwtDecode(res.data.access).first_name,
-            isAuthenticated: true,
-            isAdmin: res.data.isAdmin,
-            is_doctor:res.data.is_doctor,
-            
-          })
-        );
-        console.log(res.data.is_doctor,"this is the status");
-        if (res.data.is_doctor){
-          navigate('/doctor/dashboard')
-          return res 
-        }else{
-          navigate('/')
-          return res  
-        }
-
-
-
-        
-        
-      }
-
-      if (res.response.status === 401) {
-        navigate('/auth/signup')
-      }
-
-    }
-    catch (error) {
-      console.log(error);
-    }
-  }
   
+  const GoogleTestlogin = async(user_detail) =>{
+    const formData = {
+      client_id: user_detail,
+    } 
+    await axios.post(baseUrl + 'auth/google/doctor', formData).then((res)=>{
+      console.log(res)
+      Cookies.set("access", res.data.access);
+      Cookies.set("refresh", res.data.refresh);
+      dispatch(
+        set_Authentication({
+          name: jwtDecode(res.data.access).first_name,
+          isAuthenticated: true,
+          isAdmin: res.data.isAdmin,
+          is_doctor: res.data.is_doctor,
+        })
+      );
+      toast.success("You have successfully login")
+      if(!res.data.accountExist){
+      setTimeout(() => { toast.sucess('Welcome To Elder care') }, 3000);
+      }
+      navigate('/doctor/dashboard')
+      return res
+      
+    }).catch((err)=>{
+      console.log(err);
+      if (err.response.status === 401) {
+        navigate("/auth/doctor/login");
+      }else if(err.response.status === 403){
+        toast.error(err.response.data.detail)
+        console.log(err.response.data.detail)
+        navigate("/auth/doctor/login");
+      }
+
+    })
+  }
 
   return (
     <div className="login-container">
@@ -172,8 +161,8 @@ function DoctorLogin() {
           <div className="social-accounts">
             <GoogleLogin
               onSuccess={(credentialResponse) => {
-                Google_login(jwtDecode(credentialResponse.credential));
-                console.log(jwtDecode(credentialResponse.credential));
+                GoogleTestlogin(credentialResponse.credential);
+       
               }}
               onError={() => {
                 console.log("Login Failed");

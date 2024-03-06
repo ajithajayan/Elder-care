@@ -227,7 +227,7 @@ const PatientChatComponent = () => {
                                   <p className="text-sm">{msg.message}</p>
                                 </div>
                                 <span className="text-xs text-gray-500 leading-none">
-                                  2 min ago
+                                  {msg.timestamp}
                                 </span>
                               </div>
                               <div className="flex-shrink-0 h-10 w-10 rounded-full overflow-hidden">
@@ -256,7 +256,7 @@ const PatientChatComponent = () => {
                                   <p className="text-sm">{msg.message}</p>
                                 </div>
                                 <span className="text-xs text-gray-500 leading-none">
-                                  2 min ago
+                                {msg.timestamp}
                                 </span>
                               </div>
                             </div>

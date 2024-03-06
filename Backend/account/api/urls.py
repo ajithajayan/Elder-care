@@ -67,5 +67,12 @@ urlpatterns = [
     # for getting the Doctor cusom id using user id
 
     path("custom-id/doctor/<str:pk>",views.DoctorCustomIdView.as_view(),name="custom-id-doctor"),
+    # for google authentication for the patient
+    
+    path("google", views.UserGoogleAuth.as_view(), name="UserGoogleAuth"),
+   
+    # for google authentication for the Doctor
+
+    path("google/doctor", views.DoctorGoogleAuth.as_view(), name="UserGoogleAuth"),
 
 ]
