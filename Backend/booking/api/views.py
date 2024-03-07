@@ -28,7 +28,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.http import JsonResponse
 from rest_framework.exceptions import ValidationError
-
+from django.shortcuts import get_object_or_404
 channel_layer = get_channel_layer()
 # ************************************************************************************************************************************
 
@@ -299,6 +299,67 @@ class TransactionAPIView(APIView):
             }
             return Response(response, status=status.HTTP_400_BAD_REQUEST) 
         
+
+class PayUsingWalletAPIview(APIView):
+    def post(self, request):
+        transaction_serializer = TranscationModelSerializer(data=request.data)
+        
+        if transaction_serializer.is_valid():
+            try:
+                doctor_id = transaction_serializer.validated_data.get("doctor_id")
+                patient_id = transaction_serializer.validated_data.get("patient_id")
+                doctor = Doctor.objects.get(custom_id=doctor_id)
+                patient = Patient.objects.get(custom_id=patient_id)
+                wallet = Wallet.objects.get(patient=patient)
+
+                if wallet.balance >= transaction_serializer.validated_data.get("amount"):
+                    wallet.balance -= transaction_serializer.validated_data.get("amount")
+                    wallet.save()
+
+                    selected_from_time = transaction_serializer.validated_data.get("booked_from_time")
+                    selected_to_time = transaction_serializer.validated_data.get("booked_to_time")
+                    selected_day = transaction_serializer.validated_data.get("booked_date")
+
+                    doctor_availability = get_object_or_404(
+                        DoctorAvailability,
+                        doctor_id=doctor_id,
+                        day=selected_day,
+                        start_time__lte=selected_from_time,
+                        end_time__gte=selected_to_time
+                    )
+                    doctor_availability.is_booked = True
+                    doctor_availability.save()
+
+                    Notification.objects.create(
+                        Patient=patient,
+                        Doctor=doctor,
+                        message=f'{patient.user.first_name} has booked an appointment on {selected_day} @ {selected_from_time}.',
+                        receiver_type=Notification.RECEIVER_TYPE[1][0],
+                        notification_type=Notification.NOTIFICATION_TYPES[0][0]
+                    )
+
+                    transaction_serializer.save()
+
+                    response = {
+                        "status_code": status.HTTP_201_CREATED,
+                        "message": "Transaction created, and doctor availability updated"
+                    }
+                    return Response(response, status=status.HTTP_201_CREATED)
+                else:
+                    return Response({"error": "Insufficient balance in the wallet"}, status=status.HTTP_400_BAD_REQUEST)
+
+            except Exception as e:
+                print(e)
+                return Response({"error": "Doctor availability not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        else:
+            response = {
+                "status_code": status.HTTP_400_BAD_REQUEST,
+                "message": "Bad request",
+                "error": transaction_serializer.errors
+            }
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['POST'])
 def cancel_booking(request):

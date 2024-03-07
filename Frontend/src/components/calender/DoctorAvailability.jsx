@@ -20,7 +20,7 @@ const DoctorAvailability = ({ doctorId, fees,patient_id }) => {
   const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [loading, setLoading] = useState(false);
-
+  const [isCancelModalVisible, setCancel] = useState(false);
   
 
   useEffect(() => {
@@ -182,6 +182,51 @@ const DoctorAvailability = ({ doctorId, fees,patient_id }) => {
       });
   };
 
+
+  const handleWalletPayment = () => {
+    // Check slot availability before proceeding with payment
+    axios
+      .post(`${baseUrl}appointment/check-availability/`, {
+        doctor_id: doctorId,
+        selected_from_time: selectedTimeSlot.from,
+        selected_to_time: selectedTimeSlot.to,
+        selected_day: selectedDate.format("YYYY-MM-DD"),
+      })
+      .then((availabilityCheckResponse) => {
+        if (!availabilityCheckResponse.data.available) {
+          toast.warning("This slot is already booked. Please choose another slot.");
+          return;
+        }
+  
+        axios
+          .post(`${baseUrl}appointment/wallet/payment/`, {
+            payment_id: `wall-pay-${selectedDate.format("YYYY-MM-DD")}-${selectedTimeSlot.from}`,
+            amount: fees,
+            doctor_id: doctorId,
+            patient_id: patientID,
+            booked_date: selectedDate.format("YYYY-MM-DD"),
+            booked_from_time: selectedTimeSlot.from,
+            booked_to_time: selectedTimeSlot.to,
+          })
+          .then((response) => {
+            console.log(response.data);
+            if (response.status === 201) {
+              navigate("/sucess-page"); // Fix the typo here
+              toast.success("Payment successful!");
+            }
+          })
+          .catch((error) => {
+            console.log(error.response.data.error);
+            toast.error(error.response.data.error);
+          });
+      })
+      .catch((error) => {
+        console.error("Error during payment processing:", error);
+        // Consider displaying a user-friendly error message
+      });
+  };
+  
+
   const handleTimeSlotSelect = (timeSlot) => {
     setSelectedTimeSlot(timeSlot);
   };
@@ -231,12 +276,59 @@ const DoctorAvailability = ({ doctorId, fees,patient_id }) => {
       {selectedTimeSlot && (
         <>
           <button
-            onClick={handlePayment}
+            onClick={()=>{setCancel(true)}}
             className="bg-slate-950 text-slate-400 border border-slate-400 border-b-4 font-medium overflow-hidden relative px-4 py-2 rounded-md hover:brightness-150 hover:border-t-4 hover:border-b active:opacity-75 outline-none duration-300 group"
           >
             Book Appointment for {convertTo12HourFormat(selectedTimeSlot.from)}{" "}
             - {convertTo12HourFormat(selectedTimeSlot.to)}
           </button>
+
+          {isCancelModalVisible && (
+        <div className="fixed left-0 right-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto top-4 md:inset-0 h-modal sm:h-full">
+          <div className="w-full max-w-md px-4 md:h-auto">
+            <div className="fixed left-0 right-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto top-4 md:inset-0 h-modal sm:h-full">
+              <div className="w-full max-w-md px-4 md:h-auto">
+                <div className="relative bg-white rounded-lg shadow dark:bg-gray-800">
+                  <div className="flex justify-end p-2"></div>
+                  <div className="p-6 pt-0 text-center">
+                    <svg
+                      className="w-16 h-16 mx-auto text-red-600 mb-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    <h3 className="mt-5 mb-6 text-lg text-gray-500 dark:text-gray-400">
+                      Please select your payment method
+                    </h3>
+                    
+                    <button
+                      className="text-white bg-blue-400 hover:bg-blue-700 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-base inline-flex items-center px-3 py-2.5 text-center mr-2 dark:focus:ring-red-800"
+                      onClick={() => handleWalletPayment()}
+                    >
+                      Using Wallet
+                    </button>
+                    <button
+                      className="text-gray-900 bg-white hover:bg-gray-100 focus:ring-4 focus:ring-primary-300 border border-gray-200 font-medium inline-flex items-center rounded-lg text-base px-3 py-2.5 text-center dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700"
+                      onClick={() => handlePayment()}
+                    >
+                      Razorpay
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+          
         </>
       )}
     </div>

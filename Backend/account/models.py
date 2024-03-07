@@ -69,7 +69,7 @@ class User(AbstractBaseUser):
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     username = models.CharField(max_length=50, blank=True)
-    password = models.CharField(max_length=100)
+    password = models.CharField(max_length=100,blank=True,null=True)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50, blank=True)
     gender = models.CharField(max_length=10, choices=gender_type_choices, default='male')

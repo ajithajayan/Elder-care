@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import  DoctorBookingDetailsAPIView, DoctorSlotBulkUpdateView, DoctorSlotUpdateView,DoctorSlotsAPIView,DoctorSlotDeleteView,DocDetailList, DoctorTransactionsAPIView,DoctorsUserSideList, PatientBookingDetailsAPIView, PatientDetailList, PatientSlotsCheckingAPIView, PatientTransactionsAPIView,RazorpayOrderAPIView, TrasactionListAPIView, TrasactionRetriveAPIView, cancel_booking, cancel_booking_doctor,check_availability,TransactionAPIView    
+from .views import  DoctorBookingDetailsAPIView, DoctorSlotBulkUpdateView, DoctorSlotUpdateView,DoctorSlotsAPIView,DoctorSlotDeleteView,DocDetailList, DoctorTransactionsAPIView,DoctorsUserSideList, PatientBookingDetailsAPIView, PatientDetailList, PatientSlotsCheckingAPIView, PatientTransactionsAPIView, PayUsingWalletAPIview,RazorpayOrderAPIView, TrasactionListAPIView, TrasactionRetriveAPIView, cancel_booking, cancel_booking_doctor,check_availability,TransactionAPIView    
 
 urlpatterns = [
     path('doctors/<str:custom_id>/slots/', DoctorSlotsAPIView.as_view(), name='doctor-slots-api'),
@@ -35,6 +35,11 @@ urlpatterns = [
     path('detail/transaction/list/', TrasactionListAPIView.as_view(), name='doctor-slots-api'),
 
     path('detail/transaction/<str:pk>', TrasactionRetriveAPIView.as_view(), name='doctor-slots-api'),
+
+
+    # pay using wallet
+
+    path('wallet/payment/', PayUsingWalletAPIview.as_view(), name='wallet_order-payment'),
 
     # for cancel the booking from the patient side
 
