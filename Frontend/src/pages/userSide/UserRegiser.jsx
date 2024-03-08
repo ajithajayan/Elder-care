@@ -207,15 +207,7 @@ const Register = () => {
           <span>Confirm password</span>
         </label>
         <div className="flex-1 flex-row">
-          <GoogleLogin
-            onSuccess={(credentialResponse) => {
-              Google_reg(jwtDecode(credentialResponse.credential));
-              console.log(jwtDecode(credentialResponse.credential));
-            }}
-            onError={() => {
-              toast.error("Login Failed");
-            }}
-          />
+        
           <button type="submit" className="submit">
             Submit
           </button>

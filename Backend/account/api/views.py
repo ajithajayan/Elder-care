@@ -4,8 +4,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from account.models import  Doctor, OTPModel, Patient, User, Verification, Wallet
-from .serializers import  AdminClientUpdateSerializer, AdminDocUpdateSerializer, PatientSerializer, PatientUserSerializer, UserDetailsUpdateSerializer, UserDoctorCustomIDSerializer, UserPatientCustomIDSerializer, UserRegisterSerializer, UserSerializer, VerificationSerializer, WalletUpdateSerializer, adminDocVerificationSerializer
+from account.models import  Doctor, OTPModel, Patient, Rating, User, Verification, Wallet
+from .serializers import  AdminClientUpdateSerializer, AdminDocUpdateSerializer, DoctorRatingSerializer, PatientSerializer, PatientUserSerializer, UserDetailsUpdateSerializer, UserDoctorCustomIDSerializer, UserPatientCustomIDSerializer, UserRegisterSerializer, UserSerializer, VerificationSerializer, WalletUpdateSerializer, adminDocVerificationSerializer
 from django.contrib.auth import authenticate
 import random
 from django.core.mail import send_mail
@@ -462,3 +462,49 @@ class DoctorGoogleAuth(APIView):
         print(content)
 
         return Response(content, status=status.HTTP_200_OK)
+
+
+#  for updating the rating of the doctor
+    
+
+class DoctorRatingAPIView(generics.RetrieveUpdateAPIView):
+    queryset = Doctor.objects.all()
+    serializer_class = DoctorRatingSerializer
+
+    def get(self, request, *args, **kwargs):
+        doctor = self.get_object()
+        average_rating = doctor.rating
+        return Response({'average_rating': average_rating}, status=status.HTTP_200_OK)
+
+@api_view(['GET', 'POST'])
+def user_rating_view(request, *args, **kwargs):
+    if request.method == 'GET':
+        doctor = generics.get_object_or_404(Doctor, pk=kwargs['pk'])
+        user = request.user
+
+        try:
+            rating = Rating.objects.get(doctor=doctor, user=user).rating
+        except Rating.DoesNotExist:
+            rating = 0
+
+        return Response({'user_rating': rating}, status=status.HTTP_200_OK)
+
+    elif request.method == 'POST':
+        rating_value = request.data.get('rating')
+        custom_id=request.data.get('custom_id')
+        userID=request.data.get('userID')
+        user = User.objects.get(id=userID)
+        doctor = Doctor.objects.get(custom_id=custom_id)
+
+        try:
+            rating_instance = Rating.objects.get(doctor=doctor, user=user)
+            rating_instance.rating = rating_value
+            rating_instance.save()
+        except Rating.DoesNotExist:
+            Rating.objects.create(doctor=doctor, user=user, rating=rating_value)
+
+        # After updating the user's rating, recalculate the average rating for the doctor
+        doctor.calculate_average_rating()
+
+        return Response({'user_rating': rating_value}, status=status.HTTP_200_OK)
+     

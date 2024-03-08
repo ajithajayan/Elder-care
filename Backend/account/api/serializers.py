@@ -1,5 +1,5 @@
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer,TokenRefreshSerializer
-from account.models import Doctor, Patient, User, Verification, Wallet
+from account.models import Doctor, Patient, Rating, User, Verification, Wallet
 
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
@@ -169,4 +169,17 @@ class UserDoctorCustomIDSerializer(serializers.ModelSerializer):
     doctor_user=DoctorCustomIDSerializer(read_only=True)
     class Meta:
         model = User
-        fields = ['id','first_name','doctor_user']        
+        fields = ['id','first_name','doctor_user']     
+
+
+
+
+class DoctorRatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Doctor
+        fields = ['rating']
+
+class RatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rating
+        fields = ['rating']                  

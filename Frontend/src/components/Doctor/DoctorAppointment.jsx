@@ -32,10 +32,9 @@ function DoctorAppointment() {
                 <a className="text-blue-600 hover:text-black">Time Slots</a>
               </h5>
               <div className="text-slate-800 text-base leading-6 mt-2 max-md:max-w-full">
-                Manage your schedule effortlessly. Doctors, easily adjust your
-                availability for appointments
+                Manage your schedule effortlessly.Easily adjust your availability for appointments
                 <br />
-                with our user-friendly time slot allocation system.
+                with our allocation system.
               </div>
             </div>
           </div>
@@ -77,24 +76,24 @@ function DoctorAppointment() {
                 </a>
               </h5>
               <div className="text-slate-800 text-base leading-6 mt-2 max-md:max-w-full">
-                Access comprehensive patient information at your fingertips.
-                Stay informed,
+                Access comprehensive patient information.
                 <br />
-                view and manage patient details seamlessly for effective
-                healthcare.
+                view patient details seamlessly for effective healthcare.
               </div>
             </div>
           </div>
         </Link>
       </main>
 
-      <div className="flex items-center justify-center">
+      
+
+      {/* <div className="flex items-center justify-center">
         <Link>
         <button className=" bg-blue-400 text-wrap  w-40 h-14 text-xl font-semibold rounded-2xl transform hover:scale-x-110 hover:scale-y-110 hover:bg-gradient-to-r from-teal-500 to-purple-500 transition-all duration-500">
           Appointments
         </button>
         </Link>
-      </div>
+      </div> */}
     </div>
   );
 }

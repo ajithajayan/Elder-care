@@ -75,4 +75,11 @@ urlpatterns = [
 
     path("google/doctor", views.DoctorGoogleAuth.as_view(), name="UserGoogleAuth"),
 
+
+    # for the doctor rating
+
+    path('doctor/<str:pk>/average-rating/', views.DoctorRatingAPIView.as_view(), name='doctor-average-rating'),
+
+    path('doctor/<str:pk>/user-rating/', views.user_rating_view, name='user-doctor-rating'),
+
 ]

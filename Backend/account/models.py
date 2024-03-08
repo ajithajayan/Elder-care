@@ -175,10 +175,30 @@ class Doctor(models.Model):
                 self.custom_id = 'D5000'
         super().save(*args, **kwargs)
 
+
+    def calculate_average_rating(self):
+        ratings = self.ratings.all()
+        if ratings.exists():
+            total_ratings = ratings.count()
+            sum_ratings = ratings.aggregate(models.Sum('rating'))['rating__sum']
+            self.rating = sum_ratings // total_ratings
+        else:
+            self.rating = 0
+        self.save()
+
     @property
     def availability(self):
         # This assumes DoctorAvailability has a ForeignKey to Doctor named 'doctor'
         return self.doctoravailability_set.all()
+
+class Rating(models.Model):
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE, related_name='ratings')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    rating = models.IntegerField()
+
+    class Meta:
+        unique_together = ['doctor', 'user']
+
 
 
 class Patient(models.Model):

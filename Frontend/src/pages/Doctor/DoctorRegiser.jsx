@@ -206,15 +206,7 @@ const DoctorRegister = () => {
           <span>Confirm password</span>
         </label>
         <div className="flex-1 flex-row">
-          <GoogleLogin
-            onSuccess={(credentialResponse) => {
-              Google_reg(jwtDecode(credentialResponse.credential));
-              console.log(jwtDecode(credentialResponse.credential));
-            }}
-            onError={() => {
-              console.log("Login Failed");
-            }}
-          />
+        
           <button type="submit" className="submit" onClick={handleSubmit}>
             Submit
           </button>

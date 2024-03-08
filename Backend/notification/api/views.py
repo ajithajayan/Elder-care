@@ -39,3 +39,6 @@ class UpdateNotificationSeenStatusView(generics.UpdateAPIView):
         instance.is_seen = True
         instance.save()
         return Response({'status': 'success', 'message': 'Notification seen status updated'}, status=status.HTTP_200_OK)
+
+
+

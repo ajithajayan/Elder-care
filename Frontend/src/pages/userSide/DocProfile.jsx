@@ -13,6 +13,7 @@ import docavatar from '../../assets/images/doctor/docavatar.webp'
 import { useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
+import Rating from "../../components/Rating/Rating";
 
 function DocProfile() {
   const { id } = useParams();
@@ -113,6 +114,8 @@ function DocProfile() {
                     ? doct.user.first_name + " " + doct.user.last_name
                     : ""}
                 </h1>
+                <Rating doctorId={id}/>
+
                 <p className="text-gray-700">
                   {doct.specializations ? doct.specializations : "General"}
                 </p>
@@ -124,6 +127,10 @@ function DocProfile() {
                   >
                     Book appointment
                   </a>
+                </div>
+
+                <div className="mt-6 flex flex-wrap gap-4 justify-center">
+            
                 </div>
               </div>
               <hr className="my-6 border-t border-gray-300" />
