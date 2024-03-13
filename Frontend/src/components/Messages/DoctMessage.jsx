@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { w3cwebsocket as W3CWebSocket } from "websocket";
 import "./ChatComponent.css";
 import { useSelector } from "react-redux";
@@ -9,6 +9,7 @@ import { jwtDecode } from "jwt-decode";
 import docavatar from "../../assets/images/doctor/docavatar.webp";
 import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
 const DoctorChatComponent = () => {
+  const chatContainerRef = useRef();
   const [message, setMessage] = useState("");
   const [chatMessages, setChatMessages] = useState([]);
   const [bookings, setBookings] = useState([]);
@@ -60,6 +61,30 @@ const DoctorChatComponent = () => {
     fetchUserID();
   }, []);
 
+
+  useEffect(() => {
+    // Function to scroll to the bottom of the chat container
+    const scrollToBottom = () => {
+      if (chatContainerRef.current) {
+        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      }
+    };
+
+    // Scroll to bottom whenever new messages are added
+    scrollToBottom();
+  }, [chatMessages]);
+
+  useLayoutEffect(() => {
+    // Function to scroll to the bottom of the chat container
+    const scrollToBottom = () => {
+      if (chatContainerRef.current) {
+        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      }
+    };
+
+    // Scroll to bottom after the DOM has been updated
+    scrollToBottom();
+  }, [chatMessages]);
   const connectToWebSocket = (appointmentId) => {
     if (!appointmentId) return;
 
@@ -195,7 +220,7 @@ const DoctorChatComponent = () => {
                   ))}
                 </ul>
               </div>
-              <div className="chat-window h-96">
+              <div className="chat-window h-96" ref={chatContainerRef}>
                 {selectedAppointment && (
                   <div className="flex flex-col flex-grow w-screen h-full max-w-xl bg-white shadow-xl rounded-lg overflow-hidden">
                     <div className="selected-doctor-info d-flex align-items-center">
