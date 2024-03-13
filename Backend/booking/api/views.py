@@ -1,11 +1,10 @@
 # views.py
-import datetime
 from xml.dom import ValidationErr
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from notification.models import Notification
 from booking.models import DoctorAvailability, Transaction
-from .serializers import AdminDocUpdateSerializer, AdminPatientUpdateSerializer, DoctorAvailabilitySerializer, DoctorSlotBulkUpdateSerializer, DoctorSlotUpdateSerializer, RazorpayOrderSerializer, TransactionPatientSerializer, TranscationModelList, TranscationModelSerializer, UserDetailsUpdateSerializer
+from .serializers import AdminDocUpdateSerializer, AdminPatientUpdateSerializer, AdvancedSlotUpdateSerializer, DeleteSlotsSerializer, DoctorAvailabilitySerializer, DoctorSlotBulkUpdateSerializer, DoctorSlotUpdateSerializer, RazorpayOrderSerializer, TransactionPatientSerializer, TranscationModelList, TranscationModelSerializer, UserDetailsUpdateSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -30,6 +29,8 @@ from django.http import JsonResponse
 from rest_framework.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 channel_layer = get_channel_layer()
+from datetime import timedelta,date
+from django.db.models import F
 # ************************************************************************************************************************************
 
 
@@ -72,6 +73,25 @@ class DoctorSlotBulkUpdateView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class AdvancedSlotUpdateView(APIView):
+    def post(self, request, custom_id):
+        try:
+            doctor = Doctor.objects.get(custom_id=custom_id)
+        except Doctor.DoesNotExist:
+            return Response({"error": "Doctor not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = AdvancedSlotUpdateSerializer(data=request.data, context={'doctor': doctor})
+        try:
+            serializer.is_valid(raise_exception=True)
+            slots = serializer.update_doctor_slots(doctor)
+            return Response({"message": "Slots created successfully", "slots": slots}, status=status.HTTP_200_OK)
+        except ValidationError as e:
+            if 'overlap_error' in e.get_codes():
+                return Response({"error": str(e)}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)     
+
+
+
 class DoctorSlotsAPIView(APIView):
     def get(self, request, custom_id):
         try:
@@ -86,7 +106,7 @@ class DoctorSlotsAPIView(APIView):
             return Response({'error': 'Date parameter is required'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            date = datetime.datetime.strptime(date_param, '%Y-%m-%d').date()
+            date_object = date.fromisoformat(date_param)
         except ValueError:
             return Response({'error': 'Invalid date format'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -96,12 +116,11 @@ class DoctorSlotsAPIView(APIView):
         # Retrieve and serialize the available slots for the specified date
         slots = {
             'available_slots': [
-                {'from': slot.start_time, 'to': slot.end_time, 'is_booked': slot.is_booked} for slot in doctor_with_availability.doctoravailability_set.filter(day=date)
+                {'from': slot.start_time, 'to': slot.end_time, 'is_booked': slot.is_booked} for slot in doctor_with_availability.doctoravailability_set.filter(day=date_object)
             ]
         }
 
         return Response(slots, status=status.HTTP_200_OK)
-
 
 class PatientSlotsCheckingAPIView(APIView):
     def get(self, request, custom_id):
@@ -117,7 +136,7 @@ class PatientSlotsCheckingAPIView(APIView):
             return Response({'error': 'Date parameter is required'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            date = datetime.datetime.strptime(date_param, '%Y-%m-%d').date()
+            requested_date = date.fromisoformat(date_param)
         except ValueError:
             return Response({'error': 'Invalid date format'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -127,11 +146,11 @@ class PatientSlotsCheckingAPIView(APIView):
         # Retrieve and serialize the available slots for the specified date
         slots = {
             'available_slots': [
-                {'from': slot.start_time, 'to': slot.end_time, 'is_booked': slot.is_booked} for slot in doctor_with_availability.doctoravailability_set.filter(day=date,is_booked=False)
+                {'from': slot.start_time, 'to': slot.end_time, 'is_booked': slot.is_booked} for slot in doctor_with_availability.doctoravailability_set.filter(day=requested_date, is_booked=False)
             ]
         }
 
-        return Response(slots, status=status.HTTP_200_OK)   
+        return Response(slots, status=status.HTTP_200_OK) 
 
 
 class DoctorSlotDeleteView(APIView):
@@ -154,6 +173,7 @@ class DoctorSlotDeleteView(APIView):
         except Exception as e:
             return Response({"error": f"Error deleting slot: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+
 
 
 #****************************************** doctor detail page listing **************************************
@@ -624,4 +644,67 @@ class PatientTransactionsAPIView(APIView):
             data.append(transaction_data)
 
         return Response(data, status=status.HTTP_200_OK)
+    
+# *****************************************Docotr leave Api View**************************************************
+    
 
+from datetime import datetime
+
+class DoctorLeaveUpdateAPIView(APIView):
+    def post(self, request, *args, **kwargs):
+        doctor_id = request.data.get('custom_id')
+        from_date_str = request.data.get('fromDate')
+        to_date_str = request.data.get('toDate')
+
+        try:
+            doctor = Doctor.objects.get(custom_id=doctor_id)
+
+            # Convert string dates to datetime objects
+            from_date = datetime.strptime(from_date_str, "%Y-%m-%d")
+            to_date = datetime.strptime(to_date_str, "%Y-%m-%d")
+
+            # Fetch all doctor availability instances within the given date range
+            doctor_availability = DoctorAvailability.objects.filter(
+                doctor=doctor,
+                day__range=(from_date, to_date)
+            )
+
+            for slot in doctor_availability:
+                if slot.is_booked:
+                    try:
+                        transaction = Transaction.objects.get(
+                            doctor_id=doctor_id,
+                            booked_date=slot.day,
+                            booked_from_time=slot.start_time,
+                            booked_to_time=slot.end_time
+                        )
+
+                        try:
+                            patient = Patient.objects.get(custom_id=transaction.patient_id)
+                            patient_wallet = Wallet.objects.get(patient=patient)
+                            patient_wallet.balance = F('balance') + transaction.amount
+                            patient_wallet.save()
+
+                            transaction.status = 'REFUNDED'
+                            transaction.save()
+
+                            # Use F() expression for atomic update without the need for fetch
+                            DoctorAvailability.objects.filter(id=slot.id, is_booked=True).update(is_booked=False)
+                            slot.delete()
+
+                        except Patient.DoesNotExist:
+                            return JsonResponse({"error": f"Patient not found for transaction {transaction.id}"}, status=status.HTTP_404_NOT_FOUND)
+                    except Transaction.DoesNotExist:
+                        # Handle if the transaction is not found
+                        pass
+                else:
+                    # If the slot is not booked, delete it
+                    slot.delete()
+
+                # Increment the date for the next iteration
+                from_date += timedelta(days=1)
+
+        except Doctor.DoesNotExist:
+            return JsonResponse({"error": "Doctor not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        return JsonResponse({"message": "Leave applied successfully"}, status=status.HTTP_200_OK)

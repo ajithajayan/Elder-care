@@ -10,6 +10,8 @@ import { DateCalendar } from "@mui/x-date-pickers";
 import { TrashIcon } from "@heroicons/react/24/solid";
 import moment from "moment";
 import DoctorWeeklySlotBooking from "./DoctorWeeklySlotBooking";
+import AdvancedSlotBooking from "./AdvancedSlotBooking";
+import DoctorLeave from "./DoctorLeave";
 
 const DoctorSlotBooking = ({ docid }) => {
   const [selectedDate, setSelectedDate] = useState(dayjs());
@@ -20,12 +22,13 @@ const DoctorSlotBooking = ({ docid }) => {
   const currentTime = dayjs(new Date());
   const [isBulkBooking, setBulk] = useState(false);
   const [isNormalBooking, setNormal] = useState(true);
-  const [isRefresh,setRefresh]=useState(false);
+  const [isRefresh, setRefresh] = useState(false);
+  const [isAdvancedBooking, setAdvanceBooking] = useState(false);
 
   useEffect(() => {
     // Fetch existing time slots for the selected date and update state
     fetchAvailableSlots();
-  }, [selectedDate, docid,isRefresh]);
+  }, [selectedDate, docid, isRefresh]);
 
   // function to fetch the available slots
 
@@ -94,11 +97,11 @@ const DoctorSlotBooking = ({ docid }) => {
       // Convert the selected time range to moment objects
       const fromTimeFormatted = moment(fromTime.$d);
       const toTimeFormatted = moment(toTime.$d);
-  
+
       // Set the allowed time range
       const allowedStartTime = moment("05:00:00", "HH:mm:ss");
       const allowedEndTime = moment("22:00:00", "HH:mm:ss");
-  
+
       // Check if the selected time range is within the allowed range
       if (
         fromTimeFormatted.isBefore(allowedStartTime) ||
@@ -107,17 +110,17 @@ const DoctorSlotBooking = ({ docid }) => {
         toast.warning("Slot allocation time should be between 5 am and 10 pm.");
         return;
       }
-  
+
       // Calculate the duration in minutes
       const durationInMinutes = toTimeFormatted.diff(
         fromTimeFormatted,
         "minutes"
       );
-  
+
       // Define min and max slot durations
       const minSlotDuration = 20;
       const maxSlotDuration = 40;
-  
+
       // Check if the duration is within the allowed range
       if (
         durationInMinutes < minSlotDuration ||
@@ -128,28 +131,35 @@ const DoctorSlotBooking = ({ docid }) => {
         );
         return;
       }
-  
+
       // Get the current date and time
       const currentDate = moment();
       const currentDateTime = currentDate.format("YYYY-MM-DD HH:mm:ss");
-  
+
       // Combine selected date and time
       const selectedDateTime = moment(
-        `${selectedDate.format("YYYY-MM-DD")} ${fromTimeFormatted.format("HH:mm:ss")}`
+        `${selectedDate.format("YYYY-MM-DD")} ${fromTimeFormatted.format(
+          "HH:mm:ss"
+        )}`
       );
-  
+
       // Check if the selected date is the current date and selected time is after 30 minutes from the current time
-      if (selectedDateTime.isSame(currentDate, 'day') && selectedDateTime.isBefore(currentDate.add(30, 'minutes'))) {
-        toast.warning("Selected time should be at least 30 minutes from the current time.");
+      if (
+        selectedDateTime.isSame(currentDate, "day") &&
+        selectedDateTime.isBefore(currentDate.add(30, "minutes"))
+      ) {
+        toast.warning(
+          "Selected time should be at least 30 minutes from the current time."
+        );
         return;
       }
-  
+
       const newSlot = {
         from_time: fromTimeFormatted.format("HH:mm:ss"),
         to_time: toTimeFormatted.format("HH:mm:ss"),
       };
       const updatedSlots = [newSlot];
-  
+
       axios
         .post(baseUrl + `appointment/doctors/${docid}/update_slots/`, {
           date: selectedDate.format("YYYY-MM-DD"),
@@ -169,8 +179,7 @@ const DoctorSlotBooking = ({ docid }) => {
       toast.warning("Please select from and to time");
     }
   };
-  
-  
+
   // ******************************** Docotr slot Deletion function *************************
 
   const handleDeleteSlot = (index) => {
@@ -220,18 +229,37 @@ const DoctorSlotBooking = ({ docid }) => {
             >
               Save Slots
             </button>
-            <button
-              onClick={() => {
-                setBulk(true);
-                setNormal(false);
-              }}
-              className="  text-white bg-gray-400 ml-10 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-            >
-              Create slot for a bulk date
-            </button>
+            <div className="block flex justify-items-start pt-8">
+              <button
+                onClick={() => {
+                  setBulk(true);
+                  setNormal(false);
+                }}
+                className="  text-white bg-gray-400 ml-10 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+              >
+                Create slot for a bulk date
+              </button>
+
+              <button
+                onClick={() => {
+                  setBulk(false);
+                  setNormal(false);
+                  setAdvanceBooking(true);
+                }}
+                className="  text-white bg-gray-400 ml-10 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+              >
+                Advanced slot creation
+              </button>
+            </div>
           </>
         )}
-        {isBulkBooking && <DoctorWeeklySlotBooking docid={docid} setRefresh={setRefresh}/>}
+        <DoctorLeave docid={docid} setRefresh={setRefresh}/>
+        {isBulkBooking && (
+          <DoctorWeeklySlotBooking docid={docid} setRefresh={setRefresh} setBulk={setBulk} setNormal={setNormal} setAdvanceBooking={setAdvanceBooking}   />
+        )}
+        {isAdvancedBooking && (
+          <AdvancedSlotBooking docid={docid} setRefresh={setRefresh} setBulk={setBulk} setNormal={setNormal} setAdvanceBooking={setAdvanceBooking}/>
+        )}
       </div>
       <h2 className="font-bold p-2 mb-2 border-2 border-black">
         Created Time Slots for - {selectedDate.format("YYYY-MM-DD")}
@@ -257,11 +285,12 @@ const DoctorSlotBooking = ({ docid }) => {
                 {`${convertTo12HourFormat(
                   timeSlot.from
                 )} - ${convertTo12HourFormat(timeSlot.to)}`}
-                {!timeSlot.is_booked &&
-                <TrashIcon
-                  className="h-5 w-5 text-red-500 cursor-pointer "
-                  onClick={() => handleDeleteSlot(index)}
-                />}
+                {!timeSlot.is_booked && (
+                  <TrashIcon
+                    className="h-5 w-5 text-red-500 cursor-pointer "
+                    onClick={() => handleDeleteSlot(index)}
+                  />
+                )}
               </li>
             ))}
           </ul>

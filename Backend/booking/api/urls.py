@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import  DoctorBookingDetailsAPIView, DoctorSlotBulkUpdateView, DoctorSlotUpdateView,DoctorSlotsAPIView,DoctorSlotDeleteView,DocDetailList, DoctorTransactionsAPIView,DoctorsUserSideList, PatientBookingDetailsAPIView, PatientDetailList, PatientSlotsCheckingAPIView, PatientTransactionsAPIView, PayUsingWalletAPIview,RazorpayOrderAPIView, TrasactionListAPIView, TrasactionRetriveAPIView, cancel_booking, cancel_booking_doctor,check_availability,TransactionAPIView    
+from .views import  AdvancedSlotUpdateView, DoctorBookingDetailsAPIView, DoctorSlotBulkUpdateView, DoctorSlotUpdateView,DoctorSlotsAPIView,DoctorSlotDeleteView,DocDetailList, DoctorTransactionsAPIView,DoctorsUserSideList, PatientBookingDetailsAPIView, PatientDetailList, PatientSlotsCheckingAPIView, PatientTransactionsAPIView, PayUsingWalletAPIview,RazorpayOrderAPIView, TrasactionListAPIView, TrasactionRetriveAPIView, cancel_booking, cancel_booking_doctor,check_availability,TransactionAPIView,DoctorLeaveUpdateAPIView    
 
 urlpatterns = [
     path('doctors/<str:custom_id>/slots/', DoctorSlotsAPIView.as_view(), name='doctor-slots-api'),
@@ -12,7 +12,14 @@ urlpatterns = [
     # slot updation for a bulk data
     path('doctors/<str:custom_id>/update_slots/bulk/', DoctorSlotBulkUpdateView.as_view(), name='update-doctor-slots-bulk'),
 
+    # Advanvanced slot creation from the doctor side
+    path('doctors/<str:custom_id>/update_slots/advanced/', AdvancedSlotUpdateView.as_view(), name='update-doctor-advacedSlot'),
+
     path('doctors/<str:custom_id>/delete_slot/', DoctorSlotDeleteView.as_view(), name='delete-slot'),
+
+    # apply leave for the doctor for the selected time period
+
+    path('doctors/<str:custom_id>/update_leave/',DoctorLeaveUpdateAPIView.as_view(),name='doctorLeave-update'),
 
     #  to get the single Doctor details based on the custom id
     path("detail/doctors/<str:pk>", DocDetailList().as_view(), name="Doc-list"),

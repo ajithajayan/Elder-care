@@ -108,6 +108,123 @@ class DoctorSlotBulkUpdateSerializer(serializers.Serializer):
 
         except Exception as e:
             raise serializers.ValidationError(f"Error updating doctor slots: {str(e)}")
+        
+
+
+
+# Advanced SlotBooking Serializer
+        
+from datetime import datetime, timedelta, time
+from rest_framework import serializers
+
+
+class AdvancedSlotUpdateSerializer(serializers.Serializer):
+    fromDate = serializers.DateField()
+    toDate = serializers.DateField()
+    fromTimeInMinutes = serializers.TimeField()
+    toTimeInMinutes = serializers.TimeField()
+    bufferTimeInMinutes = serializers.IntegerField()
+    fromBreakTimeInMinutes = serializers.TimeField()
+    toBreakTimeInMinutes = serializers.TimeField()
+    workingdaysOfWeek = serializers.ListField(child=serializers.CharField())
+    slot_duration = serializers.IntegerField()
+
+    def validate(self, data):
+        from_date = data['fromDate']
+        to_date = data['toDate']
+        from_time = data['fromTimeInMinutes']
+        to_time = data['toTimeInMinutes']
+        buffer_time = data['bufferTimeInMinutes']
+        break_start_time = data['fromBreakTimeInMinutes']
+        break_end_time = data['toBreakTimeInMinutes']
+        working_days = data['workingdaysOfWeek']
+        slot_duration = data['slot_duration']
+
+        if from_date > to_date:
+            raise serializers.ValidationError("Invalid date range. 'fromDate' should be before or equal to 'toDate'.")
+
+        if from_time >= to_time:
+            raise serializers.ValidationError("Invalid time range. 'fromTimeInMinutes' should be before 'toTimeInMinutes'.")
+
+        if break_start_time >= break_end_time:
+            raise serializers.ValidationError("Invalid break time range. 'fromBreakTimeInMinutes' should be before 'toBreakTimeInMinutes'.")
+
+        return data
+
+    def update_doctor_slots(self, doctor):
+        try:
+            from_date = self.validated_data['fromDate']
+            to_date = self.validated_data['toDate']
+            working_days = self.validated_data['workingdaysOfWeek']
+            slot_duration = self.validated_data['slot_duration']
+            break_start_time = self.validated_data['fromBreakTimeInMinutes']
+            break_end_time = self.validated_data['toBreakTimeInMinutes']
+            from_time = self.validated_data['fromTimeInMinutes']
+            to_time = self.validated_data['toTimeInMinutes']
+            buffer_time = self.validated_data['bufferTimeInMinutes']
+
+            current_date = from_date
+            all_slots = []
+
+            while current_date <= to_date:
+                day_str = current_date.strftime('%Y-%m-%d')
+                if current_date.weekday() in [self.get_weekday_number(weekday) for weekday in working_days]:
+                    slots = self.create_slots_for_day(doctor, current_date, slot_duration, break_start_time, break_end_time, from_time, to_time, buffer_time)
+                    all_slots.append({"day": day_str, "slots": slots})
+                current_date += timedelta(days=1)
+
+            return all_slots
+
+        except Exception as e:
+            raise serializers.ValidationError(f"Error updating doctor slots: {str(e)}")
+
+    def create_slots_for_day(self, doctor, current_date, slot_duration, break_start_time, break_end_time, from_time, to_time, buffer_time):
+        working_days = self.validated_data['workingdaysOfWeek']
+
+        if current_date.weekday() not in [self.get_weekday_number(weekday) for weekday in working_days]:
+            return []  # No slots for non-working days
+
+        slots = []
+        current_time = self.time_to_minutes(from_time)
+
+        while current_time + (slot_duration + buffer_time) <= self.time_to_minutes(to_time):
+            # Check if the current time falls within the break time range
+            if break_start_time <= self.minutes_to_time(current_time) < break_end_time:
+                current_time += slot_duration + buffer_time
+                continue  # Skip slot creation during break time
+
+            slot_start_time = self.minutes_to_time(current_time)
+            slot_end_time = self.minutes_to_time(current_time + slot_duration)
+
+            # Check for overlap or duplication of slots
+            if not DoctorAvailability.objects.filter(doctor=doctor, day=current_date, start_time__lt=slot_end_time, end_time__gt=slot_start_time).exists():
+                DoctorAvailability.objects.create(
+                    doctor=doctor,
+                    day=current_date,
+                    start_time=slot_start_time,
+                    end_time=slot_end_time
+                )
+                slots.append({"start_time": slot_start_time.strftime('%H:%M:%S'), "end_time": slot_end_time.strftime('%H:%M:%S')})
+
+            current_time += slot_duration + buffer_time
+
+        return slots
+
+
+    @staticmethod
+    def get_weekday_number(weekday):
+        weekdays_map = {'Monday': 0, 'Tuesday': 1, 'Wednesday': 2, 'Thursday': 3, 'Friday': 4, 'Saturday': 5, 'Sunday': 6}
+        return weekdays_map.get(weekday)
+
+    @staticmethod
+    def time_to_minutes(time_obj):
+        return time_obj.hour * 60 + time_obj.minute
+
+    @staticmethod
+    def minutes_to_time(minutes):
+        return time(minutes // 60, minutes % 60)
+
+
 
 
 class DOCUserSerializer(serializers.ModelSerializer):
@@ -202,3 +319,14 @@ class TransactionPatientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
         fields = '__all__'       
+
+
+
+
+# for apply leave on a date range for  the docotor and delete the slotes on that day
+        
+class DeleteSlotsSerializer(serializers.Serializer):
+    start_time = serializers.TimeField()
+    end_time = serializers.TimeField()
+    
+            
